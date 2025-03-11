@@ -1,0 +1,25 @@
+{
+  "name": "win",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-ec2": "^3.750.0",
+    "@aws-sdk/client-route-53": "^3.750.0",
+    "@aws-sdk/client-ssm": "^3.758.0",
+    "axios": "^1.7.9",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.13.0",
+    "nodemailer": "^6.10.0",
+    "socket.io": "^4.8.1"
+  }
+}

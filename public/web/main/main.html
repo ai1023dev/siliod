@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <a href="/login/google?state=google_login">구글 로그인</a>
+    <br><br>
+    <!-- <iframe src="https://siliod-vnc-0.duckdns.org:6080/" frameborder="0"></iframe> -->
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        console.log(params.get("state")); // 특정 키의 값 가져오기
+
+
+        if (params.get("state") === 'google_join') {
+            $("body").append(`<a href="/login/google?state=google_join">구글 회원가입</a>`);
+        }
+
+
+        $.ajax({
+            method: 'GET',
+            url: '/my_data',
+            success: function (data) {
+                console.log(data)
+                $("body").append(`<h2>${data.name}</h2>`);
+                $("body").append(`<img src="${data.avatar_url}">`);
+            },
+            error: function (xhr, status, error) {
+                alert('서버 측 에러')
+            }
+        });
+    </script>
+</body>
+</html>
