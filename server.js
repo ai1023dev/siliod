@@ -382,7 +382,7 @@ async function startServer() {
                     body: new URLSearchParams({
                         code,
                         client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
-                        client_secret: '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',
+                        client_secret: process.env.GOOGLE_SECRET,
                         redirect_uri: `http://localhost:8080/${params}/google/redirect`,
                         grant_type: 'authorization_code',
                     }),
