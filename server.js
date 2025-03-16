@@ -56,8 +56,8 @@ async function startServer() {
         async function createEC2Instance() {
             try {
                 const params = {
-                    ImageId: "ami-03f19793fc72b1ca2", // 사용할 AMI ID
-                    InstanceType: "t3.nano", // 인스턴스 유형
+                    ImageId: "ami-0cb91c7de36eed2cb", // 우분투 AMI ID
+                    InstanceType: "t3.medium", // 인스턴스 유형
                     KeyName: "keypair", // 🔹 기존 키 페어 이름 입력
                     SecurityGroupIds: ["sg-0c75bf8745ed0900f"], // 🔹 보안 그룹 ID
                     SubnetId: "subnet-0d2fb1c4561c35943",
@@ -98,33 +98,79 @@ async function startServer() {
 
 
 
-        (async () => {
+        (async () => { ///////////////////////////////////////////////////////////////////////////// 노헙.아웃 안생기게     인스턴트 미리 만들기
             try {
-                // const instanceId = 'i-0b09bd322f15f5493'; // EC2 생성
+                // const instanceId = 'i-022c71624b97ea878'; // EC2 생성
                 const instanceId = await createEC2Instance(); // EC2 생성
                 const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
-                await updateRoute53Record(instanceId, publicIp);
+                // await updateRoute53Record(instanceId, publicIp);
+                // await updateRoute53Record('00123456', publicIp);
 
                 // 실행할 명령어 입력
-                const command1 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com`;
-                // const command2 = 'echo -e "xxxxxx\nxxxxxx\nn" | vncpasswd';
-                // const command2 = 'sudo reboot';
-                // const command3 = 'git clone https://github.com/novnc/noVNC.git .novnc';
-                const command4 = `vncserver :1`;
-                const command5 = `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/fullchain.pem --key /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/privkey.pem --listen 443`;
+                // const command = `sudo /home/ubuntu/.start.sh ${instanceId.substring(2)}`;
+                // const command1 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com`;
+                // const command2 = 'git clone https://github.com/novnc/noVNC.git .novnc';
+                // const command3 = 'sudo touch /root/.Xauthority && sudo chown root:root /root/.Xauthority && sudo chmod 600 /root/.Xauthority';
+                // // const command4 = 'echo -e "xxxxxx\nxxxxxx\nn" | vncpasswd';
+                // const command5 = `echo -e "xxxxxx\nxxxxxx\nn" | vncserver :1`;
+                // // const command5 = `vncserver :1`;
+                // const command6 = `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/fullchain.pem --key /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/privkey.pem --listen 443`;
 
                 // const command2 = `echo -e "@reboot /home/ubuntu/.novnc/start_vnc.sh ${instanceId.substring(2)}" | crontab -`;
                 // const command3 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com`;
                 // const command4 = `/home/ubuntu/.novnc/start_vnc.sh ${instanceId.substring(2)}`;
+                // await runSSHCommand(publicIp, command1);
+                // await runSSHCommand(publicIp, command2);
+                // await runSSHCommand(publicIp, command3);
+                // await runSSHCommand(publicIp, command4);
+                // await runSSHCommand(publicIp, command5);
+                // await runSSHCommand(publicIp, command6);
+
+                // 1. 시스템 패키지 업데이트 및 필수 패키지 설치
+                const command1 = "sudo apt-get update -y";
+                const command2 = "sudo apt-get upgrade -y";
+
+                // 2. LightDM을 기본 디스플레이 매니저로 자동 설정
+                const command3 = 'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections';
+                const command4 = 'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections';
+
+                // 3. 패키지 설치 (프롬프트 없이 진행)
+                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tightvncserver xfce4 xfce4-goodies lightdm thunar";
+
+                // 4. VNC 서버 비밀번호 자동 설정
+                const command6 = "mkdir -p ~/.vnc";
+                const command7 = 'echo "123456" | vncpasswd -f > ~/.vnc/passwd';
+                const command8 = "chmod 600 ~/.vnc/passwd";
+
+                // 5. VNC xstartup 파일 생성
+                const command9 = "echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb \$HOME/.Xresources' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup";
+                const command10 = "chmod +x ~/.vnc/xstartup";
+
+                // 6. noVNC 다운로드 및 실행
+                const command11 = "git clone https://github.com/novnc/noVNC.git ~/.novnc";
+
+                // 7. VNC 서버 시작 (비밀번호 프롬프트 없이 실행)
+                const command12 = "vncserver :1 -geometry 1920x1080 -depth 24";
+
+                // 8. noVNC 실행 (백그라운드 실행)
+                // const command13 = "ping google.com";
+                const command13 = "nohup ~/.novnc/utils/novnc_proxy --vnc localhost:5901 &";
 
                 setTimeout(async () => {
-                    
                     await runSSHCommand(publicIp, command1);
-                    // await runSSHCommand(publicIp, command2);
-                    // await runSSHCommand(publicIp, command3);
+                    await runSSHCommand(publicIp, command2);
+                    await runSSHCommand(publicIp, command3);
                     await runSSHCommand(publicIp, command4);
                     await runSSHCommand(publicIp, command5);
-                }, 10000);
+                    await runSSHCommand(publicIp, command6);
+                    await runSSHCommand(publicIp, command7);
+                    await runSSHCommand(publicIp, command8);
+                    await runSSHCommand(publicIp, command9);
+                    await runSSHCommand(publicIp, command10);
+                    await runSSHCommand(publicIp, command11);
+                    await runSSHCommand(publicIp, command12);
+                    await runSSHCommand(publicIp, command13);
+                }, 15000);
 
                 // await rebootEC2Instance(instanceId);
             } catch (error) {
