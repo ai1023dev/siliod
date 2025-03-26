@@ -103,7 +103,7 @@ async function startServer() {
                 // const instanceId = 'i-022c71624b97ea878'; // EC2 생성
                 const instanceId = await createEC2Instance(); // EC2 생성
                 const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
-                // await updateRoute53Record(instanceId, publicIp);
+                await updateRoute53Record(instanceId, publicIp);
                 // await updateRoute53Record('00123456', publicIp);
 
                 // 실행할 명령어 입력
@@ -135,7 +135,7 @@ async function startServer() {
                 const command4 = 'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections';
 
                 // 3. 패키지 설치 (프롬프트 없이 진행)
-                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tightvncserver xfce4 xfce4-goodies lightdm thunar";
+                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tightvncserver xfce4 xfce4-goodies lightdm thunar certbot";
 
                 // 4. VNC 서버 비밀번호 자동 설정
                 const command6 = "mkdir -p ~/.vnc";
@@ -146,15 +146,18 @@ async function startServer() {
                 const command9 = "echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb \$HOME/.Xresources' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup";
                 const command10 = "chmod +x ~/.vnc/xstartup";
 
+                const command11 = "echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved";
+
+                const command12 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com --non-interactive --agree-tos --email ai1023dev@gmail.com`
+
                 // 6. noVNC 다운로드 및 실행
-                const command11 = "git clone https://github.com/novnc/noVNC.git ~/.novnc";
+                const command13 = "git clone https://github.com/novnc/noVNC.git ~/.novnc";
 
                 // 7. VNC 서버 시작 (비밀번호 프롬프트 없이 실행)
-                const command12 = "vncserver :1 -geometry 1920x1080 -depth 24";
+                const command14 = "vncserver :1";
 
                 // 8. noVNC 실행 (백그라운드 실행)
-                // const command13 = "ping google.com";
-                const command13 = "nohup ~/.novnc/utils/novnc_proxy --vnc localhost:5901 &";
+                const command15 = `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/fullchain.pem --key /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/privkey.pem --listen 443 &`;
 
                 setTimeout(async () => {
                     await runSSHCommand(publicIp, command1);
@@ -170,6 +173,8 @@ async function startServer() {
                     await runSSHCommand(publicIp, command11);
                     await runSSHCommand(publicIp, command12);
                     await runSSHCommand(publicIp, command13);
+                    await runSSHCommand(publicIp, command14);
+                    await runSSHCommand(publicIp, command15);
                 }, 15000);
 
                 // await rebootEC2Instance(instanceId);
