@@ -135,7 +135,7 @@ async function startServer() {
                 const command4 = 'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections';
 
                 // 3. 패키지 설치 (프롬프트 없이 진행)
-                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tightvncserver xfce4 xfce4-goodies lightdm thunar certbot";
+                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot";
 
                 // 4. VNC 서버 비밀번호 자동 설정
                 const command6 = "mkdir -p ~/.vnc";
