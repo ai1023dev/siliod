@@ -10,7 +10,8 @@
 <body>
     <a href="/login/google?state=google_login">구글 로그인</a>
     <br><br>
-    <!-- <iframe src="https://siliod-vnc-0.duckdns.org:6080/" frameborder="0"></iframe> -->
+
+    <button class="deal-instance-create">create</button>
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
@@ -22,19 +23,89 @@
             $("body").append(`<a href="/login/google?state=google_join">구글 회원가입</a>`);
         }
 
-
         $.ajax({
             method: 'GET',
             url: '/my_data',
             success: function (data) {
                 console.log(data)
-                $("body").append(`<h2>${data.name}</h2>`);
-                $("body").append(`<img src="${data.avatar_url}">`);
+                $("body").append(`<h2>${data.user.name}</h2>`);
+                $("body").append(`<img src="${data.user.avatar_url}">`);
+
+                for (let i = 0; i < data.instance.length; i++) {
+                    $("body").append(`<div>
+                        <h1><a href="https://${data.instance[i].instance_id}.siliod.com/">${data.instance[i].name}</a></h1>
+                        <h3>${data.instance[i].instance_id}</h3>
+
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">reboot</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">start</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">stop</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">delete</button><br><br><br>
+                    </div>`);
+                }
             },
             error: function (xhr, status, error) {
                 alert('서버 측 에러')
             }
         });
+
+        $('.deal-instance-create').click(async function () {
+            $.ajax({
+                method: 'POST',
+                url: `/create_instance`,
+                data: { name:'ubnuntu', ubuntu_password: 'password', vnc_password: '123456' },
+                success: function (data) {
+                    console.log(data)
+                    setTimeout(() => {
+
+                        const urlToCheck = `https://${data.substring(2)}.siliod.com/`;
+                        const interval = 10000; // 10초
+
+                        const checker = setInterval(async () => {
+                            console.log('접속 시도 중...');
+
+                            const accessible = await checkURLAccessible(urlToCheck);
+
+                            if (accessible) {
+                                console.log('✅ 접속 가능! 루프 종료');
+                                $("body").append(`<iframe src="https://${data.substring(2)}.siliod.com/"></iframe>`);
+                                clearInterval(checker);
+                            } else {
+                                console.log('❌ 아직 접속 불가');
+                            }
+                        }, interval);
+
+                    }, 10 * 60 * 1000);
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러')
+                }
+            });
+        })
+
+        function checkURLAccessible(url) {
+            return fetch(url, {
+                method: 'HEAD',
+                mode: 'no-cors' // 이 모드에서는 상태 코드를 확인할 수 없음
+            })
+                .then(() => true)  // CORS 모드라 성공여부 판단 어려움
+                .catch(() => false);
+        }
+
+        $(document).on('click', '.deal-instance', function () {
+            console.log($(this).text())
+            $.ajax({
+                method: 'POST',
+                url: `/${$(this).text()}_instance`,
+                data: { instance_id: $(this).attr('data-fild') },
+                success: function (data) {
+
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러')
+                }
+            });
+        })
     </script>
 </body>
+
 </html>

@@ -5,7 +5,7 @@ const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, StartInstancesCommand, DescribeInstancesCommand, RunInstancesCommand, RebootInstancesCommand } = require("@aws-sdk/client-ec2");
+const { EC2Client, StartInstancesCommand, DescribeInstancesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const fs = require("fs");
@@ -77,7 +77,7 @@ async function startServer() {
         }
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=100 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(ssh_command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
@@ -95,112 +95,6 @@ async function startServer() {
             });
         }
 
-
-
-
-        (async () => { ///////////////////////////////////////////////////////////////////////////// 노헙.아웃 안생기게     인스턴트 미리 만들기
-            try {
-                // const instanceId = 'i-022c71624b97ea878'; // EC2 생성
-                const instanceId = await createEC2Instance(); // EC2 생성
-                const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
-                await updateRoute53Record(instanceId, publicIp);
-                // await updateRoute53Record('00123456', publicIp);
-
-                // 실행할 명령어 입력
-                // const command = `sudo /home/ubuntu/.start.sh ${instanceId.substring(2)}`;
-                // const command1 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com`;
-                // const command2 = 'git clone https://github.com/novnc/noVNC.git .novnc';
-                // const command3 = 'sudo touch /root/.Xauthority && sudo chown root:root /root/.Xauthority && sudo chmod 600 /root/.Xauthority';
-                // // const command4 = 'echo -e "xxxxxx\nxxxxxx\nn" | vncpasswd';
-                // const command5 = `echo -e "xxxxxx\nxxxxxx\nn" | vncserver :1`;
-                // // const command5 = `vncserver :1`;
-                // const command6 = `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/fullchain.pem --key /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/privkey.pem --listen 443`;
-
-                // const command2 = `echo -e "@reboot /home/ubuntu/.novnc/start_vnc.sh ${instanceId.substring(2)}" | crontab -`;
-                // const command3 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com`;
-                // const command4 = `/home/ubuntu/.novnc/start_vnc.sh ${instanceId.substring(2)}`;
-                // await runSSHCommand(publicIp, command1);
-                // await runSSHCommand(publicIp, command2);
-                // await runSSHCommand(publicIp, command3);
-                // await runSSHCommand(publicIp, command4);
-                // await runSSHCommand(publicIp, command5);
-                // await runSSHCommand(publicIp, command6);
-
-                // 1. 시스템 패키지 업데이트 및 필수 패키지 설치
-                const command1 = "sudo apt-get update -y";
-                const command2 = "sudo apt-get upgrade -y";
-
-                // 2. LightDM을 기본 디스플레이 매니저로 자동 설정
-                const command3 = 'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections';
-                const command4 = 'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections';
-
-                // 3. 패키지 설치 (프롬프트 없이 진행)
-                const command5 = "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot";
-
-                // 4. VNC 서버 비밀번호 자동 설정
-                const command6 = "mkdir -p ~/.vnc";
-                const command7 = 'echo "123456" | vncpasswd -f > ~/.vnc/passwd';
-                const command8 = "chmod 600 ~/.vnc/passwd";
-
-                // 5. VNC xstartup 파일 생성
-                const command9 = "echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb \$HOME/.Xresources' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup";
-                const command10 = "chmod +x ~/.vnc/xstartup";
-
-                const command11 = "echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved";
-
-                const command12 = `sudo certbot certonly --standalone -d ${instanceId.substring(2)}.siliod.com --non-interactive --agree-tos --email ai1023dev@gmail.com`
-
-                // 6. noVNC 다운로드 및 실행
-                const command13 = "git clone https://github.com/novnc/noVNC.git ~/.novnc";
-
-                // 7. VNC 서버 시작 (비밀번호 프롬프트 없이 실행)
-                const command14 = "vncserver :1";
-
-                // 8. noVNC 실행 (백그라운드 실행)
-                const command15 = `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/fullchain.pem --key /etc/letsencrypt/live/${instanceId.substring(2)}.siliod.com/privkey.pem --listen 443 &`;
-
-                setTimeout(async () => {
-                    await runSSHCommand(publicIp, command1);
-                    await runSSHCommand(publicIp, command2);
-                    await runSSHCommand(publicIp, command3);
-                    await runSSHCommand(publicIp, command4);
-                    await runSSHCommand(publicIp, command5);
-                    await runSSHCommand(publicIp, command6);
-                    await runSSHCommand(publicIp, command7);
-                    await runSSHCommand(publicIp, command8);
-                    await runSSHCommand(publicIp, command9);
-                    await runSSHCommand(publicIp, command10);
-                    await runSSHCommand(publicIp, command11);
-                    await runSSHCommand(publicIp, command12);
-                    await runSSHCommand(publicIp, command13);
-                    await runSSHCommand(publicIp, command14);
-                    await runSSHCommand(publicIp, command15);
-                }, 15000);
-
-                // await rebootEC2Instance(instanceId);
-            } catch (error) {
-                console.error("❌ 전체 실행 중 에러 발생:", error);
-            }
-        })();
-
-        async function rebootEC2Instance(instanceId) {
-            try {
-                const command = new RebootInstancesCommand({ InstanceIds: [instanceId] });
-                await aws_client.send(command);
-                console.log(`✅ EC2 인스턴스 재시작 요청 완료: ${instanceId}`);
-            } catch (error) {
-                console.error("❌ EC2 인스턴스 재시작 실패:", error);
-            }
-        }
-
-
-
-        // 기존 EC2 인스턴스 시작 함수
-        async function startExistingEC2Instance(instanceId) {
-            const command = new StartInstancesCommand({ InstanceIds: [instanceId] });
-            await aws_client.send(command);
-            console.log(`EC2 인스턴스 시작 요청 완료: ${instanceId}`);
-        }
 
         // EC2 인스턴스의 퍼블릭 IP 가져오기
         async function getPublicIP(instanceId) {
@@ -256,19 +150,199 @@ async function startServer() {
         }
 
 
-        // // 실행 함수
-        // (async () => {
-        //     try {
-        //         const instanceId = "i-097bf2ca4fed4b93a"; // 기존 EC2 인스턴스 ID 입력
 
-        //         await startExistingEC2Instance(instanceId); // 기존 인스턴스 시작
-        //         const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
-        //         console.log(`완료된 퍼블릭 IP: ${publicIp}`);
-        //         await updateRoute53Record(publicIp); // Route 53 레코드 업데이트
-        //     } catch (error) {
-        //         console.error("에러 발생:", error);
-        //     }
-        // })();
+        // const instanceId = await createEC2Instance();
+        // ready_instance(instanceId, true)
+
+        async function ready_instance(instanceId, ready) {
+            try {
+                const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
+                await updateRoute53Record(instanceId, publicIp);
+
+                // 시스템 준비 명령어 리스트
+                const commands = [
+                    "sudo apt-get update -y",
+                    "sudo apt-get upgrade -y",
+                    'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
+                    'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
+                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
+                ];
+
+                // 실행 전 딜레이 (기존에 30초 줬던 것 반영)
+                await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+
+                // 명령어 순차 실행
+                for (const cmd of commands) {
+                    await runSSHCommand(publicIp, cmd);
+                }
+
+                console.log('✅ 시스템 준비 완료');
+
+                if (ready) {
+                    // DB에 준비된 인스턴스 등록
+                    await db.collection('ready_instance').insertOne({
+                        instance_id: instanceId.substring(2)
+                    });
+
+                    // 인스턴스 정지
+                    await stop_instance(instanceId);
+                }
+
+                // 준비 실패 감지용 타이머 (백그라운드 실행)
+                setTimeout(async () => {
+                    const success = await db.collection('ready_instance').findOne({
+                        instance_id: instanceId.substring(2)
+                    });
+
+                    if (!success) {
+                        console.log('❌ 인스턴스 준비 실패. 종료 처리');
+                        await terminate_instance(instanceId);
+                    }
+                }, 20 * 60 * 1000);
+
+            } catch (error) {
+                console.error("❌ ready_instance 중 오류:", error);
+            }
+        }
+
+
+
+
+
+        async function create_instance(short_instanceId, name, ubuntu_password, vnc_password, id, res) {
+            try {
+                let instanceId
+                let time
+
+
+                if (short_instanceId) {
+                    instanceId = 'i-' + short_instanceId.instance_id
+                    res.send({ instanceId, ready: true }) // 짧게 기다림
+                    time = 60 * 1000
+                    await start_instance(instanceId)
+                    const publicIp = await getPublicIP(instanceId);
+                    await updateRoute53Record(instanceId, publicIp);
+                    await create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId)
+
+                    // 준비 완료 목록에서 제거
+                    await db.collection('ready_instance').deleteOne({
+                        instance_id: instanceId.substring(2)
+                    });
+
+                    // const ready_instanceId = await createEC2Instance();
+                    // ready_instance(ready_instanceId, true)
+
+                    // start
+                } else {
+                    instanceId = await createEC2Instance();
+                    res.send({ instanceId, ready: false }) // 길게 기다림
+                    await ready_instance(instanceId, false)
+                    time = 0
+                    const publicIp = await getPublicIP(instanceId);
+                    await create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId)
+                }
+            } catch (error) {
+                console.error("❌ 전체 실행 중 에러 발생:", error);
+            }
+        };
+
+        async function create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId) {
+            // 시간만큼 대기 (예: short_instanceId는 60초 대기)
+            if (time > 0) {
+                await new Promise(resolve => setTimeout(resolve, time));
+            }
+
+            // 실행할 SSH 명령어 리스트
+            const domain = `${instanceId.substring(2)}.siliod.com`;
+            const command = [
+                `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
+                `mkdir -p ~/.vnc`,
+                `echo "${vnc_password}" | vncpasswd -f > ~/.vnc/passwd`,
+                `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
+                `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
+                `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
+                `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
+                `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
+                `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
+                `vncserver :1`,
+                `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
+            ];
+
+            // 순차적으로 SSH 명령 실행
+            for (const cmd of command) {
+                await runSSHCommand(publicIp, cmd);
+            }
+
+            // 인스턴스 DB에 등록
+            await db.collection('instance').insertOne({
+                user: id,
+                name,
+                instance_id: instanceId.substring(2)
+            });
+
+            // 5분 후 실패 체크 타이머 (백그라운드 실행)
+            setTimeout(async () => {
+                const success = await db.collection('instance').findOne({
+                    user: id,
+                    name,
+                    instance_id: instanceId.substring(2)
+                });
+
+                if (!success) {
+                    console.log('fail');
+                    await terminate_instance(instanceId);
+                }
+            }, 5 * 60 * 1000);
+        }
+
+
+        async function reboot_instance(instanceId) {
+            try {
+                const command = new RebootInstancesCommand({ InstanceIds: [instanceId] });
+                await aws_client.send(command);
+                console.log(`✅ EC2 인스턴스 재시작 요청 완료: ${instanceId}`);
+            } catch (error) {
+                console.error("❌ EC2 인스턴스 재시작 실패:", error);
+            }
+        }
+
+
+
+        // 기존 EC2 인스턴스 시작 함수
+        async function start_instance(instanceId) {
+            try {
+                const command = new StartInstancesCommand({ InstanceIds: [instanceId] });
+                await aws_client.send(command);
+                console.log(`EC2 인스턴스 시작 요청 완료: ${instanceId}`);
+                const publicIp = await getPublicIP(instanceId);
+                await updateRoute53Record(instanceId, publicIp);
+            } catch (error) {
+                console.error("❌ EC2 인스턴스 시작 실패:", error);
+            }
+        }
+
+        async function stop_instance(instanceId) {
+            try {
+                const command = new StopInstancesCommand({ InstanceIds: [instanceId] });
+                await aws_client.send(command);
+                console.log(`✅ EC2 인스턴스 중지 요청 완료: ${instanceId}`);
+            } catch (error) {
+                console.error("❌ EC2 인스턴스 중지 실패:", error);
+            }
+        }
+
+        async function terminate_instance(instanceId) {
+            try {
+                const command = new TerminateInstancesCommand({ InstanceIds: [instanceId] });
+                await aws_client.send(command);
+                console.log(`✅ EC2 인스턴스 삭제 요청 완료: ${instanceId}`);
+            } catch (error) {
+                console.error("❌ EC2 인스턴스 삭제 실패:", error);
+            }
+        }
+
+
 
 
 
@@ -280,10 +354,44 @@ async function startServer() {
 
         // 메인 페이지
         app.get('/my_data', async (req, res) => {
-            const data = await db.collection('user').findOne(
-                { id: login_check(req) }
-            );
-            res.send(data);
+            const id = login_check(req)
+
+            const user = await db.collection('user').findOne({ id });
+
+            const instance = await db.collection('instance').find({ user: id }).toArray();
+
+            res.send({ user, instance });
+        });
+
+        app.post('/create_instance', async (req, res) => {
+            const id = login_check(req)
+
+            const instanceId = await db.collection('ready_instance').findOne({});
+            create_instance(instanceId, req.body.name, req.body.ubuntu_password, req.body.vnc_password, id, res)
+        });
+
+        app.post('/reboot_instance', (req, res) => {
+            res.send(true)
+            reboot_instance('i-' + req.body.instance_id)
+        });
+
+        app.post('/start_instance', (req, res) => {
+            res.send(true)
+            start_instance('i-' + req.body.instance_id)
+        });
+
+        app.post('/stop_instance', (req, res) => {
+            res.send(true)
+            stop_instance('i-' + req.body.instance_id)
+        });
+
+        app.post('/delete_instance', (req, res) => {
+            res.send(true)
+            terminate_instance('i-' + req.body.instance_id)
+
+            db.collection('instance').deleteOne({
+                instance_id: req.body.instance_id
+            });
         });
 
 
@@ -301,7 +409,7 @@ async function startServer() {
             service: "gmail",
             auth: {
                 user: "siliod.official@gmail.com", // 본인 이메일
-                pass: "ltbywucnizwxxfvs", // Gmail의 앱 비밀번호 사용
+                pass: process.env.GMAIL_APP_PASSWORD, // Gmail의 앱 비밀번호 사용
             },
         });
 
