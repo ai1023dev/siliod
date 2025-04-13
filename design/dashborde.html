@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="siliod_logo.png" alt="logo" />
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유금액</div>
+                <div class="balance-amount">5,700원</div>
+                <button class="charge-btn">충전하기</button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <button><img src="refresh.svg"> 결제</button>
+                <button><img src="refresh.svg"> 보안</button>
+                <button><img src="refresh.svg"> API</button>
+                <button><img src="refresh.svg"> 문의</button>
+                <button><img src="refresh.svg"> 기타</button>
+            </nav>
+            <hr>
+            <span>인스턴스</span>
+            <div class="instance-section">
+                <nav class="sidebar-menu">
+                    <button>파이썬 서버</button>
+                    <button>Ubuntu</button>
+                </nav>
+            </div>
+
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>2 인스턴스 / 1 실행중</h2>
+                    <button>
+                        <img src="refresh.svg" alt="refresh">
+                        <span>상태 새로고침</span>
+                    </button>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar"
+                        src="https://lh3.googleusercontent.com/a/ACg8ocJLnRjfKRsCrXHGedC9Ww9ebLPlH2RZPJmJmn6HXU234zLhYA=s96-c"
+                        alt="Profile" />
+                    <div class="username">ai1023</div>
+                </div>
+            </header>
+
+            <main class="cards-container">
+                <div class="card">
+                    <h2>파이썬 서버<span>GUI</span></h2>
+                    <hr>
+                    <div class="status-row">
+                        <span class="status running">running</span>
+                        <button class="connect-btn">접속하기</button>
+                    </div>
+                    <div class="specs">
+                        nano - 03986a06700853dbb
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Ubuntu<span>CLI</span></h2>
+                    <hr>
+                    <div class="status-row">
+                        <span class="status stopped">stopped</span>
+                        <button class="connect-btn">시작하기</button>
+                    </div>
+                    <div class="specs">
+                        medium - 0585fa8f6d4ea3462
+                    </div>
+                </div>
+
+
+                <div class="card add-card">
+                    <div class="plus-icon">+</div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

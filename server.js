@@ -5,7 +5,7 @@ const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, StartInstancesCommand, DescribeInstancesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } = require("@aws-sdk/client-ec2");
+const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const fs = require("fs");
@@ -95,6 +95,33 @@ async function startServer() {
             });
         }
 
+        // 인스턴트 상태검사
+        async function getInstanceStatus(instanceId) {
+            try {
+                const command = new DescribeInstanceStatusCommand({
+                    InstanceIds: [instanceId],
+                    IncludeAllInstances: true, // 중지 상태 인스턴스도 포함
+                });
+
+                const response = await aws_client.send(command);
+
+                const instance = response.InstanceStatuses[0];
+                if (!instance) {
+                    console.log("📭 인스턴스 정보 없음");
+                    return null;
+                }
+
+                return {
+                    instanceState: instance.InstanceState.Name, // "running", "stopped", "pending" 등
+                    systemStatus: instance.SystemStatus.Status, // "ok", "impaired", etc
+                    instanceStatus: instance.InstanceStatus.Status // "ok", "impaired", etc
+                };
+            } catch (error) {
+                console.error("❌ 인스턴스 상태 조회 실패:", error);
+                return null;
+            }
+        }
+
 
         // EC2 인스턴스의 퍼블릭 IP 가져오기
         async function getPublicIP(instanceId) {
@@ -151,8 +178,16 @@ async function startServer() {
 
 
 
-        // const instanceId = await createEC2Instance();
-        // ready_instance(instanceId, true)
+        // const instanceId1 = await createEC2Instance();
+        // ready_instance(instanceId1, true)
+        // const instanceId2 = await createEC2Instance();
+        // ready_instance(instanceId2, true)
+        // const instanceId3 = await createEC2Instance();
+        // ready_instance(instanceId3, true)
+        // const instanceId4 = await createEC2Instance();
+        // ready_instance(instanceId4, true)
+        // const instanceId5 = await createEC2Instance();
+        // ready_instance(instanceId5, true)
 
         async function ready_instance(instanceId, ready) {
             try {
@@ -169,7 +204,7 @@ async function startServer() {
                 ];
 
                 // 실행 전 딜레이 (기존에 30초 줬던 것 반영)
-                await new Promise(resolve => setTimeout(resolve, 30 * 1000));
+                await cheak_command(publicIp)
 
                 // 명령어 순차 실행
                 for (const cmd of commands) {
@@ -186,6 +221,8 @@ async function startServer() {
 
                     // 인스턴스 정지
                     await stop_instance(instanceId);
+                } else {
+                    return publicIp
                 }
 
                 // 준비 실패 감지용 타이머 (백그라운드 실행)
@@ -211,47 +248,66 @@ async function startServer() {
 
         async function create_instance(short_instanceId, name, ubuntu_password, vnc_password, id, res) {
             try {
-                let instanceId
-                let time
-
-
                 if (short_instanceId) {
-                    instanceId = 'i-' + short_instanceId.instance_id
+                    // 준비 인스턴트 다시 생성성
+                    // const ready_instanceId = await createEC2Instance();
+                    // ready_instance(ready_instanceId, true)
+
+                    const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
-                    time = 60 * 1000
-                    await start_instance(instanceId)
-                    const publicIp = await getPublicIP(instanceId);
-                    await updateRoute53Record(instanceId, publicIp);
-                    await create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId)
 
                     // 준비 완료 목록에서 제거
                     await db.collection('ready_instance').deleteOne({
                         instance_id: instanceId.substring(2)
                     });
 
-                    // const ready_instanceId = await createEC2Instance();
-                    // ready_instance(ready_instanceId, true)
+                    await db.collection('instance').insertOne({
+                        user: id,
+                        name,
+                        build: true,
+                        instance_id: instanceId.substring(2)
+                    });
 
-                    // start
+                    const publicIp = await start_instance(instanceId)
+                    console.log(publicIp)
+                    await cheak_command(publicIp)
+                    await create_command(publicIp, ubuntu_password, vnc_password, instanceId)
                 } else {
-                    instanceId = await createEC2Instance();
+                    const instanceId = await createEC2Instance();
                     res.send({ instanceId, ready: false }) // 길게 기다림
-                    await ready_instance(instanceId, false)
-                    time = 0
-                    const publicIp = await getPublicIP(instanceId);
-                    await create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId)
+                    const publicIp = await ready_instance(instanceId, false)
+
+                    console.log(publicIp)
+                    await create_command(publicIp, ubuntu_password, vnc_password, instanceId)
                 }
             } catch (error) {
                 console.error("❌ 전체 실행 중 에러 발생:", error);
             }
         };
 
-        async function create_command(publicIp, id, name, time, ubuntu_password, vnc_password, instanceId) {
-            // 시간만큼 대기 (예: short_instanceId는 60초 대기)
-            if (time > 0) {
-                await new Promise(resolve => setTimeout(resolve, time));
-            }
+        async function cheak_command(publicIp) {
+            const maxAttempts = 20;
+            const interval = 15000; // 15초
 
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    await runSSHCommand(publicIp, 'pwd');
+                    console.log(`✅ 연결 확인 성공 (시도 ${attempt})`);
+                    return; // 성공 시 반복 종료
+                } catch (err) {
+                    console.log(`❌ 연결 확인 실패 (시도 ${attempt})`);
+                    if (attempt < maxAttempts) {
+                        await new Promise(resolve => setTimeout(resolve, interval));
+                    } else {
+                        console.error('⛔ 최대 시도 횟수 초과로 중단됨');
+                        throw err;
+                    }
+                }
+            }
+        }
+
+
+        async function create_command(publicIp, ubuntu_password, vnc_password, instanceId) {
             // 실행할 SSH 명령어 리스트
             const domain = `${instanceId.substring(2)}.siliod.com`;
             const command = [
@@ -275,22 +331,24 @@ async function startServer() {
             }
 
             // 인스턴스 DB에 등록
-            await db.collection('instance').insertOne({
-                user: id,
-                name,
-                instance_id: instanceId.substring(2)
-            });
+            await db.collection('instance').updateOne(
+                { instance_id: instanceId.substring(2) },
+                { $set: { build: false } }
+            );
+            
 
             // 5분 후 실패 체크 타이머 (백그라운드 실행)
             setTimeout(async () => {
-                const success = await db.collection('instance').findOne({
-                    user: id,
-                    name,
+                const fail = await db.collection('instance').findOne({
+                    build: true,
                     instance_id: instanceId.substring(2)
                 });
 
-                if (!success) {
+                if (fail) {
                     console.log('fail');
+                    await db.collection('instance').deleteOne({
+                        instance_id: instanceId.substring(2)
+                    });
                     await terminate_instance(instanceId);
                 }
             }, 5 * 60 * 1000);
@@ -310,17 +368,38 @@ async function startServer() {
 
 
         // 기존 EC2 인스턴스 시작 함수
-        async function start_instance(instanceId) {
+        async function start_instance(instanceId, maxRetry = 20, retryInterval = 15000) {
             try {
                 const command = new StartInstancesCommand({ InstanceIds: [instanceId] });
-                await aws_client.send(command);
-                console.log(`EC2 인스턴스 시작 요청 완료: ${instanceId}`);
-                const publicIp = await getPublicIP(instanceId);
-                await updateRoute53Record(instanceId, publicIp);
+
+                for (let attempt = 1; attempt <= maxRetry; attempt++) {
+                    try {
+                        await aws_client.send(command);
+                        console.log(`✅ EC2 인스턴스 시작 요청 완료: ${instanceId}`);
+
+                        // 인스턴스 시작 요청이 성공하면 IP 조회 후 도메인 업데이트
+                        const publicIp = await getPublicIP(instanceId);
+                        await updateRoute53Record(instanceId, publicIp);
+                        return publicIp;
+
+                    } catch (err) {
+                        console.error(`❌ 인스턴스 시작 실패 (시도 ${attempt}/${maxRetry}):`, err);
+
+                        if (attempt < maxRetry) {
+                            await new Promise(resolve => setTimeout(resolve, retryInterval));
+                        } else {
+                            console.error("⛔ 최대 재시도 횟수 초과로 중단됨");
+                            throw err;
+                        }
+                    }
+                }
+
             } catch (error) {
-                console.error("❌ EC2 인스턴스 시작 실패:", error);
+                console.error("❌ EC2 인스턴스 시작 처리 중 에러:", error);
+                throw error;
             }
         }
+
 
         async function stop_instance(instanceId) {
             try {
@@ -355,12 +434,29 @@ async function startServer() {
         // 메인 페이지
         app.get('/my_data', async (req, res) => {
             const id = login_check(req)
-
             const user = await db.collection('user').findOne({ id });
-
             const instance = await db.collection('instance').find({ user: id }).toArray();
 
             res.send({ user, instance });
+        });
+
+        // 메인 페이지
+        app.get('/status', async (req, res) => {
+            const id = login_check(req)
+
+            const instance = await db.collection('instance').find({ user: id }).toArray();
+
+            let status = []
+            for (let i = 0; i < instance.length; i++) {
+                if (instance[i].build) {
+                    status[i] = { instance_id: instance[i].instance_id, status: 'building' }
+                } else {
+                    const status_one = await getInstanceStatus('i-' + instance[i].instance_id)
+                    status[i] = { instance_id: instance[i].instance_id, status: status_one }
+                }
+            }
+
+            res.send(status);
         });
 
         app.post('/create_instance', async (req, res) => {
