@@ -141,29 +141,31 @@ body {
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 4px;
+}
 
-    /* Firefox 전용 스크롤 스타일 */
+/* Firefox 전용 스크롤 스타일 */
+.scroll {
     scrollbar-width: thin;
     scrollbar-color: #c3d4ff transparent;
 }
 
 /* WebKit (Chrome, Edge, Safari 등) */
-.instance-section::-webkit-scrollbar {
+.scroll::-webkit-scrollbar {
     width: 6px;
 }
 
-.instance-section::-webkit-scrollbar-track {
+.scroll::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.instance-section::-webkit-scrollbar-thumb {
+.scroll::-webkit-scrollbar-thumb {
     background-color: #c3d4ff;
     border-radius: 6px;
     border: 2px solid transparent;
     background-clip: content-box;
 }
 
-.instance-section::-webkit-scrollbar-thumb:hover {
+.scroll::-webkit-scrollbar-thumb:hover {
     background-color: #99b8ff;
 }
 
@@ -285,6 +287,10 @@ body {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    height: calc(60vh - 39px - 5.5rem);
+    padding-bottom: 8px;
+    margin-right: -10px;
+    overflow: auto;
 }
 
 .card {
@@ -303,7 +309,7 @@ body {
 
 .card h2 {
     font-size: 18px;
-    margin-bottom: 0.8rem;
+    margin-bottom: 1rem;
 }
 
 .card h2 span {
@@ -315,7 +321,7 @@ body {
 .card hr {
     border: none;
     border-top: 1px solid #d4e4ff;
-    margin-bottom: 0.9rem;
+    margin-bottom: 1rem;
 }
 
 
@@ -389,14 +395,16 @@ body {
 }
 
 
-/* 스피리터 섹션 */
-.splitter-container {
-    width: 100%;
-    margin-top: 2rem;
+.deal-container {
+    position: fixed;
+    width: calc(100vw - 260px - 4rem);
+    height: 40vh; /* cards-container 에 100vh 빼고 적용 */
+    padding: 2rem 0;
     bottom: 0;
+    background-color: white;
 }
 
-.splitter-line {
+.deal-line {
     border-top: #c2d4ff solid 1px;
     margin-bottom: 2rem;
 }
