@@ -10,6 +10,7 @@ body {
     background-color: #fff;
     height: 100vh;
     display: flex;
+    overflow: hidden;
 }
 
 .layout {
@@ -20,8 +21,10 @@ body {
 /* ===== 왼쪽 사이드바 ===== */
 .sidebar {
     width: 260px;
-    min-width: 260px; /* 최소 너비 고정 */
-    max-width: 260px; /* 최대 너비 고정 */
+    min-width: 260px;
+    /* 최소 너비 고정 */
+    max-width: 260px;
+    /* 최대 너비 고정 */
     background-color: #f5f8ff;
     padding: 1.3rem 1rem;
     display: flex;
@@ -29,7 +32,8 @@ body {
     border-right: 1px solid #c2d4ff;
     display: flex;
     flex-direction: column;
-    height: 100vh; /* 화면 전체 높이 */
+    height: 100vh;
+    /* 화면 전체 높이 */
 }
 
 .logo {
@@ -109,7 +113,8 @@ body {
 /* 인스턴스 버튼 스타일 */
 .sidebar-menu button {
     display: flex;
-    align-items: center; /* 세로 정렬 중앙 */
+    align-items: center;
+    /* 세로 정렬 중앙 */
     gap: 0.5rem;
     padding: 0.4rem 0.2rem;
     font-size: 1rem;
@@ -184,7 +189,8 @@ body {
 
 .header {
     display: flex;
-    justify-content: space-between; /* 좌우 정렬 */
+    justify-content: space-between;
+    /* 좌우 정렬 */
     align-items: center;
     padding-bottom: 1.5rem;
     margin-bottom: 2rem;
@@ -220,7 +226,8 @@ body {
     border-radius: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    line-height: 1; /* 텍스트 중앙 정렬 보정 */
+    line-height: 1;
+    /* 텍스트 중앙 정렬 보정 */
 }
 
 .header-left button span {
@@ -244,8 +251,13 @@ body {
 
 /* 회전 애니메이션 */
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* 버튼 hover 시, 아이콘에 애니메이션 적용 */
@@ -284,21 +296,24 @@ body {
 }
 
 .cards-container {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    height: calc(60vh - 39px - 5.5rem);
+    height: calc(100vh - 400px - 39px - 5.5rem);
     padding-bottom: 8px;
-    margin-right: -10px;
-    overflow: auto;
+    margin-left: -0.5rem;
+    margin-right: -1rem;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .card {
+    float: left;
+    margin: 0.5rem;
     background-color: #f5f8ff;
     border: 1px solid #c2d4ff;
     border-radius: 0.75rem;
     padding: 1.3rem;
     width: calc((100vw - 230px - 9rem) / 4);
+    height: auto;
+    align-self: flex-start;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     transition: 0.2s;
 }
@@ -382,6 +397,12 @@ body {
     background-color: #fafdff;
     cursor: pointer;
     opacity: 0.6;
+    position: relative; /* 추가 */
+}
+
+
+.add-card-hight {
+    opacity: 0;
 }
 
 .add-card:hover {
@@ -389,16 +410,22 @@ body {
 }
 
 .plus-icon {
+    position: absolute;
     font-size: 3rem;
     line-height: 1;
-    transform: translateY(-3px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateY(-3px);
 }
+
 
 
 .deal-container {
     position: fixed;
     width: calc(100vw - 260px - 4rem);
-    height: 40vh; /* cards-container 에 100vh 빼고 적용 */
+    height: 400px; /* cards-container 에 100vh 빼고 적용 */
+    max-height: calc(100vh - 3.5rem - 39px);
+    min-height: 4.5rem;
     padding: 2rem 0;
     bottom: 0;
     background-color: white;
@@ -406,7 +433,17 @@ body {
 
 .deal-line {
     border-top: #c2d4ff solid 1px;
+}
+
+.deal-line-hover {
     margin-bottom: 2rem;
+    padding: 3px 0;
+    cursor: row-resize;
+}
+
+.deal-line-hover:hover div {
+    outline: #c2d4ff solid 3px;
+    border-radius: 3px;
 }
 
 
