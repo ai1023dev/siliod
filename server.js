@@ -20,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const { MongoClient } = require('mongodb');
+const { type } = require('os');
 let db;
 
 async function startServer() {
@@ -78,7 +79,7 @@ async function startServer() {
 
         async function runSSHCommand(ip, command) {
             const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
-            console.log(ssh_command)
+            console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
                     if (error) {
@@ -178,24 +179,74 @@ async function startServer() {
 
 
 
-        // const instanceId1 = await createEC2Instance();
-        // ready_instance(instanceId1, true)
-        // const instanceId2 = await createEC2Instance();
-        // ready_instance(instanceId2, true)
-        // const instanceId3 = await createEC2Instance();
-        // ready_instance(instanceId3, true)
-        // const instanceId4 = await createEC2Instance();
-        // ready_instance(instanceId4, true)
-        // const instanceId5 = await createEC2Instance();
-        // ready_instance(instanceId5, true)
-
-        async function ready_instance(instanceId, ready) {
+        async function cli_ready_instance(instanceId) {
             try {
+                console.time("작업시간");
                 const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
                 await updateRoute53Record(instanceId, publicIp);
 
+
+                const domain = `${instanceId.substring(2)}.siliod.com`;
+
                 // 시스템 준비 명령어 리스트
                 const commands = [
+                    "sudo apt-get update -y",
+                    "sudo apt-get upgrade -y",
+                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
+                    "git clone https://github.com/tsl0922/ttyd.git /home/ubuntu/.ttyd",
+                    "mkdir /home/ubuntu/.ttyd/build",
+                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
+                    "make -C /home/ubuntu/.ttyd/build",
+                    "sudo make -C /home/ubuntu/.ttyd/build install",
+                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                    `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
+                    `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+                ];
+
+
+                await cheak_command(publicIp)
+
+                // 명령어 순차 실행
+                for (const cmd of commands) {
+                    await runSSHCommand(publicIp, cmd);
+                }
+
+                console.log('✅ 시스템 준비 완료');
+                console.timeEnd("작업시간");
+            } catch (error) {
+                console.error("❌ ready_instance 중 오류:", error);
+            }
+        }
+
+
+
+
+        // const instanceId1 = await createEC2Instance();
+        // ready_instance(instanceId1, true, true)
+        // const instanceId2 = await createEC2Instance();
+        // ready_instance(instanceId2, true, false)
+        // const instanceId3 = await createEC2Instance();
+        // ready_instance(instanceId3, true, true)
+        // const instanceId4 = await createEC2Instance();
+        // ready_instance(instanceId4, true, true)
+        // const instanceId5 = await createEC2Instance();
+        // ready_instance(instanceId5, true, true)
+
+
+        async function ready_instance(instanceId, ready, type) {
+            try {
+                const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
+
+                await updateRoute53Record(instanceId, publicIp);
+
+                await cheak_command(publicIp)
+
+                const domain = `${instanceId.substring(2)}.siliod.com`;
+
+                let commands = []
+
+                // 시스템 준비 명령어 리스트
+                const gui_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
@@ -203,8 +254,25 @@ async function startServer() {
                     "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
                 ];
 
-                // 실행 전 딜레이 (기존에 30초 줬던 것 반영)
-                await cheak_command(publicIp)
+                const cli_ready_commands = [
+                    "sudo apt-get update -y",
+                    "sudo apt-get upgrade -y",
+                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
+                    "git clone https://github.com/tsl0922/ttyd.git /home/ubuntu/.ttyd",
+                    "mkdir /home/ubuntu/.ttyd/build",
+                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
+                    "make -C /home/ubuntu/.ttyd/build",
+                    "sudo make -C /home/ubuntu/.ttyd/build install",
+                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                    // `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
+                    // `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+                ];
+
+                if (type) {
+                    commands = gui_ready_commands
+                } else {
+                    commands = cli_ready_commands
+                }
 
                 // 명령어 순차 실행
                 for (const cmd of commands) {
@@ -216,7 +284,7 @@ async function startServer() {
                 if (ready) {
                     // DB에 준비된 인스턴스 등록
                     await db.collection('ready_instance').insertOne({
-                        instance_id: instanceId.substring(2)
+                        instance_id: instanceId.substring(2), type
                     });
 
                     // 인스턴스 정지
@@ -231,7 +299,11 @@ async function startServer() {
                         instance_id: instanceId.substring(2)
                     });
 
-                    if (!success) {
+                    const used_success = await db.collection('instance').findOne({
+                        instance_id: instanceId.substring(2)
+                    });
+
+                    if (!success || !used_success) {
                         console.log('❌ 인스턴스 준비 실패. 종료 처리');
                         await terminate_instance(instanceId);
                     }
@@ -246,12 +318,12 @@ async function startServer() {
 
 
 
-        async function create_instance(short_instanceId, name, ubuntu_password, vnc_password, id, res) {
+        async function create_instance(short_instanceId, type, name, ubuntu_password, connect_password, id, res) {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
                     // const ready_instanceId = await createEC2Instance();
-                    // ready_instance(ready_instanceId, true)
+                    // ready_instance(ready_instan true,ceId, true)
 
                     const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
@@ -264,6 +336,7 @@ async function startServer() {
                     await db.collection('instance').insertOne({
                         user: id,
                         name,
+                        type,
                         build: true,
                         instance_id: instanceId.substring(2)
                     });
@@ -271,14 +344,24 @@ async function startServer() {
                     const publicIp = await start_instance(instanceId)
                     console.log(publicIp)
                     await cheak_command(publicIp)
-                    await create_command(publicIp, ubuntu_password, vnc_password, instanceId)
+                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId)
                 } else {
                     const instanceId = await createEC2Instance();
                     res.send({ instanceId, ready: false }) // 길게 기다림
-                    const publicIp = await ready_instance(instanceId, false)
+
+                    await db.collection('instance').insertOne({
+                        user: id,
+                        name,
+                        type,
+                        build: true,
+                        instance_id: instanceId.substring(2)
+                    });
+
+                    const publicIp = await ready_instance(instanceId, false, type)
+                    await updateRoute53Record(instanceId, publicIp);
 
                     console.log(publicIp)
-                    await create_command(publicIp, ubuntu_password, vnc_password, instanceId)
+                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId)
                 }
             } catch (error) {
                 console.error("❌ 전체 실행 중 에러 발생:", error);
@@ -307,13 +390,13 @@ async function startServer() {
         }
 
 
-        async function create_command(publicIp, ubuntu_password, vnc_password, instanceId) {
+        async function create_command(publicIp, type, ubuntu_password, connect_password, instanceId) {
             // 실행할 SSH 명령어 리스트
             const domain = `${instanceId.substring(2)}.siliod.com`;
-            const command = [
+            const gui_command = [
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `mkdir -p ~/.vnc`,
-                `echo "${vnc_password}" | vncpasswd -f > ~/.vnc/passwd`,
+                `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
                 `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
                 `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
@@ -325,6 +408,19 @@ async function startServer() {
                 `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
             ];
 
+            const cli_command = [
+                `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
+                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
+                `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+            ];
+
+            let command
+            if (type) {
+                command = gui_command
+            } else {
+                command = cli_command
+            }
+
             // 순차적으로 SSH 명령 실행
             for (const cmd of command) {
                 await runSSHCommand(publicIp, cmd);
@@ -335,7 +431,7 @@ async function startServer() {
                 { instance_id: instanceId.substring(2) },
                 { $set: { build: false } }
             );
-            
+
 
             // 5분 후 실패 체크 타이머 (백그라운드 실행)
             setTimeout(async () => {
@@ -461,9 +557,11 @@ async function startServer() {
 
         app.post('/create_instance', async (req, res) => {
             const id = login_check(req)
-
-            const instanceId = await db.collection('ready_instance').findOne({});
-            create_instance(instanceId, req.body.name, req.body.ubuntu_password, req.body.vnc_password, id, res)
+            
+            const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type });
+            console.log(req.body.type)
+            console.log(instanceId)
+            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, id, res)
         });
 
         app.post('/reboot_instance', (req, res) => {

@@ -11,7 +11,8 @@
     <a href="/login/google?state=google_login">구글 로그인</a>
     <br><br>
 
-    <button class="deal-instance-create">create</button>
+    <button class="deal-gui-instance-create">gui create</button>
+    <button class="deal-cli-instance-create">cli create</button>
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
@@ -32,8 +33,14 @@
                 $("body").append(`<img src="${data.user.avatar_url}">`);
 
                 for (let i = 0; i < data.instance.length; i++) {
+                    let type
+                    if (data.instance[i].type) {
+                        type = 'gui'
+                    } else {
+                        type = 'cli'
+                    }
                     $("body").append(`<div>
-                        <h3><a href="https://${data.instance[i].instance_id}.siliod.com/">${data.instance[i].name}</a></h3>
+                        <h2><a href="https://${data.instance[i].instance_id}.siliod.com/">${data.instance[i].name}</a> - ${type}</h2>
                         <h3>${data.instance[i].instance_id}<p class="status-${data.instance[i].instance_id}"></p></h3>
 
                         <button class="deal-instance" data-fild="${data.instance[i].instance_id}">reboot</button>
@@ -71,11 +78,17 @@
             }
         });
 
-        $('.deal-instance-create').click(async function () {
+        $('.deal-gui-instance-create').click(async function () {
             $.ajax({
                 method: 'POST',
                 url: `/create_instance`,
-                data: { name:'asdf', ubuntu_password: 'password', vnc_password: '123456' },
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: 'asdf',
+                    type: true,
+                    ubuntu_password: 'password',
+                    connect_password: '123456'
+                }),
                 success: function (data) {
                     console.log(data)
                     let time
@@ -109,6 +122,27 @@
                     alert('서버 측 에러')
                 }
             });
+        })
+
+        $('.deal-cli-instance-create').click(async function () {
+            $.ajax({
+                method: 'POST',
+                url: `/create_instance`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: 'asdf',
+                    type: false,
+                    ubuntu_password: 'password',
+                    connect_password: '123456'
+                }),
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러');
+                }
+            });
+
         })
 
         function checkURLAccessible(url) {
