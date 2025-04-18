@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <a href="/login/google?state=google_login">구글 로그인</a>
+    <br><br>
+
+    <button class="deal-gui-instance-create">gui create</button>
+    <button class="deal-cli-instance-create">cli create</button>
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        console.log(params.get("state")); // 특정 키의 값 가져오기
+
+
+        if (params.get("state") === 'google_join') {
+            $("body").append(`<a href="/login/google?state=google_join">구글 회원가입</a>`);
+        }
+
+        $.ajax({
+            method: 'GET',
+            url: '/my_data',
+            success: function (data) {
+                console.log(data)
+                $("body").append(`<h2>${data.user.name}</h2>`);
+                $("body").append(`<img src="${data.user.avatar_url}">`);
+
+                for (let i = 0; i < data.instance.length; i++) {
+                    let type
+                    if (data.instance[i].type) {
+                        type = 'gui'
+                    } else {
+                        type = 'cli'
+                    }
+                    $("body").append(`<div>
+                        <h2><a href="https://${data.instance[i].instance_id}.siliod.com/">${data.instance[i].name}</a> - ${type}</h2>
+                        <h3>${data.instance[i].instance_id}<p class="status-${data.instance[i].instance_id}"></p></h3>
+
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">reboot</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">start</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">stop</button>
+                        <button class="deal-instance" data-fild="${data.instance[i].instance_id}">delete</button><br><br><br>
+                    </div>`);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('서버 측 에러')
+            }
+        });
+
+        $.ajax({
+            method: 'GET',
+            url: '/status',
+            success: function (data) {
+                console.log(data)
+                for (let i = 0; i < data.length; i++) {
+                    console.log('.status-' + data[i].instance_id)
+                    if (data[i].status === 'building') {
+                        $('.status-' + data[i].instance_id).text('building')
+                    } else {
+                        if (data[i].status) {
+                            $('.status-' + data[i].instance_id).text(data[i].status.instanceState)
+                        } else {
+                            $('.status-' + data[i].instance_id).text('no data')
+                        }
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('서버 측 에러')
+            }
+        });
+
+        $('.deal-gui-instance-create').click(async function () {
+            $.ajax({
+                method: 'POST',
+                url: `/create_instance`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: 'asdf',
+                    type: true,
+                    ubuntu_password: 'password',
+                    connect_password: '123456'
+                }),
+                success: function (data) {
+                    console.log(data)
+                    let time
+                    if (data.ready) {
+                        time = 3
+                    } else {
+                        time = 10
+                    }
+
+                    setTimeout(() => {
+                        const urlToCheck = `https://${data.instanceId.substring(2)}.siliod.com/`;
+                        const interval = 15000; // 15초
+
+                        const checker = setInterval(async () => {
+                            console.log('접속 시도 중...');
+
+                            const accessible = await checkURLAccessible(urlToCheck);
+
+                            if (accessible) {
+                                console.log('✅ 접속 가능! 루프 종료');
+                                $("body").append(`<iframe src="https://${data.instanceId.substring(2)}.siliod.com/"></iframe>`);
+                                clearInterval(checker);
+                            } else {
+                                console.log('❌ 아직 접속 불가');
+                            }
+                        }, interval);
+
+                    }, time * 60 * 1000);
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러')
+                }
+            });
+        })
+
+        $('.deal-cli-instance-create').click(async function () {
+            $.ajax({
+                method: 'POST',
+                url: `/create_instance`,
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name: 'asdf',
+                    type: false,
+                    ubuntu_password: 'password',
+                    connect_password: '123456'
+                }),
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러');
+                }
+            });
+
+        })
+
+        function checkURLAccessible(url) {
+            return fetch(url, {
+                method: 'HEAD',
+                mode: 'no-cors' // 이 모드에서는 상태 코드를 확인할 수 없음
+            })
+                .then(() => true)  // CORS 모드라 성공여부 판단 어려움
+                .catch(() => false);
+        }
+
+        $(document).on('click', '.deal-instance', function () {
+            console.log($(this).text())
+            $.ajax({
+                method: 'POST',
+                url: `/${$(this).text()}_instance`,
+                data: { instance_id: $(this).attr('data-fild') },
+                success: function (data) {
+
+                },
+                error: function (xhr, status, error) {
+                    alert('서버 측 에러')
+                }
+            });
+        })
+    </script>
+</body>
+
+</html>

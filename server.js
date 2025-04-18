@@ -179,46 +179,6 @@ async function startServer() {
 
 
 
-        async function cli_ready_instance(instanceId) {
-            try {
-                console.time("작업시간");
-                const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
-                await updateRoute53Record(instanceId, publicIp);
-
-
-                const domain = `${instanceId.substring(2)}.siliod.com`;
-
-                // 시스템 준비 명령어 리스트
-                const commands = [
-                    "sudo apt-get update -y",
-                    "sudo apt-get upgrade -y",
-                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
-                    "git clone https://github.com/tsl0922/ttyd.git /home/ubuntu/.ttyd",
-                    "mkdir /home/ubuntu/.ttyd/build",
-                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
-                    "make -C /home/ubuntu/.ttyd/build",
-                    "sudo make -C /home/ubuntu/.ttyd/build install",
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
-                    `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
-                    `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash > /dev/null 2>&1 & disown`
-                ];
-
-
-                await cheak_command(publicIp)
-
-                // 명령어 순차 실행
-                for (const cmd of commands) {
-                    await runSSHCommand(publicIp, cmd);
-                }
-
-                console.log('✅ 시스템 준비 완료');
-                console.timeEnd("작업시간");
-            } catch (error) {
-                console.error("❌ ready_instance 중 오류:", error);
-            }
-        }
-
-
 
 
         // const instanceId1 = await createEC2Instance();
@@ -251,8 +211,21 @@ async function startServer() {
                     "sudo apt-get upgrade -y",
                     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
                     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
+                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11",
+                    `mkdir -p ~/.vnc`,
+                    `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
+                    `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
+                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                    `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
+                    `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
                 ];
+                // const gui_ready_commands = [
+                //     "sudo apt-get update -y",
+                //     "sudo apt-get upgrade -y",
+                //     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
+                //     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
+                //     "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
+                // ];
 
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
@@ -263,7 +236,7 @@ async function startServer() {
                     "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
                     "make -C /home/ubuntu/.ttyd/build",
                     "sudo make -C /home/ubuntu/.ttyd/build install",
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`
                     // `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
                     // `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash > /dev/null 2>&1 & disown`
                 ];
@@ -390,27 +363,36 @@ async function startServer() {
         }
 
 
+
         async function create_command(publicIp, type, ubuntu_password, connect_password, instanceId) {
             // 실행할 SSH 명령어 리스트
             const domain = `${instanceId.substring(2)}.siliod.com`;
             const gui_command = [
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
-                `mkdir -p ~/.vnc`,
                 `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
-                `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
-                `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
-                `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
-                `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
-                `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
                 `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
                 `vncserver :1`,
                 `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
             ];
+            // const gui_command = [
+            //     `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
+            //     `mkdir -p ~/.vnc`,
+            //     `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
+            //     `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
+            //     `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
+            //     `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
+            //     `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+            //     `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
+            //     `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
+            //     `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
+            //     `vncserver :1`,
+            //     `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
+            // ];
 
             const cli_command = [
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
-                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
+                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
                 `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
             ];
 
@@ -468,31 +450,16 @@ async function startServer() {
             try {
                 const command = new StartInstancesCommand({ InstanceIds: [instanceId] });
 
-                for (let attempt = 1; attempt <= maxRetry; attempt++) {
-                    try {
-                        await aws_client.send(command);
-                        console.log(`✅ EC2 인스턴스 시작 요청 완료: ${instanceId}`);
+                await aws_client.send(command);
+                console.log(`✅ EC2 인스턴스 시작 요청 완료: ${instanceId}`);
 
-                        // 인스턴스 시작 요청이 성공하면 IP 조회 후 도메인 업데이트
-                        const publicIp = await getPublicIP(instanceId);
-                        await updateRoute53Record(instanceId, publicIp);
-                        return publicIp;
-
-                    } catch (err) {
-                        console.error(`❌ 인스턴스 시작 실패 (시도 ${attempt}/${maxRetry}):`, err);
-
-                        if (attempt < maxRetry) {
-                            await new Promise(resolve => setTimeout(resolve, retryInterval));
-                        } else {
-                            console.error("⛔ 최대 재시도 횟수 초과로 중단됨");
-                            throw err;
-                        }
-                    }
-                }
-
+                // 인스턴스 시작 요청이 성공하면 IP 조회 후 도메인 업데이트
+                const publicIp = await getPublicIP(instanceId);
+                await updateRoute53Record(instanceId, publicIp);
+                return publicIp;
             } catch (error) {
                 console.error("❌ EC2 인스턴스 시작 처리 중 에러:", error);
-                throw error;
+                return false
             }
         }
 
@@ -523,6 +490,11 @@ async function startServer() {
 
 
         // 메인 페이지
+        app.get('/test', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/test/test.html'));
+        });
+
+        // 메인 페이지
         app.get('/', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/web/main/main.html'));
         });
@@ -538,6 +510,7 @@ async function startServer() {
 
         // 메인 페이지
         app.get('/status', async (req, res) => {
+            console.log('ddd')
             const id = login_check(req)
 
             const instance = await db.collection('instance').find({ user: id }).toArray();
@@ -557,7 +530,7 @@ async function startServer() {
 
         app.post('/create_instance', async (req, res) => {
             const id = login_check(req)
-            
+
             const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type });
             console.log(req.body.type)
             console.log(instanceId)
@@ -569,9 +542,13 @@ async function startServer() {
             reboot_instance('i-' + req.body.instance_id)
         });
 
-        app.post('/start_instance', (req, res) => {
-            res.send(true)
-            start_instance('i-' + req.body.instance_id)
+        app.post('/start_instance', async (req, res) => {
+            const success = await start_instance('i-' + req.body.instance_id)
+            if (success) {
+                res.send(true)
+            } else {
+                res.send(false)
+            }
         });
 
         app.post('/stop_instance', (req, res) => {
@@ -714,14 +691,10 @@ async function startServer() {
         const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
         app.get('/login/google/redirect', async (req, res) => {
-            google_login(req, res, 'login')
+            google_login(req, res)
         });
 
-        app.get('/join/google/redirect', async (req, res) => {
-            google_login(req, res, 'join')
-        });
-
-        async function google_login(req, res, params) {
+        async function google_login(req, res) {
             const { code } = req.query;
             console.log(`code: ${code}`);
 
@@ -736,7 +709,7 @@ async function startServer() {
                         code,
                         client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
                         client_secret: process.env.GOOGLE_SECRET,
-                        redirect_uri: `http://localhost:8080/${params}/google/redirect`,
+                        redirect_uri: `http://localhost:8080/login/google/redirect`,
                         grant_type: 'authorization_code',
                     }),
                 });
@@ -764,30 +737,23 @@ async function startServer() {
                 console.log('Google User Data:', userData);
 
                 // DB에서 사용자 조회
+                give_jwt(userData.id, res);
                 const user = await db.collection('user').findOne({ id: userData.id });
 
                 if (user) {
-                    // 기존 회원 → JWT 발급 후 로그인 처리
-                    give_jwt(userData.id, res);
                     return res.redirect("/");
                 } else {
-                    if (params === 'login') {
-                        // 로그인 시도했으나 회원가입 안 되어 있음 → 회원가입 페이지로 리다이렉트
-                        return res.redirect('/?state=google_join');
-                    } else {
-                        // 회원가입 진행
-                        await db.collection('user').insertOne({
-                            type: 'google',
-                            id: userData.id,
-                            name: userData.name,
-                            avatar_url: userData.picture,
-                            email: userData.email
-                        });
+                    // 회원가입 진행
+                    await db.collection('user').insertOne({
+                        type: 'google',
+                        id: userData.id,
+                        name: userData.name,
+                        avatar_url: userData.picture,
+                        email: userData.email
+                    });
 
-                        // JWT 발급 후 로그인 처리
-                        give_jwt(userData.id, res);
-                        return res.redirect("/");
-                    }
+                    // JWT 발급 후 로그인 처리
+                    return res.redirect("/?new=new");
                 }
             } catch (error) {
                 console.error('Google OAuth Error:', error);
