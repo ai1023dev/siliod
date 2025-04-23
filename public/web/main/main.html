@@ -16,15 +16,10 @@
             <p>지금 신규 가입하면</p>
             <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
 
-            <a href="/login/google?state=google_login"><button class="social-login google-login">
-                <img src="image/google-icon.png" alt="Google" />
-                Google 계정으로 로그인
-            </button></a>
-
-            <button class="social-login github-login">
-                <img src="image/github-icon.png" alt="GitHub" />
-                GitHub 계정으로 로그인
-            </button>
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
         </div>
     </div>
 
@@ -46,17 +41,12 @@
             </div>
 
             <nav class="sidebar-menu">
-                <button><img src="image/refresh.svg"> 결제 (아이콘 바꿔야됨)</button>
-                <button><img src="image/refresh.svg"> 보안</button>
-                <button><img src="image/refresh.svg"> API</button>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
                 <button><img src="image/refresh.svg"> 문의</button>
-                <button><img src="image/refresh.svg"> 기타</button>
+                <button><img src="image/refresh.svg"> API</button>
             </nav>
-            <hr>
-            <span>인스턴스</span>
-            <div class="instance-section scroll">
-                <nav class="sidebar-menu instance-menu"></nav>
-            </div>
+            <button class="logout">logout</button>
 
         </aside>
 
@@ -79,31 +69,6 @@
 
             <div class="cards-container scroll">
                 <div class="cards-container-data"></div>
-                <!-- <div class="card">
-                    <h2>파이썬 서버<span>GUI</span></h2>
-                    <hr>
-                    <div class="status-row">
-                        <span class="status running">running</span>
-                        <button class="connect-btn">접속하기</button>
-                    </div>
-                    <div class="specs">
-                        nano - 03986a06700853dbb
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>Ubuntu<span>CLI</span></h2>
-                    <hr>
-                    <div class="status-row">
-                        <span class="status stopped">stopped</span>
-                        <button class="connect-btn">시작하기</button>
-                    </div>
-                    <div class="specs">
-                        medium - 0585fa8f6d4ea3462
-                    </div>
-                </div>
- -->
-
 
                 <div class="card add-card">
                     <div class="plus-icon">+</div>
@@ -120,16 +85,83 @@
                 <div class="deal-line-hover">
                     <div class="deal-line"></div>
                 </div>
-                <h2>인스턴트 다루는 거 넣을곳</h2><br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
-                dsfasdfdsafasdfsad <br>
+
+                <div class="deal-container-main scroll">
+                    <span class="deal-name"><span id="instance-name">-</span>
+                        <span class="type" id="instance-type-label">-</span>
+                        <span class="status loading" id="instance-status-loading">loading</span>
+                    </span>
+
+                    <div class="instance-info">
+                        <div class="info-pair info-pair-incetance">
+                            <div class="info-label">인스턴스 ID :</div>
+                            <div class="info-value" id="instance-id">-</div>
+                        </div>
+                        <div class="info-pair">
+                            <div class="info-label">인스턴스 유형 :</div>
+                            <div class="info-value" id="instance-type">-</div>
+                        </div>
+                    </div>
+
+                    <div class="instance-info-row deal-instance-connect">
+                        <div class="ip-label">인스턴스 접속</div>
+                        <div class="ip-value">
+                            <a class="deal-incetance-link" target="_blank" id="instance-connect-url">-</a>
+                            <button class="copy-btn" id="copy-connect-url">복사</button>
+                        </div>
+                    </div>
+
+                    <div class="deal-button-group">
+                        <button class="action-btn restart" id="btn-start">인스턴스 시작</button>
+                        <button class="action-btn restart" id="btn-restart">인스턴스 재시작</button>
+                        <button class="action-btn red stop" id="btn-stop">인스턴스 중지</button>
+                    </div>
+
+                    <div class="instance-info-row">
+                        <div class="ip-label">퍼블릭 IP</div>
+                        <div class="ip-value">
+                            <span id="public-ip">-</span>
+                            <button class="copy-btn" id="copy-public-ip">복사</button>
+                        </div>
+                    </div>
+
+                    <div class="instance-info-row">
+                        <div class="ip-label">프라이빗 IP</div>
+                        <div class="ip-value">
+                            <span id="private-ip">-</span>
+                            <button class="copy-btn" id="copy-private-ip">복사</button>
+                        </div>
+                    </div>
+
+                    <div class="instance-info-row">
+                        <div class="info-label port-label">열린 포트</div>
+                        <div class="port-value" id="open-ports">
+                            <button>22</button>
+                            <button>80</button>
+                            <button>443</button>
+                            <button class="add-port-btn" id="add-port-btn">
+                                <p>+</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="deal-button-group deal-button-group-more">
+                        <button class="action-btn" id="btn-more">더보기</button>
+                    </div>
+                </div>
+
+                <button class="deal-refresh">
+                    <img src="image/refresh.svg" alt="refresh">
+                </button>
+                
+                
+                <div class="iframe-container">
+                    <div id="no-connect">연결 확인 중</div>
+                    <iframe src="" frameborder="0"></iframe>
+                </div>
             </div>
         </div>
+    </div>
     </div>
 
 

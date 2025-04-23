@@ -13,7 +13,7 @@ body {
     overflow: hidden;
 }
 
-a {
+a:not(.deal-incetance-link) {
     text-decoration: none;
     color: #fff;
 }
@@ -104,6 +104,7 @@ a {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -114,6 +115,7 @@ a {
         transform: scale(0.95);
         opacity: 0;
     }
+
     to {
         transform: scale(1);
         opacity: 1;
@@ -128,19 +130,14 @@ a {
 /* ===== 왼쪽 사이드바 ===== */
 .sidebar {
     width: 260px;
-    min-width: 260px;
-    /* 최소 너비 고정 */
-    max-width: 260px;
-    /* 최대 너비 고정 */
-    background-color: #f5f8ff;
-    padding: 1.3rem 1rem;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #c2d4ff;
-    display: flex;
-    flex-direction: column;
     height: 100vh;
-    /* 화면 전체 높이 */
+    background-color: #f9fbff;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #dbe4ff;
+    display: flex;
+    gap: 2rem;
 }
 
 .logo {
@@ -151,15 +148,6 @@ a {
     height: 40px;
 }
 
-.sidebar {
-    width: 220px;
-    padding: 1.5rem;
-    background-color: #f9fbff;
-    border-right: 1px solid #dbe4ff;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
 
 .balance-section {
     background-color: #eef4ff;
@@ -202,13 +190,6 @@ a {
     gap: 0.6rem;
 }
 
-/* 구분선 */
-.sidebar hr {
-    border: none;
-    border-top: 1px solid #dbe4ff;
-    margin: 0.5rem 0 0.2rem;
-}
-
 /* 인스턴스 섹션 제목 */
 .sidebar span {
     font-size: 0.85rem;
@@ -242,17 +223,9 @@ a {
     transform: translateY(1.5px);
 }
 
-
-
 .sidebar-menu button:hover {
     color: #3366cc;
     background-color: #f0f4ff;
-}
-
-.instance-section {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 4px;
 }
 
 /* Firefox 전용 스크롤 스타일 */
@@ -461,7 +434,7 @@ a {
     /* text-transform: uppercase; */
 }
 
-.status.lodeing {
+.status.loading {
     background-color: #e0e0e0;
     color: #555555;
     border: 1px solid #aaaaaa;
@@ -540,8 +513,7 @@ a {
 .deal-container {
     position: fixed;
     width: calc(100vw - 260px - 4rem);
-    height: 400px;
-    /* cards-container 에 100vh 빼고 적용 */
+    height: 4.5rem;
     max-height: calc(100vh - 3.5rem - 39px);
     min-height: 4.5rem;
     padding: 2rem 0;
@@ -563,6 +535,219 @@ a {
     outline: #c2d4ff solid 3px;
     border-radius: 3px;
 }
+
+
+
+
+.deal-container-main {
+    height: calc(100% - 3rem);
+    padding: 0 1em 0 1rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1.2rem;
+    float: left;
+    overflow-y: auto;
+}
+
+.deal-name {
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+}
+
+
+.deal-name .type {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 6px;
+    margin-right: 1rem;
+    transform: translateY(2.5px);
+}
+
+.deal-container-main .status {
+    width: fit-content;
+    font-weight: 400;
+    margin-right: 0.4rem;
+}
+
+.deal-refresh {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #3393ff;
+    background-color: #f3f7fa;
+    border-radius: 50%;
+    height: 2.2rem;
+    width: 2.2rem;
+    margin-top: 1px;
+    cursor: pointer;
+    float: left;
+}
+
+.deal-refresh:hover {
+    background-color: #e7ecfa;
+    animation: spin 1.4s linear infinite;
+}
+
+.deal-refresh img {
+    height: 1.7rem;
+}
+
+
+
+
+.instance-info {
+    font-size: 0.9rem;
+    align-items: center;
+    color: #333;
+    flex-wrap: wrap;
+}
+
+.info-pair {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-right: 30px;
+}
+
+.info-pair-incetance {
+    margin-bottom: 0.5rem;
+}
+
+.info-label {
+    color: #666;
+}
+
+.deal-button-group {
+    margin-bottom: 1rem;
+}
+
+.deal-instance-connect {
+    margin: 0.5rem 0;
+}
+
+.action-btn {
+    background-color: #3393ff;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-right: 5px;
+    display: none;
+}
+
+.action-btn:hover {
+    background-color: #2277dd;
+}
+
+.red {
+    background-color: #f35e59;
+}
+
+.red:hover {
+    background-color: #ca504c;
+}
+
+.ip-label {
+    margin-bottom: 0.4rem;
+    color: #666;
+}
+
+.ip-value {
+    font-size: 1.1rem;
+}
+
+.port-label {
+    margin-bottom: 10px;
+}
+
+.port-value {
+    display: flex;
+}
+
+.port-value button {
+    background-color: #55a4ff;
+    color: #fff;
+    font-size: 0.9rem;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+    margin-right: 5px;
+}
+
+.port-value button:hover {
+    background-color: #3483e4;
+}
+
+.add-port-btn {
+    margin-left: 5px;
+    background-color: #8dc0ff !important;
+    font-size: 1.4rem !important;
+    height: 32px;
+    /* 일반 버튼 높이에 맞춰서 설정 */
+    padding: 0 0.6rem;
+    /* 좌우 여백만 주기 */
+}
+
+.add-port-btn:hover {
+    background-color: #75a8e6 !important;
+}
+
+.add-port-btn p {
+    transform: translateY(-5px);
+}
+
+.delete {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.deal-button-group-more {
+    margin-bottom: 0;
+}
+
+.deal-button-group-more .action-btn {
+    margin-bottom: 0;
+    background-color: #aaa;
+    display: inline;
+}
+
+.deal-button-group-more .action-btn:hover {
+    background-color: #777;
+}
+
+
+.iframe-container {
+    height: calc(100% - 3rem);
+    width: calc(100vw - 800px);
+    float: right;
+    border-radius: 8px;
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.iframe-container div {
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+iframe {
+    height:100%;
+    width: 100%;
+    border-radius: 8px;
+    display: none;
+}
+
 
 
 

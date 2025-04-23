@@ -150,6 +150,33 @@ async function startServer() {
             return publicIp;
         }
 
+        // EC2 인스턴스의 내부 IP 가져오기
+        async function getPrivateIP(instanceId) {
+            let privateIp = null;
+            let attempts = 0;
+            const maxAttempts = 20;
+
+            while (!privateIp && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                const command = new DescribeInstancesCommand({ InstanceIds: [instanceId] });
+                const response = await aws_client.send(command);
+                const instance = response.Reservations[0].Instances[0];
+
+                // 내부 IP 확인
+                privateIp = instance.PrivateIpAddress;
+                console.log(`내부 IP 확인 중... 현재 상태: ${privateIp || '할당 대기 중'}`);
+                attempts++;
+            }
+
+            if (!privateIp) {
+                throw new Error("내부 IP를 할당받지 못했습니다.");
+            }
+
+            console.log(`내부 IP: ${privateIp}`);
+            return privateIp;
+        }
+
+
         // Route 53 A 레코드 업데이트 함수
         async function updateRoute53Record(instanceId, ipAddress) {
             const hostedZoneId = "Z070832120OJZ8UY8BSCI"; // 네임서버가 있는 Hosted Zone ID 입력
@@ -510,7 +537,6 @@ async function startServer() {
 
         // 메인 페이지
         app.get('/status', async (req, res) => {
-            console.log('ddd')
             const id = login_check(req)
 
             const instance = await db.collection('instance').find({ user: id }).toArray();
@@ -521,7 +547,7 @@ async function startServer() {
                     status[i] = { instance_id: instance[i].instance_id, status: 'building' }
                 } else {
                     const status_one = await getInstanceStatus('i-' + instance[i].instance_id)
-                    status[i] = { instance_id: instance[i].instance_id, status: status_one }
+                    status[i] = { instance_id: instance[i].instance_id, status: status_one.instanceState }
                 }
             }
 
@@ -566,10 +592,139 @@ async function startServer() {
         });
 
 
+        app.post('/instance_info', async (req, res) => {
+            const id = login_check(req)
+            const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
+            const state = await getInstanceStatus('i-' + req.body.instance_id)
+            res.send({instance, state: state.instanceState})
+        });
+
+        app.post('/instance_info_ip', async (req, res) => {
+            login_check(req)
+            const state = await getInstanceStatus('i-' + req.body.instance_id)
+            if (state.instanceState === 'pending' || state.instanceState === 'running') {
+                const publicIp = await getPublicIP('i-' + req.body.instance_id);
+                res.send(publicIp)
+            } else {
+                res.send(false)
+            }
+        });
+
+
+
+
+
+
+
         // 결제 페이지
         app.get('/pay', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
         });
+
+        // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
+        // @docs https://docs.tosspayments.com/reference/using-api/api-keys
+        const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
+        app.post("/confirm", async function (req, res) {
+            const { paymentKey, orderId, amount } = req.body;
+
+            const swap_account = Number(orderId.split('_')[0])
+
+            const data = await db.collection('user').findOne(
+                { swap_account: swap_account }
+            );
+
+            console.log(data)
+
+            if (data !== null) {
+
+                // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
+                // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
+                const encryptedSecretKey = "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
+
+                // 동적 임포트
+                const { default: got } = await import('got');
+
+                // 결제 승인 API를 호출합니다.
+                // 결제를 승인하면 결제수단에서 금액이 차감돼요.
+                got.post("https://api.tosspayments.com/v1/payments/confirm", {
+                    headers: {
+                        Authorization: encryptedSecretKey,
+                        "Content-Type": "application/json",
+                    },
+                    json: {
+                        orderId: orderId,
+                        amount: amount,
+                        paymentKey: paymentKey,
+                    },
+                    responseType: "json",
+                })
+                    .then(async function (response) {
+                        try {
+                            let data_update;
+
+                            const previous_wold = await db.collection('user').findOne({ swap_account: swap_account });
+                            console.log(previous_wold.history[0].word)
+
+                            const word = await generateUniqueWord(previous_wold.history[previous_wold.history.length - 1].word);
+
+
+                            if (isBeforeLastSaturdayThreshold()) {
+                                data_update = await db.collection('user').updateOne(
+                                    { swap_account: swap_account },
+                                    {
+                                        $inc: { money: Number(amount) },
+                                        $push: {
+                                            history: { money: Number(amount), word: word }
+                                        }
+                                    }
+                                );
+                            } else {
+                                data_update = await db.collection('user').updateOne(
+                                    { swap_account: swap_account },
+                                    {
+                                        $inc: { next_money: Number(amount) },
+                                        $push: {
+                                            history: { money: Number(amount), word: word }
+                                        }
+                                    }
+                                );
+                            }
+
+                            if (data_update.modifiedCount > 0) {
+                                // 결제 성공 비즈니스 로직을 구현하세요.
+                                console.log("업데이트 성공");
+                                res.status(response.statusCode).json({ toss: response.body, word: word })
+                            } else {
+                                res.status(400).json({ message: 'server error', code: 400 })
+                            }
+                        } catch (error) {
+                            // 예외 상황을 처리
+                            console.error("에러 발생:", error);
+                            res.status(400).json({ message: 'server error', code: 400 })
+                        }
+
+                    })
+                    .catch(function (error) {
+                        // 결제 실패 비즈니스 로직을 구현하세요.
+                        console.log(error.response.body);
+                        res.status(error.response.statusCode).json(error.response.body)
+                    });
+            } else {
+                res.status(400).json({ message: 'worng swap account number', code: 400 })
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
 
         app.get('/mail', (req, res) => {
             sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
@@ -603,12 +758,12 @@ async function startServer() {
 
         //////////////////////////////////// 로그인 /////////////////////////////////////
 
-        const secretKey = 'qwertyuiop' // process.env.SECRET_KEY
+        const secretKey = process.env.JWT_SECRET_KEY
 
         // 옵션 설정 (선택 사항)
         const options = {
             algorithm: 'HS256',
-            expiresIn: '3h'
+            expiresIn: '12h'
         };
 
         function give_jwt(id, res) {
@@ -623,7 +778,7 @@ async function startServer() {
                 res.cookie('account', token, {
                     httpOnly: true, // 클라이언트 측 스크립트에서 쿠키에 접근 불가
                     secure: true, // HTTPS 연결에서만 쿠키 전송
-                    maxAge: 3 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
+                    maxAge: 12 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
                 });
                 return true
             } catch (error) {
@@ -665,6 +820,13 @@ async function startServer() {
             }
         }
 
+        ////////////////////////// 로그아웃 /////////////////////////////////
+        app.get('/logout', (req, res) => {
+            // 예시: JWT 쿠키 삭제
+            res.clearCookie('account');
+            res.send(true);
+        });
+
 
 
         //////////////////////////////////// 구글 로그인 /////////////////////////////////////
@@ -675,9 +837,7 @@ async function startServer() {
 
             url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
 
-            let redirectUri = req.query.state === 'google_login'
-                ? 'http://localhost:8080/login/google/redirect'
-                : 'http://localhost:8080/join/google/redirect';
+            let redirectUri = 'http://localhost:8080/login/google/redirect'
 
             url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
             url += '&response_type=code';

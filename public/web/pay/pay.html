@@ -8,22 +8,16 @@
 </head>
 
 <body>
-    <button>dsfdf</button>
+    <!-- 결제 UI -->
+    <div id="payment-method"></div>
+    <!-- 이용약관 UI -->
+    <div id="agreement"></div>
+
+    <div id="payment-button">결제 및 송금하기</div>
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script>
-        $('button').click(function () {
-            $.ajax({
-                method: 'GET',
-                url: '/mail',
-                success: function (data) {
-                },
-                error: function (xhr, status, error) {
-                    alert('서버 측 에러')
-                }
-            });
-        })
-    </script>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <script src="web/pay/script.js"></script>
 </body>
 
 </html>
