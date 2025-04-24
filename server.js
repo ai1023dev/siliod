@@ -5,7 +5,7 @@ const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand } = require("@aws-sdk/client-ec2");
+const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const fs = require("fs");
@@ -54,7 +54,7 @@ async function startServer() {
 
 
         // 🔹 새 EC2 인스턴스를 생성하는 함수
-        async function createEC2Instance() {
+        async function createEC2Instance(type, ) {
             try {
                 const params = {
                     ImageId: "ami-0cb91c7de36eed2cb", // 우분투 AMI ID
@@ -76,6 +76,43 @@ async function startServer() {
                 console.error("❌ EC2 인스턴스 생성 실패:", error);
             }
         }
+
+        const attachVolume = async (instanceId, size) => {
+            try {
+                // 1. 인스턴스 AZ 조회
+                const descCommand = new DescribeInstancesCommand({ InstanceIds: [instanceId] });
+                const descResult = await aws_client.send(descCommand);
+                const az = descResult.Reservations[0].Instances[0].Placement.AvailabilityZone;
+                console.log(`🔍 인스턴스 ${instanceId} 의 AZ: ${az}`);
+        
+                // 2. 볼륨 생성
+                const createParams = {
+                    AvailabilityZone: az,
+                    Size: size,
+                    VolumeType: "gp3"
+                };
+                const createCommand = new CreateVolumeCommand(createParams);
+                const createResult = await aws_client.send(createCommand);
+                const volumeId = createResult.VolumeId;
+                console.log("✅ 볼륨 생성 완료:", volumeId);
+
+                await waitUntilVolumeAvailable({ client: aws_client, maxWaitTime: 60 }, { VolumeIds: [volumeId] });
+                console.log("✅ 볼륨이 사용 가능 상태입니다.");
+        
+                // 3. 볼륨 연결
+                const attachParams = {
+                    Device: "/dev/xvdf",
+                    InstanceId: instanceId,
+                    VolumeId: volumeId
+                };
+                const attachCommand = new AttachVolumeCommand(attachParams);
+                await aws_client.send(attachCommand);
+                console.log(`✅ ${volumeId} 볼륨을 ${instanceId} 인스턴스에 연결 완료`);
+            } catch (error) {
+                console.error("❌ 볼륨 생성 또는 연결 실패:", error);
+            }
+        };
+        
 
         async function runSSHCommand(ip, command) {
             const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
@@ -205,6 +242,53 @@ async function startServer() {
         }
 
 
+        async function getOpenPorts(instanceId) {
+            // 인스턴스 정보 가져오기
+            const instanceCommand = new DescribeInstancesCommand({ InstanceIds: [instanceId] });
+            const instanceResponse = await aws_client.send(instanceCommand);
+            const instance = instanceResponse.Reservations[0].Instances[0];
+        
+            const securityGroupIds = instance.SecurityGroups.map(sg => sg.GroupId);
+        
+            // 보안 그룹 정보 가져오기
+            const sgCommand = new DescribeSecurityGroupsCommand({ GroupIds: securityGroupIds });
+            const sgResponse = await aws_client.send(sgCommand);
+        
+            const openPorts = [];
+        
+            sgResponse.SecurityGroups.forEach(sg => {
+                sg.IpPermissions.forEach(permission => {
+                    if (permission.FromPort !== undefined && permission.ToPort !== undefined) {
+                        openPorts.push({
+                            protocol: permission.IpProtocol,
+                            fromPort: permission.FromPort,
+                            toPort: permission.ToPort,
+                            sources: [
+                                ...(permission.IpRanges || []).map(range => range.CidrIp),
+                                ...(permission.Ipv6Ranges || []).map(range => range.CidrIpv6)
+                            ]
+                        });
+                    }
+                });
+            });
+        
+            return openPorts;
+        }
+
+
+        // (async () => {
+        //     try {
+        //         const instanceId = 'i-07b74d34a44eaeeea'; // 실제 인스턴스 ID로 변경
+        //         const ports = await getOpenPorts(instanceId);
+        //         console.log("열려있는 포트:", ports);
+        //     } catch (err) {
+        //         console.error("오류:", err);
+        //     }
+        // })();
+        
+
+
+
 
 
 
@@ -318,7 +402,7 @@ async function startServer() {
 
 
 
-        async function create_instance(short_instanceId, type, name, ubuntu_password, connect_password, id, res) {
+        async function create_instance(short_instanceId, type, name, ubuntu_password, connect_password, size, id, res) {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
@@ -327,6 +411,7 @@ async function startServer() {
 
                     const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
+
 
                     // 준비 완료 목록에서 제거
                     await db.collection('ready_instance').deleteOne({
@@ -342,9 +427,10 @@ async function startServer() {
                     });
 
                     const publicIp = await start_instance(instanceId)
+                    await updateRoute53Record(instanceId, publicIp);
                     console.log(publicIp)
                     await cheak_command(publicIp)
-                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId)
+                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
                 } else {
                     const instanceId = await createEC2Instance();
                     res.send({ instanceId, ready: false }) // 길게 기다림
@@ -358,10 +444,9 @@ async function startServer() {
                     });
 
                     const publicIp = await ready_instance(instanceId, false, type)
-                    await updateRoute53Record(instanceId, publicIp);
 
                     console.log(publicIp)
-                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId)
+                    await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
                 }
             } catch (error) {
                 console.error("❌ 전체 실행 중 에러 발생:", error);
@@ -391,10 +476,13 @@ async function startServer() {
 
 
 
-        async function create_command(publicIp, type, ubuntu_password, connect_password, instanceId) {
+        async function create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size) {
             // 실행할 SSH 명령어 리스트
             const domain = `${instanceId.substring(2)}.siliod.com`;
             const gui_command = [
+                `sudo mkfs -t ext4 /dev/nvme1n1`,
+                `sudo mkdir /mnt/ebs`,
+                `sudo mount /dev/nvme1n1 /mnt/ebs`,
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
@@ -402,22 +490,11 @@ async function startServer() {
                 `vncserver :1`,
                 `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
             ];
-            // const gui_command = [
-            //     `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
-            //     `mkdir -p ~/.vnc`,
-            //     `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
-            //     `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
-            //     `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
-            //     `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
-            //     `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
-            //     `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
-            //     `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
-            //     `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
-            //     `vncserver :1`,
-            //     `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
-            // ];
 
             const cli_command = [
+                `sudo mkfs -t ext4 /dev/nvme1n1`,
+                `sudo mkdir /mnt/ebs`,
+                `sudo mount /dev/nvme1n1 /mnt/ebs`,
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
                 `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
@@ -429,6 +506,8 @@ async function startServer() {
             } else {
                 command = cli_command
             }
+
+            await attachVolume(instanceId, size);
 
             // 순차적으로 SSH 명령 실행
             for (const cmd of command) {
@@ -560,7 +639,7 @@ async function startServer() {
             const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type });
             console.log(req.body.type)
             console.log(instanceId)
-            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, id, res)
+            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, req.body.size, id, res)
         });
 
         app.post('/reboot_instance', (req, res) => {

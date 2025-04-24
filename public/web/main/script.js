@@ -292,6 +292,7 @@ function deal_open() {
                 $('#no-connect').text('인스턴스가 실행되지않음')
                 $('#no-connect').css('display', 'inline')
                 $('iframe').css('display', 'none')
+                $('iframe').attr('src', '')
 
                 $('.deal-instance-' + main_data[0]).text('시작하기')
                 $('.status-' + main_data[0]).addClass('stopped')

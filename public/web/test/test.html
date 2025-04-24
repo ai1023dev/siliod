@@ -14,6 +14,8 @@
     <button class="deal-gui-instance-create">gui create</button>
     <button class="deal-cli-instance-create">cli create</button>
 
+    <iframe src="http://127.0.0.1:5500/vnc.html" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
+
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
@@ -87,7 +89,8 @@
                     name: 'asdf',
                     type: true,
                     ubuntu_password: 'password',
-                    connect_password: '123456'
+                    connect_password: '123456',
+                    size: 5
                 }),
                 success: function (data) {
                     console.log(data)
