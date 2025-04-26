@@ -51,6 +51,8 @@ function get_instance_data(first) {
                     $(".cards-container-data").empty()
                 }
 
+                $(".summation").text(`${data.instance.length} 인스턴스 / ? 실행중`)
+
                 for (let i = 0; i < data.instance.length; i++) {
                     let type
                     if (data.instance[i].type) {
@@ -91,6 +93,8 @@ function get_instance_data(first) {
         url: '/status',
         success: function (data) {
             console.log(data)
+            let running = 0
+            
             for (let i = 0; i < data.length; i++) {
                 console.log('.status-' + data[i].instance_id)
                 if (data[i].status === 'building') {
@@ -99,8 +103,9 @@ function get_instance_data(first) {
                     if (data[i].status) {
                         $('.status-' + data[i].instance_id).text(data[i].status)
                         $('.status-' + data[i].instance_id).removeClass('loading')
-
+                        
                         if (data[i].status === 'running') {
+                            running = running + 1
                             $('.deal-instance-' + data[i].instance_id).text('접속하기')
                             $('.status-' + data[i].instance_id).addClass('running')
                             $('.deal-instance-' + data[i].instance_id).attr('running', 'true')
@@ -114,6 +119,8 @@ function get_instance_data(first) {
                     }
                 }
             }
+
+            $(".summation").text(`${data.length} 인스턴스 / ${running} 실행중`)
         },
         error: function (xhr, status, error) {
             alert('서버 측 에러')
@@ -126,73 +133,6 @@ $('.header-left button').click(function () {
 })
 
 
-
-$('.deal-gui-instance-create').click(async function () {
-    $.ajax({
-        method: 'POST',
-        url: `/create_instance`,
-        contentType: 'application/json',
-        data: JSON.stringify({
-            name: 'asdf',
-            type: true,
-            ubuntu_password: 'password',
-            connect_password: '123456'
-        }),
-        success: function (data) {
-            console.log(data)
-            let time
-            if (data.ready) {
-                time = 3
-            } else {
-                time = 10
-            }
-
-            setTimeout(() => {
-                const urlToCheck = `https://${data.instanceId.substring(2)}.siliod.com/`;
-                const interval = 15000; // 15초
-
-                const checker = setInterval(async () => {
-                    console.log('접속 시도 중...');
-
-                    const accessible = await checkURLAccessible(urlToCheck);
-
-                    if (accessible) {
-                        console.log('✅ 접속 가능! 루프 종료');
-                        $("body").append(`<iframe src="https://${data.instanceId.substring(2)}.siliod.com/"></iframe>`);
-                        clearInterval(checker);
-                    } else {
-                        console.log('❌ 아직 접속 불가');
-                    }
-                }, interval);
-
-            }, time * 60 * 1000);
-        },
-        error: function (xhr, status, error) {
-            alert('서버 측 에러')
-        }
-    });
-})
-
-$('.deal-cli-instance-create').click(async function () {
-    $.ajax({
-        method: 'POST',
-        url: `/create_instance`,
-        contentType: 'application/json',
-        data: JSON.stringify({
-            name: 'asdf',
-            type: false,
-            ubuntu_password: 'password',
-            connect_password: '123456'
-        }),
-        success: function (data) {
-            console.log(data);
-        },
-        error: function (xhr, status, error) {
-            alert('서버 측 에러');
-        }
-    });
-
-})
 
 function checkURLAccessible(instance_id) {
     return fetch(`https://${instance_id}.siliod.com/`, {
@@ -232,6 +172,7 @@ $(document).on('click', '.connect-btn', function () {
 let main_data
 $(document).on('click', '.open-deal', function () {
     main_data = JSON.parse($(this).attr('data-fild'))
+    $('.deal-container').css('height', 'calc(510px + 7rem)')
     deal_open()
 })
 
@@ -240,8 +181,6 @@ $(document).on('click', '.deal-refresh', function () {
 })
 
 function deal_open() {
-    $('.deal-container').css('height', 'calc(510px + 7rem)')
-
     $('#instance-name').text(main_data[1])
     $('#instance-type-label').text(main_data[2])
     $('#instance-id').text(main_data[0])

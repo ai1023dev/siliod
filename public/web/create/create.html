@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="web/create/style.css" />
+</head>
+
+<body>
+    <!-- 로그인 모달 -->
+    <div class="login-modal-backdrop hidden">
+        <div class="login-modal">
+            <p>지금 신규 가입하면</p>
+            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
+        </div>
+    </div>
+
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="image/siliod_logo_black.png" alt="logo" />
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유금액</div>
+                <div class="balance-amount">5,700원</div>
+                <button class="charge-btn">충전하기</button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <button><img src="image/refresh.svg"> 대쉬보드</button>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
+                <button><img src="image/refresh.svg"> 문의</button>
+                <button><img src="image/refresh.svg"> API</button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>인스턴스 생성</h2>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar" src="image/profile.png" alt="Profile" />
+                    <div class="username">Login</div>
+                </div>
+            </header>
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="instance-name">인스턴스 이름</label>
+                    <input type="text" id="instance-name" placeholder="예: my-instance" />
+                </div>
+
+                <div class="form-group">
+                    <label>접속 방식</label>
+                    <div class="radio-group">
+                        <label class="custom-radio">
+                            <input type="radio" name="interface" value="gui" />
+                            <span class="radio-mark"></span>
+                            GUI
+                        </label>
+                        <label class="custom-radio">
+                            <input type="radio" name="interface" value="cli" />
+                            <span class="radio-mark"></span>
+                            CLI
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="instance-name">인스턴스 등급</label>
+                    <select class="custom-select" name="interface">
+                        <option value="nano">nano</option>
+                        <option value="micro">micro</option>
+                        <option value="small">small</option>
+                        <option value="medium" selected>medium (권장)</option>
+                        <option value="large">large</option>
+                        <option value="xlarge">xlarge</option>
+                    </select>
+
+
+                    <div class="password-strength" id="speac-strength"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instance-name">스토리지</label>
+                    <div class="password-wrapper">
+                        <input type="number" id="storage-input" min="8" step="1" value="10"/>
+                        <button type="button" class="gib">GiB</button>
+                    </div>
+                    <div class="password-strength" id="storage-strength">GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.</div>
+                </div>
+
+
+                <div>
+                    <div class="width">
+                        <div class="form-group">
+                            <label for="ubuntu-password">Ubuntu 비밀번호</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="ubuntu-password" />
+                                <button type="button" class="toggle-password" data-target="#ubuntu-password">보기</button>
+                            </div>
+                            <div class="password-strength" id="ubuntu-password-strength"></div>
+                        </div><br>
+
+                        <div class="form-group">
+                            <label for="ubuntu-password-confirm">Ubuntu 비밀번호 확인</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="ubuntu-password-confirm" />
+                                <button type="button" class="toggle-password"
+                                    data-target="#ubuntu-password-confirm">보기</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="width">
+                        <div class="form-group">
+                            <label for="connect-password">접속 비밀번호</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="connect-password" placeholder="Connect 비밀번호 (6~8자리)" />
+                                <button type="button" class="toggle-password"
+                                    data-target="#connect-password">보기</button>
+                            </div>
+                            <div class="password-strength" id="connect-password-strength"></div>
+                        </div><br>
+
+                        <div class="form-group">
+                            <label for="connect-password-confirm">접속 비밀번호 확인</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="connect-password-confirm" />
+                                <button type="button" class="toggle-password"
+                                    data-target="#connect-password-confirm">보기</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-actions">
+                    <button type="button" id="create-instance-btn">인스턴스 생성</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="web/create/script.js"></script>
+</body>
+
+</html>

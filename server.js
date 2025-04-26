@@ -293,15 +293,17 @@ async function startServer() {
 
 
         // const instanceId1 = await createEC2Instance();
-        // ready_instance(instanceId1, true, true)
+        // ready_instance(instanceId1, true, false)
         // const instanceId2 = await createEC2Instance();
         // ready_instance(instanceId2, true, false)
         // const instanceId3 = await createEC2Instance();
-        // ready_instance(instanceId3, true, true)
+        // ready_instance(instanceId3, true, false)
         // const instanceId4 = await createEC2Instance();
         // ready_instance(instanceId4, true, true)
         // const instanceId5 = await createEC2Instance();
         // ready_instance(instanceId5, true, true)
+        // const instanceId6 = await createEC2Instance();
+        // ready_instance(instanceId6, true, true)
 
 
         async function ready_instance(instanceId, ready, type) {
@@ -387,7 +389,7 @@ async function startServer() {
                         instance_id: instanceId.substring(2)
                     });
 
-                    if (!success || !used_success) {
+                    if (!success && !used_success) {
                         console.log('❌ 인스턴스 준비 실패. 종료 처리');
                         await terminate_instance(instanceId);
                     }
@@ -423,7 +425,8 @@ async function startServer() {
                         name,
                         type,
                         build: true,
-                        instance_id: instanceId.substring(2)
+                        instance_id: instanceId.substring(2),
+                        private_ip : null
                     });
 
                     const publicIp = await start_instance(instanceId)
@@ -440,7 +443,8 @@ async function startServer() {
                         name,
                         type,
                         build: true,
-                        instance_id: instanceId.substring(2)
+                        instance_id: instanceId.substring(2),
+                        private_ip : null
                     });
 
                     const publicIp = await ready_instance(instanceId, false, type)
@@ -507,17 +511,21 @@ async function startServer() {
                 command = cli_command
             }
 
-            await attachVolume(instanceId, size);
+            if (size !== 0) {
+                await attachVolume(instanceId, size);
+            }
 
             // 순차적으로 SSH 명령 실행
             for (const cmd of command) {
                 await runSSHCommand(publicIp, cmd);
             }
 
+            const privateIP = await getPrivateIP(instanceId); 
+
             // 인스턴스 DB에 등록
             await db.collection('instance').updateOne(
                 { instance_id: instanceId.substring(2) },
-                { $set: { build: false } }
+                { $set: { build: false, private_ip: privateIP } }
             );
 
 
@@ -605,13 +613,23 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/web/main/main.html'));
         });
 
-        // 메인 페이지
+        app.get('/create', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/create/create.html'));
+        });
+
         app.get('/my_data', async (req, res) => {
             const id = login_check(req)
             const user = await db.collection('user').findOne({ id });
             const instance = await db.collection('instance').find({ user: id }).toArray();
 
             res.send({ user, instance });
+        });
+
+        app.get('/login_cheak', async (req, res) => {
+            const id = login_check(req)
+            const user = await db.collection('user').findOne({ id });
+
+            res.send(user);
         });
 
         // 메인 페이지
@@ -636,10 +654,10 @@ async function startServer() {
         app.post('/create_instance', async (req, res) => {
             const id = login_check(req)
 
+            console.log(req.body)
             const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type });
-            console.log(req.body.type)
-            console.log(instanceId)
-            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, req.body.size, id, res)
+            const size =  Number(req.body.storage) - 8
+            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, size, id, res)
         });
 
         app.post('/reboot_instance', (req, res) => {
@@ -871,10 +889,6 @@ async function startServer() {
 
                 const decoded = check_token(token);
                 if (decoded !== false) {  // 조건문 수정
-                    console.log('해석한 쿠키:', decoded.id);
-                    console.log('생산 날짜:', timestampToDate(decoded.iat));
-                    console.log('유효날짜:', timestampToDate(decoded.exp));
-
                     return decoded.id;
                 } else {
                     return false;

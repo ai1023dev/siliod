@@ -703,11 +703,6 @@ a:not(.deal-incetance-link) {
     transform: translateY(-5px);
 }
 
-.delete {
-    padding: 0.4rem 0.6rem;
-    font-size: 0.9rem;
-    margin-top: 5px;
-}
 
 .deal-button-group-more {
     margin-bottom: 0;

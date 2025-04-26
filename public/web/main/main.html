@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>siliod</title>
     <link rel="stylesheet" href="web/main/style.css" />
-    <!-- <link rel="stylesheet" href="web/main/dark.css" /> -->
 </head>
 
 <body>
@@ -31,7 +30,6 @@
         <aside class="sidebar">
             <div class="logo">
                 <img src="image/siliod_logo_black.png" alt="logo" />
-                <!-- <img src="image/siliod_logo_white.png" alt="logo" /> -->
             </div>
 
             <div class="balance-section">
@@ -54,7 +52,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>2 인스턴스 / 1 실행중</h2>
+                    <h2 class="summation">? 인스턴스 / ? 실행중</h2>
                     <button>
                         <img src="image/refresh.svg" alt="refresh">
                         <span>상태 새로고침</span>
@@ -70,15 +68,17 @@
             <div class="cards-container scroll">
                 <div class="cards-container-data"></div>
 
-                <div class="card add-card">
-                    <div class="plus-icon">+</div>
-                    <div class="add-card-hight">
-                        <h2>a</h2>
-                        <hr>
-                        <div class="status-row"><span class="status stopped">a</span></div>
-                        <div class="specs">a</div>
+                <a href="/create">
+                    <div class="card add-card">
+                        <div class="plus-icon">+</div>
+                        <div class="add-card-hight">
+                            <h2>a</h2>
+                            <hr>
+                            <div class="status-row"><span class="status stopped">a</span></div>
+                            <div class="specs">a</div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
 
             <div class="deal-container">
@@ -153,8 +153,8 @@
                 <button class="deal-refresh">
                     <img src="image/refresh.svg" alt="refresh">
                 </button>
-                
-                
+
+
                 <div class="iframe-container">
                     <div id="no-connect">연결 확인 중</div>
                     <iframe src="" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
