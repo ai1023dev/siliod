@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="web/more/style.css" />
+</head>
+
+<body>
+    <!-- 로그인 모달 -->
+    <div class="login-modal-backdrop hidden">
+        <div class="login-modal">
+            <p>지금 신규 가입하면</p>
+            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
+        </div>
+    </div>
+
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="image/siliod_logo_black.png" alt="logo" />
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유금액</div>
+                <div class="balance-amount">5,700원</div>
+                <button class="charge-btn">충전하기</button>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="/">
+                    <button><img src="image/refresh.svg"> 대쉬보드</button>
+                </a>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
+                <button><img src="image/refresh.svg"> 문의</button>
+                <button><img src="image/refresh.svg"> API</button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>인스턴스 정보</h2>
+
+                    <button id="refresh">
+                        <img src="image/refresh.svg" alt="refresh">
+                        <span>상태 새로고침</span>
+                    </button>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar" src="image/profile.png" alt="Profile" />
+                    <div class="username">Login</div>
+                </div>
+            </header>
+
+            <div class="main-section">
+                <span class="deal-name"><input id="instance-name" type="text">
+                    <span class="type" id="instance-type-label">-</span>
+                    <span class="status loading" id="instance-status-loading">loading</span>
+                </span>
+
+                <div class="instance-info-wrapper">
+                    <div class="instance-info">
+                        <div class="info-pair info-pair-incetance">
+                            <div class="info-label">인스턴스 ID :</div>
+                            <div class="info-value" id="instance-id">-</div>
+                        </div>
+                        <div class="info-pair">
+                            <div class="info-label">인스턴스 유형 :</div>
+                            <div class="info-value" id="instance-type">-</div>
+                        </div>
+
+                        <div class="instance-info-row deal-instance-connect">
+                            <div class="ip-label">인스턴스 접속</div>
+                            <div class="ip-value">
+                                <a class="deal-incetance-link" target="_blank" id="instance-connect-url">-</a>
+                                <button class="copy-btn" id="copy-connect-url">복사</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ip-info">
+                        <div class="instance-info-row">
+                            <div class="ip-label">퍼블릭 IP</div>
+                            <div class="ip-value">
+                                <span id="public-ip">-</span>
+                                <button class="copy-btn" id="copy-public-ip">복사</button>
+                            </div>
+                        </div>
+                        <div class="instance-info-row">
+                            <div class="ip-label">프라이빗 IP</div>
+                            <div class="ip-value">
+                                <span id="private-ip">-</span>
+                                <button class="copy-btn" id="copy-private-ip">복사</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="delete-incetance" class="action-btn red">인스턴스 삭제</button>
+
+
+                <div class="rules-label">인바운드 규칙</div>
+                <div id="rules-container">
+                    <!-- 규칙 블록들이 여기에 들어감 -->
+                </div>
+
+                <div class="action-btn-container">
+                    <button id="add-rule" class="action-btn">규칙 추가</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="web/more/script.js"></script>
+</body>
+
+</html>

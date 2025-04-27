@@ -51,8 +51,6 @@ function get_instance_data(first) {
                     $(".cards-container-data").empty()
                 }
 
-                $(".summation").text(`${data.instance.length} 인스턴스 / ? 실행중`)
-
                 for (let i = 0; i < data.instance.length; i++) {
                     let type
                     if (data.instance[i].type) {
@@ -133,17 +131,6 @@ $('.header-left button').click(function () {
 })
 
 
-
-function checkURLAccessible(instance_id) {
-    return fetch(`https://${instance_id}.siliod.com/`, {
-        method: 'HEAD',
-        mode: 'no-cors'
-    })
-        .then(() => true)
-        .catch(() => false);
-}
-
-
 $(document).on('click', '.connect-btn', function () {
     if ($(this).attr('running') === 'true') {
         window.open(`https://${$(this).attr('data-fild')}.siliod.com/`, '_blank');
@@ -172,7 +159,7 @@ $(document).on('click', '.connect-btn', function () {
 let main_data
 $(document).on('click', '.open-deal', function () {
     main_data = JSON.parse($(this).attr('data-fild'))
-    $('.deal-container').css('height', 'calc(510px + 7rem)')
+    $('.deal-container').css('height', 'calc(430px + 7rem)')
     deal_open()
 })
 
@@ -187,6 +174,8 @@ function deal_open() {
     $('#instance-connect-url').text(main_data[0] + '.siliod.com')
     $('#instance-connect-url').attr('href', 'https://' + main_data[0] + '.siliod.com')
     $('#public-ip').text('로딩중')
+    $('#btn-more').attr('href', `/more?id=${main_data[0]}`)
+
     $('#instance-status-loading').text('lodeing')
     $('#instance-status-loading').addClass('loading')
     $('#instance-status-loading').removeClass('running')

@@ -113,6 +113,37 @@ $('#storage-input').change(function () {
 });
 
 
+$('#ip').change(function () {
+    const isValid = ip_cheak()
+    if (isValid) {
+        $('#ip-strength').text("유효한 IP 입력입니다.").removeClass("weak strong").addClass('strong');
+    } else {
+        $('#ip-strength').text("유효하지 않은 IP가 포함되어 있습니다.").removeClass("weak strong").addClass('weak');
+    }
+});
+
+function ip_cheak() {
+    const selectedValue = $('#ip').val();
+
+    // '0.0.0.0/0'은 모든 접속 허용, 이를 바로 통과시킴
+    if (selectedValue === '0.0.0.0/0') {
+        return true;  // 모든 접속 허용은 유효
+    }
+
+    // IP 유효성 검사 함수
+    function isValidIP(ip) {
+        const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipPattern.test(ip);
+    }
+
+    // 각 IP 주소를 검사
+    if (!isValidIP(selectedValue)) {
+        return false;  // 유효하지 않으면 false 반환
+    }
+    return true;  // 모든 IP가 유효하면 true 반환
+}
+
+
 
 
 // 생성 버튼 클릭
@@ -136,14 +167,19 @@ $("#create-instance-btn").click(function () {
         return;
     }
 
+    if (instanceName !== instanceName.includes(' ')) {
+        alert("인스턴스 이름에 공백이 포함되어 있습니다.");
+        return;
+    }
+
     // 라디오 버튼이 선택되지 않으면 경고
     if (!interfaceSelected) {
         alert("접속 방식을 선택해주세요.");
         return;
     }
 
-    if (storage <= 8) {
-        alert("접속 비밀번호는 6~8자리여야 합니다.");
+    if (storage < 8) {
+        alert("최소 스토리지 용량은 8GiB입니다.");
         return;
     }
 
@@ -158,7 +194,12 @@ $("#create-instance-btn").click(function () {
     }
 
     if (connectPassword.length < 6 || connectPassword.length > 8) {
-        alert("최소 스토리지 용량은 8GiB입니다.");
+        alert("접속 비밀번호는 6~8자리여야 합니다.");
+        return;
+    }
+
+    if (!ip_cheak()) {
+        alert("유효하지 않은 IP가 포함되어 있습니다..");
         return;
     }
 
@@ -176,6 +217,7 @@ $("#create-instance-btn").click(function () {
             name: instanceName,
             type,
             grade: $(".custom-select").val(),
+            source: $("#ip").val(),
             storage,
             ubuntu_password: ubuntuPassword,
             connect_password: connectPassword
@@ -187,4 +229,15 @@ $("#create-instance-btn").click(function () {
             alert('서버 측 에러');
         }
     });
+});
+
+$.ajax({
+    method: 'GET',
+    url: `https://api.ipify.org?format=json`,
+    success: function (data) {
+        $("#ip").val(data.ip)
+    },
+    error: function (xhr, status, error) {
+        alert('서버 측 에러');
+    }
 });

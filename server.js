@@ -5,7 +5,7 @@ const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable } = require("@aws-sdk/client-ec2");
+const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const fs = require("fs");
@@ -20,7 +20,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const { MongoClient } = require('mongodb');
-const { type } = require('os');
 let db;
 
 async function startServer() {
@@ -54,13 +53,15 @@ async function startServer() {
 
 
         // 🔹 새 EC2 인스턴스를 생성하는 함수
-        async function createEC2Instance(type, ) {
+        async function createEC2Instance(grade) {
             try {
+                const securityGroupId = await createSecurityGroup();
+
                 const params = {
                     ImageId: "ami-0cb91c7de36eed2cb", // 우분투 AMI ID
-                    InstanceType: "t3.medium", // 인스턴스 유형
+                    InstanceType: 't3.' + grade, // 동적으로 인스턴스 유형 설정
                     KeyName: "keypair", // 🔹 기존 키 페어 이름 입력
-                    SecurityGroupIds: ["sg-0c75bf8745ed0900f"], // 🔹 보안 그룹 ID
+                    SecurityGroupIds: [securityGroupId],
                     SubnetId: "subnet-0d2fb1c4561c35943",
                     MinCount: 1,
                     MaxCount: 1
@@ -71,11 +72,80 @@ async function startServer() {
 
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
+
+                await addIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+                await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
+
                 return instanceId;
             } catch (error) {
                 console.error("❌ EC2 인스턴스 생성 실패:", error);
             }
         }
+
+        async function createSecurityGroup() {
+            const params = {
+                GroupName: "SecurityGroup" + Date.now(),  // 고유한 이름 생성
+                VpcId: "vpc-0899762b3597175ba",          // VPC ID
+                Description: "temporary"
+            };
+
+            const command = new CreateSecurityGroupCommand(params);
+            const response = await aws_client.send(command);
+            return response.GroupId; // 반환: 보안 그룹 ID
+        }
+
+        async function addIngressRule(instanceId, protocol, from_port, to_port, source) {
+            const groupId = await getSecurityGroupId(instanceId);
+            const params = {
+                GroupId: groupId,
+                IpPermissions: [
+                    {
+                        IpProtocol: protocol,
+                        FromPort: from_port,
+                        ToPort: to_port,
+                        IpRanges: [{ CidrIp: source }] // 모든 IP에서 접근 가능
+                    }
+                ]
+            };
+
+            const command = new AuthorizeSecurityGroupIngressCommand(params);
+            await aws_client.send(command);
+            console.log(`✅ 보안 그룹에 포트 ${from_port}-${to_port} 허용 규칙 추가 완료`);
+        }
+
+        async function removeIngressRule(instanceId, protocol, from_port, to_port, source) {
+            const groupId = await getSecurityGroupId(instanceId);
+            const params = {
+                GroupId: groupId,
+                IpPermissions: [
+                    {
+                        IpProtocol: protocol,
+                        FromPort: from_port,
+                        ToPort: to_port,
+                        IpRanges: [{ CidrIp: source }]
+                    }
+                ]
+            };
+
+            const command = new RevokeSecurityGroupIngressCommand(params);
+            await aws_client.send(command);
+            console.log(`✅ 보안 그룹에서 포트 ${from_port}-${to_port} 허용 규칙 삭제 완료`);
+        }
+
+
+        async function getSecurityGroupId(instanceId) {
+            const params = {
+                InstanceIds: [instanceId]
+            };
+
+            const command = new DescribeInstancesCommand(params);
+            const data = await aws_client.send(command);
+
+            // 인스턴스의 보안 그룹 ID 가져오기
+            const securityGroupId = data.Reservations[0].Instances[0].SecurityGroups[0].GroupId;
+            return securityGroupId;
+        }
+
 
         const attachVolume = async (instanceId, size) => {
             try {
@@ -84,7 +154,7 @@ async function startServer() {
                 const descResult = await aws_client.send(descCommand);
                 const az = descResult.Reservations[0].Instances[0].Placement.AvailabilityZone;
                 console.log(`🔍 인스턴스 ${instanceId} 의 AZ: ${az}`);
-        
+
                 // 2. 볼륨 생성
                 const createParams = {
                     AvailabilityZone: az,
@@ -98,7 +168,7 @@ async function startServer() {
 
                 await waitUntilVolumeAvailable({ client: aws_client, maxWaitTime: 60 }, { VolumeIds: [volumeId] });
                 console.log("✅ 볼륨이 사용 가능 상태입니다.");
-        
+
                 // 3. 볼륨 연결
                 const attachParams = {
                     Device: "/dev/xvdf",
@@ -112,7 +182,7 @@ async function startServer() {
                 console.error("❌ 볼륨 생성 또는 연결 실패:", error);
             }
         };
-        
+
 
         async function runSSHCommand(ip, command) {
             const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
@@ -247,15 +317,15 @@ async function startServer() {
             const instanceCommand = new DescribeInstancesCommand({ InstanceIds: [instanceId] });
             const instanceResponse = await aws_client.send(instanceCommand);
             const instance = instanceResponse.Reservations[0].Instances[0];
-        
+
             const securityGroupIds = instance.SecurityGroups.map(sg => sg.GroupId);
-        
+
             // 보안 그룹 정보 가져오기
             const sgCommand = new DescribeSecurityGroupsCommand({ GroupIds: securityGroupIds });
             const sgResponse = await aws_client.send(sgCommand);
-        
+
             const openPorts = [];
-        
+
             sgResponse.SecurityGroups.forEach(sg => {
                 sg.IpPermissions.forEach(permission => {
                     if (permission.FromPort !== undefined && permission.ToPort !== undefined) {
@@ -271,22 +341,9 @@ async function startServer() {
                     }
                 });
             });
-        
+
             return openPorts;
         }
-
-
-        // (async () => {
-        //     try {
-        //         const instanceId = 'i-07b74d34a44eaeeea'; // 실제 인스턴스 ID로 변경
-        //         const ports = await getOpenPorts(instanceId);
-        //         console.log("열려있는 포트:", ports);
-        //     } catch (err) {
-        //         console.error("오류:", err);
-        //     }
-        // })();
-        
-
 
 
 
@@ -404,7 +461,7 @@ async function startServer() {
 
 
 
-        async function create_instance(short_instanceId, type, name, ubuntu_password, connect_password, size, id, res) {
+        async function create_instance(short_instanceId, type, name, grade, ubuntu_password, connect_password, size, source, id, res) {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
@@ -420,14 +477,18 @@ async function startServer() {
                         instance_id: instanceId.substring(2)
                     });
 
+                    const privateIP = await getPrivateIP(instanceId);
                     await db.collection('instance').insertOne({
                         user: id,
                         name,
                         type,
                         build: true,
                         instance_id: instanceId.substring(2),
-                        private_ip : null
+                        private_ip: privateIP
                     });
+
+
+                    await addIngressRule(instanceId, 'tcp', 443, 443, source + '/32')
 
                     const publicIp = await start_instance(instanceId)
                     await updateRoute53Record(instanceId, publicIp);
@@ -435,17 +496,20 @@ async function startServer() {
                     await cheak_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
                 } else {
-                    const instanceId = await createEC2Instance();
+                    const instanceId = await createEC2Instance(grade);
                     res.send({ instanceId, ready: false }) // 길게 기다림
 
+                    const privateIP = await getPrivateIP(instanceId);
                     await db.collection('instance').insertOne({
                         user: id,
                         name,
                         type,
                         build: true,
                         instance_id: instanceId.substring(2),
-                        private_ip : null
+                        private_ip: privateIP
                     });
+
+                    await addIngressRule(instanceId, 'tcp', 443, 443, source + '/32')
 
                     const publicIp = await ready_instance(instanceId, false, type)
 
@@ -484,9 +548,6 @@ async function startServer() {
             // 실행할 SSH 명령어 리스트
             const domain = `${instanceId.substring(2)}.siliod.com`;
             const gui_command = [
-                `sudo mkfs -t ext4 /dev/nvme1n1`,
-                `sudo mkdir /mnt/ebs`,
-                `sudo mount /dev/nvme1n1 /mnt/ebs`,
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
@@ -496,12 +557,15 @@ async function startServer() {
             ];
 
             const cli_command = [
-                `sudo mkfs -t ext4 /dev/nvme1n1`,
-                `sudo mkdir /mnt/ebs`,
-                `sudo mount /dev/nvme1n1 /mnt/ebs`,
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
                 `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+            ];
+
+            const ebs_command = [
+                `sudo mkfs -t ext4 /dev/nvme1n1`,
+                `sudo mkdir /mnt/ebs`,
+                `sudo mount /dev/nvme1n1 /mnt/ebs`,
             ];
 
             let command
@@ -513,6 +577,9 @@ async function startServer() {
 
             if (size !== 0) {
                 await attachVolume(instanceId, size);
+                for (const cmd of ebs_command) {
+                    await runSSHCommand(publicIp, cmd);
+                }
             }
 
             // 순차적으로 SSH 명령 실행
@@ -520,12 +587,14 @@ async function startServer() {
                 await runSSHCommand(publicIp, cmd);
             }
 
-            const privateIP = await getPrivateIP(instanceId); 
+              
+            await removeIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+            await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
             // 인스턴스 DB에 등록
             await db.collection('instance').updateOne(
                 { instance_id: instanceId.substring(2) },
-                { $set: { build: false, private_ip: privateIP } }
+                { $set: { build: false } }
             );
 
 
@@ -617,6 +686,10 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/web/create/create.html'));
         });
 
+        app.get('/more', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/more/more.html'));
+        });
+
         app.get('/my_data', async (req, res) => {
             const id = login_check(req)
             const user = await db.collection('user').findOne({ id });
@@ -655,9 +728,10 @@ async function startServer() {
             const id = login_check(req)
 
             console.log(req.body)
-            const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type });
-            const size =  Number(req.body.storage) - 8
-            create_instance(instanceId, req.body.type, req.body.name, req.body.ubuntu_password, req.body.connect_password, size, id, res)
+            const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type, grade: req.body.grade });
+            const size = Number(req.body.storage) - 8
+            create_instance(instanceId, req.body.type, req.body.name, req.body.grade,
+                req.body.ubuntu_password, req.body.connect_password, size, req.body.source, id, res)
         });
 
         app.post('/reboot_instance', (req, res) => {
@@ -693,7 +767,7 @@ async function startServer() {
             const id = login_check(req)
             const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
             const state = await getInstanceStatus('i-' + req.body.instance_id)
-            res.send({instance, state: state.instanceState})
+            res.send({ instance, state: state.instanceState })
         });
 
         app.post('/instance_info_ip', async (req, res) => {
@@ -705,6 +779,19 @@ async function startServer() {
             } else {
                 res.send(false)
             }
+        });
+
+        app.get('/get_ip', (req, res) => {
+            const clientIp = req.ip;  // 클라이언트 IP 주소를 가져옴
+            res.json(clientIp);
+        });
+
+        app.post('/inbound_info', async (req, res) => {
+            login_check(req)
+
+            const ports = await getOpenPorts('i-' + req.body.instance_id);
+            console.log("열려있는 포트:", ports);
+            res.send(ports)
         });
 
 
