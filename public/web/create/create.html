@@ -11,7 +11,7 @@
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
-        <div class="login-modal">
+        <div class="modal">
             <p>지금 신규 가입하면</p>
             <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
 
@@ -22,11 +22,22 @@
         </div>
     </div>
 
+    <!-- 공룡 게임 모달 -->
+    <div class="dino-modal-backdrop hidden">
+        <div class="modal dino-modal">
+            <span id="dino-time">예상 소요시간 1분</span>
+            <a id="dino-dashboard"><button>대쉬보드로 이동</button></a><br>
+            <iframe src="http://localhost:8080/dino" frameborder="0"></iframe>
+
+            <div>게임 한 판 어때요? 인스턴스가 곧 시작돼요!</div>
+        </div>
+    </div>
+
     <div class="layout">
         <!-- 왼쪽 사이드바 -->
         <aside class="sidebar">
             <div class="logo">
-                <img src="image/siliod_logo_black.png" alt="logo" />
+                <a href="/"><img src="image/siliod_logo_black.png" alt="logo" /></a>
             </div>
 
             <div class="balance-section">
@@ -99,7 +110,7 @@
                     </div>
                     <div class="form-group">
                         <div class="form-group">
-                            <label for="instance-name">접속 허용 ip (모든 접속 허용은 '0.0.0.0/0' 이나 권장하지 않습니다.)</label>
+                            <label for="instance-name">접속 허용 IP (CIDR 표기 필수)</label>
                             <input id="ip" type="text">
 
                             <div class="strength" id="ip-strength">현재 ip</div>

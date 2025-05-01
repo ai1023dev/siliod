@@ -349,27 +349,27 @@ async function startServer() {
 
 
 
-        // const instanceId1 = await createEC2Instance();
-        // ready_instance(instanceId1, true, false)
-        // const instanceId2 = await createEC2Instance();
-        // ready_instance(instanceId2, true, false)
-        // const instanceId3 = await createEC2Instance();
-        // ready_instance(instanceId3, true, false)
-        // const instanceId4 = await createEC2Instance();
-        // ready_instance(instanceId4, true, true)
-        // const instanceId5 = await createEC2Instance();
-        // ready_instance(instanceId5, true, true)
-        // const instanceId6 = await createEC2Instance();
-        // ready_instance(instanceId6, true, true)
+        // const instanceId1 = await createEC2Instance('medium');
+        // ready_instance(instanceId1, true, false, 'medium')
+        // const instanceId2 = await createEC2Instance('medium');
+        // ready_instance(instanceId2, true, false, 'medium')
+        // const instanceId3 = await createEC2Instance('large');
+        // ready_instance(instanceId3, true, false, 'large')
+        // const instanceId4 = await createEC2Instance('medium');
+        // ready_instance(instanceId4, true, true, 'medium')
+        // const instanceId5 = await createEC2Instance('medium');
+        // ready_instance(instanceId5, true, true, 'medium')
+        // const instanceId6 = await createEC2Instance('large');
+        // ready_instance(instanceId6, true, true, 'large')
 
 
-        async function ready_instance(instanceId, ready, type) {
+        async function ready_instance(instanceId, ready, type, grade) {
             try {
                 const publicIp = await getPublicIP(instanceId); // 퍼블릭 IP 가져오기
 
                 await updateRoute53Record(instanceId, publicIp);
 
-                await cheak_command(publicIp)
+                await check_command(publicIp)
 
                 const domain = `${instanceId.substring(2)}.siliod.com`;
 
@@ -427,7 +427,7 @@ async function startServer() {
                 if (ready) {
                     // DB에 준비된 인스턴스 등록
                     await db.collection('ready_instance').insertOne({
-                        instance_id: instanceId.substring(2), type
+                        instance_id: instanceId.substring(2), type, grade
                     });
 
                     // 인스턴스 정지
@@ -488,12 +488,12 @@ async function startServer() {
                     });
 
 
-                    await addIngressRule(instanceId, 'tcp', 443, 443, source + '/32')
+                    await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
                     const publicIp = await start_instance(instanceId)
                     await updateRoute53Record(instanceId, publicIp);
                     console.log(publicIp)
-                    await cheak_command(publicIp)
+                    await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
                 } else {
                     const instanceId = await createEC2Instance(grade);
@@ -509,9 +509,9 @@ async function startServer() {
                         private_ip: privateIP
                     });
 
-                    await addIngressRule(instanceId, 'tcp', 443, 443, source + '/32')
+                    await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
-                    const publicIp = await ready_instance(instanceId, false, type)
+                    const publicIp = await ready_instance(instanceId, false, type, grade)
 
                     console.log(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
@@ -521,7 +521,7 @@ async function startServer() {
             }
         };
 
-        async function cheak_command(publicIp) {
+        async function check_command(publicIp) {
             const maxAttempts = 20;
             const interval = 15000; // 15초
 
@@ -690,6 +690,15 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/web/more/more.html'));
         });
 
+        app.get('/dino', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
+        });
+
+
+
+
+
+
         app.get('/my_data', async (req, res) => {
             const id = login_check(req)
             const user = await db.collection('user').findOne({ id });
@@ -698,7 +707,7 @@ async function startServer() {
             res.send({ user, instance });
         });
 
-        app.get('/login_cheak', async (req, res) => {
+        app.get('/login_check', async (req, res) => {
             const id = login_check(req)
             const user = await db.collection('user').findOne({ id });
 
@@ -781,12 +790,7 @@ async function startServer() {
             }
         });
 
-        app.get('/get_ip', (req, res) => {
-            const clientIp = req.ip;  // 클라이언트 IP 주소를 가져옴
-            res.json(clientIp);
-        });
-
-        app.post('/inbound_info', async (req, res) => {
+        app.post('/port_info', async (req, res) => {
             login_check(req)
 
             const ports = await getOpenPorts('i-' + req.body.instance_id);
@@ -794,6 +798,48 @@ async function startServer() {
             res.send(ports)
         });
 
+        app.post('/add_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/edit_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await removeIngressRule('i-' + req.body.instance_id, req.body.delete_port.protocol, 
+                req.body.delete_port.fromPort, req.body.delete_port.toPort, req.body.delete_port.sources)
+
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/remove_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/instance_build', async (req, res) => {
+            const id = login_check(req)
+            const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
+            if (!instance || !instance.build) {
+                res.send(true)
+            } else {
+                res.send(false)
+            }
+        });
 
 
 
@@ -947,7 +993,7 @@ async function startServer() {
         // 옵션 설정 (선택 사항)
         const options = {
             algorithm: 'HS256',
-            expiresIn: '12h'
+            expiresIn: '15h'
         };
 
         function give_jwt(id, res) {
@@ -962,7 +1008,7 @@ async function startServer() {
                 res.cookie('account', token, {
                     httpOnly: true, // 클라이언트 측 스크립트에서 쿠키에 접근 불가
                     secure: true, // HTTPS 연결에서만 쿠키 전송
-                    maxAge: 12 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
+                    maxAge: 15 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
                 });
                 return true
             } catch (error) {
@@ -986,9 +1032,6 @@ async function startServer() {
             }
         }
 
-        function timestampToDate(timestamp) {
-            return new Date(timestamp * 1000).toLocaleString();
-        }
 
         // JWT 검증 함수
         function check_token(token) {

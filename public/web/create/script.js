@@ -1,6 +1,6 @@
 $.ajax({
     method: 'GET',
-    url: '/login_cheak',
+    url: '/login_check',
     success: function (data) {
         console.log(data)
         if (data) {
@@ -68,8 +68,8 @@ function updateStrengthIndicator(inputSelector, strengthSelector) {
 
 
 // 비밀번호 strength 실시간 표시
-updateStrengthIndicator("#ubuntu-password", "#ubuntu-password-strength");
-updateStrengthIndicator("#connect-password", "#connect-password-strength");
+updateStrengthIndicator("#ubuntu-password", "#ubuntu-strength");
+updateStrengthIndicator("#connect-password", "#connect-strength");
 
 
 $('.custom-select').change(function () {
@@ -103,7 +103,7 @@ $('.custom-select').change(function () {
     $('#speac-strength').text(specs);
 });
 
-$('#storage-input').change(function () {
+$('#storage-input').on('input', function () {
     const selectedValue = $(this).val();
     if (selectedValue >= 8) {
         $('#storage-strength').text('GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.').removeClass("weak medium strong");
@@ -113,8 +113,9 @@ $('#storage-input').change(function () {
 });
 
 
-$('#ip').change(function () {
-    const isValid = ip_cheak()
+
+$('#ip').on('input', function () {
+    const isValid = ip_check();
     if (isValid) {
         $('#ip-strength').text("유효한 IP 입력입니다.").removeClass("weak strong").addClass('strong');
     } else {
@@ -122,26 +123,28 @@ $('#ip').change(function () {
     }
 });
 
-function ip_cheak() {
+
+function ip_check() {
     const selectedValue = $('#ip').val();
 
     // '0.0.0.0/0'은 모든 접속 허용, 이를 바로 통과시킴
     if (selectedValue === '0.0.0.0/0') {
-        return true;  // 모든 접속 허용은 유효
+        return true;
     }
 
-    // IP 유효성 검사 함수
-    function isValidIP(ip) {
-        const ipPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-        return ipPattern.test(ip);
+    // CIDR 유효성 검사 함수
+    function isValidCIDR(cidr) {
+        const cidrPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\/([0-9]|[1-2][0-9]|3[0-2])$/;
+        return cidrPattern.test(cidr);
     }
 
-    // 각 IP 주소를 검사
-    if (!isValidIP(selectedValue)) {
-        return false;  // 유효하지 않으면 false 반환
+    if (isValidCIDR(selectedValue)) {
+        return true;
     }
-    return true;  // 모든 IP가 유효하면 true 반환
+
+    return false;
 }
+
 
 
 
@@ -162,19 +165,23 @@ $("#create-instance-btn").click(function () {
     // 라디오 버튼 선택 여부 확인
     const interfaceSelected = $("input[name='interface']:checked").length > 0;
 
-    if (!instanceName.trim() || !ubuntuPassword.trim() || !ubuntuPasswordConfirm.trim() || !connectPassword.trim() || !connectPasswordConfirm.trim()) {
+    if (!instanceName || !ubuntuPassword || !ubuntuPasswordConfirm || !connectPassword || !connectPasswordConfirm || !interfaceSelected) {
         alert("모든 필드를 채워주세요.");
         return;
     }
 
-    if (instanceName !== instanceName.includes(' ')) {
+    if (instanceName.includes(' ')) {
         alert("인스턴스 이름에 공백이 포함되어 있습니다.");
         return;
     }
 
-    // 라디오 버튼이 선택되지 않으면 경고
-    if (!interfaceSelected) {
-        alert("접속 방식을 선택해주세요.");
+    if (ubuntuPassword.includes(' ')) {
+        alert("Ubuntu 비밀번호에 공백이 포함되어 있습니다.");
+        return;
+    }
+
+    if (connectPassword.includes(' ')) {
+        alert("접속 비밀번호에 공백이 포함되어 있습니다.");
         return;
     }
 
@@ -198,7 +205,7 @@ $("#create-instance-btn").click(function () {
         return;
     }
 
-    if (!ip_cheak()) {
+    if (!ip_check()) {
         alert("유효하지 않은 IP가 포함되어 있습니다..");
         return;
     }
@@ -208,6 +215,8 @@ $("#create-instance-btn").click(function () {
         type = false
     }
 
+
+    $(".dino-modal-backdrop").removeClass("hidden");
 
     $.ajax({
         method: 'POST',
@@ -224,6 +233,23 @@ $("#create-instance-btn").click(function () {
         }),
         success: function (data) {
             console.log(data);
+            if (!data.ready) {
+                $("#dino-time").text('예상 소요시간 10분')
+            }
+            $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
+
+            setInterval(() => {
+                $.ajax({
+                    method: 'POST',
+                    url: `/instance_build`,
+                    data: { instance_id: data.instanceId.substring(2) },
+                    success: function (build) {
+                        if (build) {
+                            window.location.href = '/?instance=' + data.instanceId.substring(2)
+                        }
+                    },
+                });
+            }, 5000);
         },
         error: function (xhr, status, error) {
             alert('서버 측 에러');
@@ -235,7 +261,7 @@ $.ajax({
     method: 'GET',
     url: `https://api.ipify.org?format=json`,
     success: function (data) {
-        $("#ip").val(data.ip)
+        $("#ip").val(data.ip + '/32')
     },
     error: function (xhr, status, error) {
         alert('서버 측 에러');
