@@ -37,6 +37,47 @@ $('.logout').click(function () {
 
 const params = new URLSearchParams(window.location.search);
 
+if (params.get("result") === 'success') {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentKey = urlParams.get("paymentKey");
+    const orderId = urlParams.get("orderId");
+    const amount = urlParams.get("amount");
+
+    async function confirm() {
+        const requestData = {
+            paymentKey: paymentKey,
+            orderId: orderId,
+            amount: amount,
+        };
+
+        const response = await fetch("/confirm", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(requestData),
+        });
+
+        const json = await response.json();
+
+        if (!response.ok) {
+            // 결제 실패 비즈니스 로직을 구현하세요.
+            console.log(json);
+            window.location.href = `/?result=fail&message=${json.message}&code=${json.code}`;
+        } else {
+            alert('결제성공')
+        }
+
+        // 결제 성공 비즈니스 로직을 구현하세요.
+        console.log(json);
+    }
+    confirm();
+}
+
+if (params.get("result") === 'fail') {
+    alert('결제 실패')
+}
+
 function get_instance_data(first) {
     $.ajax({
         method: 'GET',
@@ -92,7 +133,7 @@ function get_instance_data(first) {
         success: function (data) {
             console.log(data)
             let running = 0
-            
+
             for (let i = 0; i < data.length; i++) {
                 console.log('.status-' + data[i].instance_id)
                 if (data[i].status === 'building') {
@@ -101,7 +142,7 @@ function get_instance_data(first) {
                     if (data[i].status) {
                         $('.status-' + data[i].instance_id).text(data[i].status)
                         $('.status-' + data[i].instance_id).removeClass('loading')
-                        
+
                         if (data[i].status === 'running') {
                             running = running + 1
                             $('.deal-instance-' + data[i].instance_id).text('접속하기')

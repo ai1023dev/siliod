@@ -1,4 +1,29 @@
-main();
+let orderId
+
+$.ajax({
+    method: 'GET',
+    url: '/login_check',
+    success: function (data) {
+        console.log(data)
+        orderId = data.id + '_' +Date.now()
+        console.log(orderId)
+
+        if (data) {
+            $(".avatar").attr('src', data.avatar_url);
+            $(".username").text(data.name);
+        } else {
+            $(".login-modal-backdrop").removeClass("hidden");
+        }
+    },
+    error: function (xhr, status, error) {
+        alert('서버 측 에러')
+    }
+});
+
+const params = new URLSearchParams(window.location.search);
+const amount = params.get("amount")
+
+$("h1").text(amount);
 
 
 async function main() {
@@ -13,7 +38,7 @@ async function main() {
     // ------ 주문의 결제 금액 설정 ------
     await widgets.setAmount({
         currency: "KRW",
-        value: 1000,
+        value: Number(amount),
     });
 
     await Promise.all([
@@ -27,18 +52,13 @@ async function main() {
     ]);
 
 
-    const ran1 = Math.random();
-    const ran2 = Math.random();
-    const ran_orderId = String(ran1).replace('.', '') + String(ran2).replace('.', '');
-
-
     // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
     button.addEventListener("click", async function () {
         await widgets.requestPayment({
-            orderId: ran_orderId,
-            orderName: "SwAP",
-            successUrl: window.location.origin + "/remittance/pay/success",
-            failUrl: window.location.origin + "/remittance/pay/fail",
+            orderId: orderId,
+            orderName: "siliod 충전",
+            successUrl: window.location.origin + "/?result=success&",
+            failUrl: window.location.origin + "/?result=fail&",
         });
     });
-}
+} main()

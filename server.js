@@ -8,7 +8,6 @@ const nodemailer = require("nodemailer");
 const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
-const fs = require("fs");
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -587,7 +586,7 @@ async function startServer() {
                 await runSSHCommand(publicIp, cmd);
             }
 
-              
+
             await removeIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
             await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
@@ -692,6 +691,22 @@ async function startServer() {
 
         app.get('/dino', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
+        });
+
+        app.get('/credit', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/credit/credit.html'));
+        });
+
+        app.get('/pay', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
+        });
+
+        app.get('/pay/success', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/pay/success/success.html'));
+        });
+
+        app.get('/pay/fail', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/pay/fail/fail.html'));
         });
 
 
@@ -803,7 +818,7 @@ async function startServer() {
 
             console.log(req.body)
 
-            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
                 Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
             res.send(true)
         });
@@ -813,10 +828,10 @@ async function startServer() {
 
             console.log(req.body)
 
-            await removeIngressRule('i-' + req.body.instance_id, req.body.delete_port.protocol, 
+            await removeIngressRule('i-' + req.body.instance_id, req.body.delete_port.protocol,
                 req.body.delete_port.fromPort, req.body.delete_port.toPort, req.body.delete_port.sources)
 
-            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
                 Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
             res.send(true)
         });
@@ -826,7 +841,7 @@ async function startServer() {
 
             console.log(req.body)
 
-            await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol, 
+            await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
                 Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
             res.send(true)
         });
@@ -847,35 +862,25 @@ async function startServer() {
 
 
         // 결제 페이지
-        app.get('/pay', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
-        });
 
         // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
         // @docs https://docs.tosspayments.com/reference/using-api/api-keys
-        const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
         app.post("/confirm", async function (req, res) {
+            // 클라이언트에서 받은 JSON 요청 바디입니다.
             const { paymentKey, orderId, amount } = req.body;
 
-            const swap_account = Number(orderId.split('_')[0])
+            // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
+            // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
+            const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+            const encryptedSecretKey =
+                "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
 
-            const data = await db.collection('user').findOne(
-                { swap_account: swap_account }
-            );
+            const id = login_check(req)
 
-            console.log(data)
-
-            if (data !== null) {
-
-                // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
-                // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
-                const encryptedSecretKey = "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
-
-                // 동적 임포트
+            if (id === orderId.split("_")[0]) {
                 const { default: got } = await import('got');
 
-                // 결제 승인 API를 호출합니다.
                 // 결제를 승인하면 결제수단에서 금액이 차감돼요.
                 got.post("https://api.tosspayments.com/v1/payments/confirm", {
                     headers: {
@@ -890,50 +895,19 @@ async function startServer() {
                     responseType: "json",
                 })
                     .then(async function (response) {
-                        try {
-                            let data_update;
+                        // 결제 성공 비즈니스 로직을 구현하세요.
+                        const user_data = await db.collection('user').findOne({ id: id });
 
-                            const previous_wold = await db.collection('user').findOne({ swap_account: swap_account });
-                            console.log(previous_wold.history[0].word)
+                        sendEmail(user_data.email, "siliod 충전", response.body.totalAmount + "원 충전됨여여.")
+                        await db.collection('user').updateOne(
+                            { id: id }, // 조건
+                            { $inc: { amount: response.body.totalAmount } } // 수정 내용
+                        );
 
-                            const word = await generateUniqueWord(previous_wold.history[previous_wold.history.length - 1].word);
+                        await db.collection('receipt').insertOne({ id: id, amount: response.body.totalAmount, receipt: response.body.receipt.url });
 
-
-                            if (isBeforeLastSaturdayThreshold()) {
-                                data_update = await db.collection('user').updateOne(
-                                    { swap_account: swap_account },
-                                    {
-                                        $inc: { money: Number(amount) },
-                                        $push: {
-                                            history: { money: Number(amount), word: word }
-                                        }
-                                    }
-                                );
-                            } else {
-                                data_update = await db.collection('user').updateOne(
-                                    { swap_account: swap_account },
-                                    {
-                                        $inc: { next_money: Number(amount) },
-                                        $push: {
-                                            history: { money: Number(amount), word: word }
-                                        }
-                                    }
-                                );
-                            }
-
-                            if (data_update.modifiedCount > 0) {
-                                // 결제 성공 비즈니스 로직을 구현하세요.
-                                console.log("업데이트 성공");
-                                res.status(response.statusCode).json({ toss: response.body, word: word })
-                            } else {
-                                res.status(400).json({ message: 'server error', code: 400 })
-                            }
-                        } catch (error) {
-                            // 예외 상황을 처리
-                            console.error("에러 발생:", error);
-                            res.status(400).json({ message: 'server error', code: 400 })
-                        }
-
+                        console.log(response.body);
+                        res.status(response.statusCode).json(response.body)
                     })
                     .catch(function (error) {
                         // 결제 실패 비즈니스 로직을 구현하세요.
@@ -941,7 +915,7 @@ async function startServer() {
                         res.status(error.response.statusCode).json(error.response.body)
                     });
             } else {
-                res.status(400).json({ message: 'worng swap account number', code: 400 })
+                res.status(401).json({ message: "인증되지 않은 요청입니다." });
             }
         });
 
@@ -956,9 +930,8 @@ async function startServer() {
 
 
 
-        app.get('/mail', (req, res) => {
-            sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
-        });
+        // sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
+
 
         // SMTP 설정
         const transporter = nodemailer.createTransport({
@@ -1128,11 +1101,11 @@ async function startServer() {
                 } else {
                     // 회원가입 진행
                     await db.collection('user').insertOne({
-                        type: 'google',
                         id: userData.id,
                         name: userData.name,
                         avatar_url: userData.picture,
-                        email: userData.email
+                        email: userData.email,
+                        amount: 1000
                     });
 
                     // JWT 발급 후 로그인 처리
