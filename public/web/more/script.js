@@ -6,6 +6,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
+            $(".balance-amount").text(data.amount+'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -21,23 +22,25 @@ console.log(instance_id)
 
 let port_info
 function main_data() {
+    $('#instance-id').text(instance_id)
+    $('#instance-connect-url').text(instance_id + '.siliod.com')
+    $('#instance-connect-url').attr('href', 'https://' + instance_id + '.siliod.com')
+
     $.ajax({
         method: 'POST',
         url: `/instance_info`,
         data: { instance_id },
         success: function (data) {
+            console.log(data);
+            
             $('#instance-name').val(data.instance.name)
             if (data.instance.type) {
                 $('#instance-type-label').text('GUI')
             } else {
                 $('#instance-type-label').text('CLI')
             }
-            $('#instance-id').text(instance_id)
-            $('#instance-connect-url').text(instance_id + '.siliod.com')
-            $('#instance-connect-url').attr('href', 'https://' + instance_id + '.siliod.com')
+            $('#instance-type').text(data.instance.grade)
 
-
-            console.log(data);
             $('#private-ip').text(data.instance.private_ip)
             $('#instance-status-loading').text(data.state)
             $('#instance-status-loading').removeClass('loading')
@@ -46,31 +49,8 @@ function main_data() {
             console.log(data.state)
             if (data.state === 'running') {
                 $('#instance-status-loading').addClass('running')
-                $('#btn-start').css('display', 'none')
-                $('#btn-restart').css('display', 'inline')
-                $('#btn-stop').css('display', 'inline')
-
-                $('iframe').css('display', 'inline')
-                $('iframe').attr('src', 'https://' + instance_id + '.siliod.com')
-                $('#no-connect').css('display', 'none')
-
-                $('.deal-instance-' + instance_id).text('접속하기')
-                $('.status-' + instance_id).addClass('running')
-                $('.deal-instance-' + instance_id).attr('running', 'true')
             } else {
                 $('#instance-status-loading').addClass('stopped')
-                $('#btn-start').css('display', 'inline')
-                $('#btn-restart').css('display', 'none')
-                $('#btn-stop').css('display', 'none')
-
-                $('#no-connect').text('인스턴스가 실행되지않음')
-                $('#no-connect').css('display', 'inline')
-                $('iframe').css('display', 'none')
-                $('iframe').attr('src', '')
-
-                $('.deal-instance-' + instance_id).text('시작하기')
-                $('.status-' + instance_id).addClass('stopped')
-                $('.deal-instance-' + instance_id).attr('running', 'false')
             }
         },
         error: function (xhr, status, error) {
@@ -173,7 +153,7 @@ function createRule(i, rule = {}) {
 
     const ruleHtml = `
         <div class="rule-list">
-            <div class="form-rule" data-fild="${i}">
+            <div class="form-rule" data-field="${i}">
                 <div class="form-group">
                     <label>프로토콜</label>
                     <select class="protocol">
@@ -332,7 +312,7 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
         sources: [customIP]
     };
 
-    const delete_port = port_info[$form.attr('data-fild')]
+    const delete_port = port_info[$form.attr('data-field')]
 
     console.log(delete_port)
 

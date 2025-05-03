@@ -88,6 +88,7 @@ function get_instance_data(first) {
                 if (first) {
                     $(".avatar").attr('src', data.user.avatar_url);
                     $(".username").text(data.user.name);
+                    $(".balance-amount").text(data.user.amount+'p');
                 } else {
                     $(".cards-container-data").empty()
                 }
@@ -101,13 +102,13 @@ function get_instance_data(first) {
                     }
 
                     $(".cards-container-data").append(
-                        `<div class="card open-deal" data-fild=["${data.instance[i].instance_id}","${data.instance[i].name}","${type}"]>
+                        `<div class="card open-deal" data-field=["${data.instance[i].instance_id}","${data.instance[i].name}","${type}"]>
                             <h2>${data.instance[i].name}<span>${type}</span></h2>
                             <hr>
                             <div class="status-row">
                                 <span class="status loading status-${data.instance[i].instance_id}">loading</span>
                                 <button class="connect-btn deal-instance-${data.instance[i].instance_id}"
-                                    data-fild="${data.instance[i].instance_id}">로딩중</button>
+                                    data-field="${data.instance[i].instance_id}">로딩중</button>
                             </div>
                             <div class="specs">
                                 nano - ${data.instance[i].instance_id}
@@ -138,6 +139,7 @@ function get_instance_data(first) {
                 console.log('.status-' + data[i].instance_id)
                 if (data[i].status === 'building') {
                     $('.status-' + data[i].instance_id).text('building')
+                    $('.deal-instance-' + data[i].instance_id).text('생성중')
                 } else {
                     if (data[i].status) {
                         $('.status-' + data[i].instance_id).text(data[i].status)
@@ -174,16 +176,16 @@ $('.header-left button').click(function () {
 
 $(document).on('click', '.connect-btn', function () {
     if ($(this).attr('running') === 'true') {
-        window.open(`https://${$(this).attr('data-fild')}.siliod.com/`, '_blank');
+        window.open(`https://${$(this).attr('data-field')}.siliod.com/`, '_blank');
     } else {
         console.log('saaaa')
-        $(`.status-${$(this).attr('data-fild')}`).text('pending')
+        $(`.status-${$(this).attr('data-field')}`).text('pending')
         $(this).attr('running', 'true')
 
         $.ajax({
             method: 'POST',
             url: 'start_instance',
-            data: { instance_id: $(this).attr('data-fild') },
+            data: { instance_id: $(this).attr('data-field') },
             success: function (data) {
                 console.log(data);
                 if (!data) {
@@ -199,7 +201,7 @@ $(document).on('click', '.connect-btn', function () {
 
 let main_data
 $(document).on('click', '.open-deal', function () {
-    main_data = JSON.parse($(this).attr('data-fild'))
+    main_data = JSON.parse($(this).attr('data-field'))
     $('.deal-container').css('height', 'calc(430px + 7rem)')
     deal_open()
 })
@@ -234,38 +236,58 @@ function deal_open() {
         success: function (data) {
             console.log(data);
             $('#private-ip').text(data.instance.private_ip)
-            $('#instance-status-loading').text(data.state)
-            $('#instance-status-loading').removeClass('loading')
-            $('.status-' + main_data[0]).text(data.state)
 
             console.log(data.state)
-            if (data.state === 'running') {
-                $('#instance-status-loading').addClass('running')
-                $('#btn-start').css('display', 'none')
-                $('#btn-restart').css('display', 'inline')
-                $('#btn-stop').css('display', 'inline')
 
-                $('iframe').css('display', 'inline')
-                $('iframe').attr('src', 'https://' + main_data[0] + '.siliod.com')
-                $('#no-connect').css('display', 'none')
+            if (data.instance.build) {
+                $('.status-' + main_data[0]).text('buliding')
+                $('#instance-status-loading').text('buliding')
 
-                $('.deal-instance-' + main_data[0]).text('접속하기')
-                $('.status-' + main_data[0]).addClass('running')
-                $('.deal-instance-' + main_data[0]).attr('running', 'true')
-            } else {
-                $('#instance-status-loading').addClass('stopped')
-                $('#btn-start').css('display', 'inline')
-                $('#btn-restart').css('display', 'none')
-                $('#btn-stop').css('display', 'none')
-
-                $('#no-connect').text('인스턴스가 실행되지않음')
+                $('#no-connect').text('인스턴스가 생성중')
                 $('#no-connect').css('display', 'inline')
                 $('iframe').css('display', 'none')
                 $('iframe').attr('src', '')
 
-                $('.deal-instance-' + main_data[0]).text('시작하기')
-                $('.status-' + main_data[0]).addClass('stopped')
-                $('.deal-instance-' + main_data[0]).attr('running', 'false')
+                $('#btn-start').css('display', 'none')
+                $('#btn-restart').css('display', 'none')
+                $('#btn-stop').css('display', 'none')
+
+                $('.deal-instance-' + main_data[0]).text('생성중')
+            } else {
+                $('.status-' + main_data[0]).text(data.state)
+                $('#instance-status-loading').text(data.state)
+                $('#instance-status-loading').removeClass('loading')
+
+                if (data.state === 'running') {
+                    $('#instance-status-loading').addClass('running')
+                    $('.status-' + main_data[0]).addClass('running')
+
+                    $('iframe').css('display', 'inline')
+                    $('iframe').attr('src', 'https://' + main_data[0] + '.siliod.com')
+                    $('#no-connect').css('display', 'none')
+
+                    $('#btn-start').css('display', 'none')
+                    $('#btn-restart').css('display', 'inline')
+                    $('#btn-stop').css('display', 'inline')
+
+                    $('.deal-instance-' + main_data[0]).text('접속하기')
+                    $('.deal-instance-' + main_data[0]).attr('running', 'true')
+                } else {
+                    $('#instance-status-loading').addClass('stopped')
+                    $('.status-' + main_data[0]).addClass('stopped')
+
+                    $('#no-connect').text('인스턴스가 실행되지않음')
+                    $('#no-connect').css('display', 'inline')
+                    $('iframe').css('display', 'none')
+                    $('iframe').attr('src', '')
+
+                    $('#btn-start').css('display', 'inline')
+                    $('#btn-restart').css('display', 'none')
+                    $('#btn-stop').css('display', 'none')
+
+                    $('.deal-instance-' + main_data[0]).text('시작하기')
+                    $('.deal-instance-' + main_data[0]).attr('running', 'false')
+                }
             }
         },
         error: function (xhr, status, error) {

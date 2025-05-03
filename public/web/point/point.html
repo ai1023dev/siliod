@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>siliod</title>
-    <link rel="stylesheet" href="web/credit/style.css" />
+    <link rel="stylesheet" href="web/point/style.css" />
 </head>
 
 <body>
@@ -32,7 +32,7 @@
 
             <div class="balance-section">
                 <div class="balance-label">보유금액</div>
-                <div class="balance-amount">5,700원</div>
+                <div class="balance-amount"></div>
             </div>
 
             <nav class="sidebar-menu">
@@ -50,7 +50,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>크레딧 충전</h2>
+                    <h2>포인트 충전</h2>
                 </div>
 
                 <div class="header-right">
@@ -59,80 +59,77 @@
                 </div>
             </header>
 
-            <!-- 1p = 1hour -->
             <div class="point-container">
-                <div class="point-card select" data-fild="24-4320">
+                <div class="point-card select" data-field="240">
                     <div class="badge">인기</div>
-                    <div class="point">24p</div>
+                    <div class="point top">240p</div>
                     <div class="price">4,320원</div>
                     <div class="discount">10% 할인 4800 -> 4320</div>
                 </div>
                 
-                <div class="point-card" data-fild="720-100800">
-                    <div class="label">720p (한달)</div>
-                    <div class="point">720p</div>
+                <div class="point-card" data-field="7200">
+                    <div class="point">7200p</div>
                     <div class="price">100,800원</div>
                     <div class="discount">30% 할인 144,000 -> 100800</div>
                 </div>
                 
-                <div class="point-card" data-fild="168-26880">
-                    <div class="label">168p (1주일)</div>
-                    <div class="point">168p</div>
+                <div class="point-card" data-field="1680">
+                    <div class="point">1680p</div>
                     <div class="price">26,880원</div>
                     <div class="discount">20% 할인 33,600 -> 26880</div>
                 </div>
                 
-                <div class="point-card" data-fild="100-17000">
-                    <div class="point">100p</div>
+                <div class="point-card" data-field="1000">
+                    <div class="point">1000p</div>
                     <div class="price">17,000원</div>
                     <div class="discount">15% 할인 20000 -> 17000</div>
                 </div>
                 
-                <div class="point-card" data-fild="50-9000">
-                    <div class="point">50p</div>
+                <div class="point-card" data-field="500">
+                    <div class="point">500p</div>
                     <div class="price">9,000원</div>
                     <div class="discount">10% 할인 10,000 -> 9000</div>
                 </div>
                 
-                <div class="point-card" data-fild="15-3000">
-                    <div class="point">15p</div>
+                <div class="point-card" data-field="150">
+                    <div class="point">150p</div>
                     <div class="price">3,000원</div>
                     <div class="discount">할인 없음</div>
                 </div>
                 
-                <div class="point-card" data-fild="10-2000">
-                    <div class="point">10p</div>
+                <div class="point-card" data-field="100">
+                    <div class="point">100p</div>
                     <div class="price">2,000원</div>
                     <div class="discount">할인 없음</div>
                 </div>
                 
-                <div class="point-card" data-fild="5-1000">
-                    <div class="point">5p</div>
+                <div class="point-card" data-field="50">
+                    <div class="point">50p</div>
                     <div class="price">1,000원</div>
                     <div class="discount">할인 없음</div>
                 </div>                
             </div>
 
             <div class="explanation">
-                <span>24p 결제시</span>
+                <span id="explanation-point">240p 충전시</span>
                 <select class="custom-select" name="interface">
-                    <option value="nano">nano</option>
-                    <option value="micro">micro</option>
-                    <option value="small">small</option>
-                    <option value="medium" selected>medium (권장)</option>
-                    <option value="large">large</option>
-                    <option value="xlarge">xlarge</option>
+                    <option value="3">nano</option>
+                    <option value="5">micro</option>
+                    <option value="7">small</option>
+                    <option value="10" selected>medium (권장)</option>
+                    <option value="20">large</option>
+                    <option value="40">xlarge</option>
                 </select>
-                <span>인스턴스 24시간 사용 가능</span>
+                <span id="explanation-time">인스턴스 24시간 사용 가능</span>
             </div>
             
-            <a class="move-pay" href="/pay?amount=24"><button class="pay-btn">충전하기</button></a>
+            <a class="move-pay" href="/pay?point=240"><button class="pay-btn">충전하기</button></a>
         </div>
     </div>
 
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="web/credit/script.js"></script>
+    <script src="web/point/script.js"></script>
 </body>
 
 </html>

@@ -11,6 +11,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
+            $(".balance-amount").text(data.amount+'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -21,9 +22,12 @@ $.ajax({
 });
 
 const params = new URLSearchParams(window.location.search);
-const amount = params.get("amount")
+const point = params.get("point")
+const amount = point * 200
 
-$("h1").text(amount);
+
+$(".point").html(`<span class="bold">${point}</span>p`)
+$(".amount").html(`<span class="bold">${amount}</span>원`)
 
 
 async function main() {
@@ -56,7 +60,7 @@ async function main() {
     button.addEventListener("click", async function () {
         await widgets.requestPayment({
             orderId: orderId,
-            orderName: "siliod 충전",
+            orderName: `siliod ${point}p 충전`,
             successUrl: window.location.origin + "/?result=success&",
             failUrl: window.location.origin + "/?result=fail&",
         });

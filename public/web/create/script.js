@@ -6,6 +6,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
+            $(".balance-amount").text(data.amount+'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -78,22 +79,22 @@ $('.custom-select').change(function () {
 
     switch (selectedValue) {
         case 'nano':
-            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 $0.0052';
+            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 3p';
             break;
         case 'micro':
-            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 $0.0104';
+            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 5p';
             break;
         case 'small':
-            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 $0.0209';
+            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 7p';
             break;
         case 'medium':
-            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 $0.0418';
+            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 10p';
             break;
         case 'large':
-            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 $0.0832';
+            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 20p';
             break;
         case 'xlarge':
-            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 $0.1664';
+            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 40p';
             break;
         default:
             specs = '';

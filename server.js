@@ -481,6 +481,7 @@ async function startServer() {
                         user: id,
                         name,
                         type,
+                        grade,
                         build: true,
                         instance_id: instanceId.substring(2),
                         private_ip: privateIP
@@ -503,6 +504,7 @@ async function startServer() {
                         user: id,
                         name,
                         type,
+                        grade,
                         build: true,
                         instance_id: instanceId.substring(2),
                         private_ip: privateIP
@@ -669,6 +671,27 @@ async function startServer() {
 
 
 
+        // setInterval(async () => {
+        //     const instance = await db.collection('instance').find({}).toArray();
+        //     for (let i = 0; i < instance.length; i++) {
+        //         const status = await getInstanceStatus('i-' + instance[i].instance_id)
+
+        //         if (status.instanceState === 'running') {
+        //             let amount
+        //             if (instance[i].grade === 'medium') {
+        //                 amount = -0.25
+        //             }
+
+        //             await db.collection('user').updateOne(
+        //                 { id: instance[i].user }, // 조건
+        //                 { $inc: { amount: amount } } // 수정 내용
+        //             );
+        //         }
+        //     }
+        // }, 10000);
+        // }, 15 * 60 * 1000);
+
+
 
 
         // 메인 페이지
@@ -693,20 +716,12 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
         });
 
-        app.get('/credit', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/credit/credit.html'));
+        app.get('/point', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/point/point.html'));
         });
 
         app.get('/pay', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
-        });
-
-        app.get('/pay/success', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/pay/success/success.html'));
-        });
-
-        app.get('/pay/fail', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/pay/fail/fail.html'));
         });
 
 
