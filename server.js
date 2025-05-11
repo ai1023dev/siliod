@@ -9,6 +9,14 @@ const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, Describ
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const dotenv = require("dotenv");
+const https = require('https');
+const fs = require('fs');
+
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/siliod.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/siliod.com/fullchain.pem')
+};
+
 
 dotenv.config();
 
@@ -709,460 +717,460 @@ async function startServer() {
         //     }
         // }
         // }, 30000);
-    // }, 15 * 60 * 1000);
+        // }, 15 * 60 * 1000);
 
 
 
 
-    // 메인 페이지
-    app.get('/test', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/test/test.html'));
-    });
+        // 메인 페이지
+        app.get('/test', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/test/test.html'));
+        });
 
-    // 메인 페이지
-    app.get('/', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/main/main.html'));
-    });
+        // 메인 페이지
+        app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/main/main.html'));
+        });
 
-    app.get('/create', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/create/create.html'));
-    });
+        app.get('/create', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/create/create.html'));
+        });
 
-    app.get('/more', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/more/more.html'));
-    });
+        app.get('/more', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/more/more.html'));
+        });
 
-    app.get('/dino', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
-    });
+        app.get('/dino', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
+        });
 
-    app.get('/point', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/point/point.html'));
-    });
+        app.get('/point', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/point/point.html'));
+        });
 
-    app.get('/pay', (req, res) => {
-        res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
-    });
-
-
+        app.get('/pay', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
+        });
 
 
 
 
-    app.get('/my_data', async (req, res) => {
-        const id = login_check(req)
-        const user = await db.collection('user').findOne({ id });
-        const instance = await db.collection('instance').find({ user: id }).toArray();
 
-        res.send({ user, instance });
-    });
 
-    app.get('/login_check', async (req, res) => {
-        const id = login_check(req)
-        const user = await db.collection('user').findOne({ id });
+        app.get('/my_data', async (req, res) => {
+            const id = login_check(req)
+            const user = await db.collection('user').findOne({ id });
+            const instance = await db.collection('instance').find({ user: id }).toArray();
 
-        res.send(user);
-    });
+            res.send({ user, instance });
+        });
 
-    // 메인 페이지
-    app.get('/status', async (req, res) => {
-        const id = login_check(req)
+        app.get('/login_check', async (req, res) => {
+            const id = login_check(req)
+            const user = await db.collection('user').findOne({ id });
 
-        const instance = await db.collection('instance').find({ user: id }).toArray();
+            res.send(user);
+        });
 
-        let status = []
-        for (let i = 0; i < instance.length; i++) {
-            if (instance[i].build) {
-                status[i] = { instance_id: instance[i].instance_id, status: 'building' }
+        // 메인 페이지
+        app.get('/status', async (req, res) => {
+            const id = login_check(req)
+
+            const instance = await db.collection('instance').find({ user: id }).toArray();
+
+            let status = []
+            for (let i = 0; i < instance.length; i++) {
+                if (instance[i].build) {
+                    status[i] = { instance_id: instance[i].instance_id, status: 'building' }
+                } else {
+                    const status_one = await getInstanceStatus('i-' + instance[i].instance_id)
+                    status[i] = { instance_id: instance[i].instance_id, status: status_one.instanceState }
+                }
+            }
+
+            res.send(status);
+        });
+
+        app.post('/create_instance', async (req, res) => {
+            const id = login_check(req)
+
+            console.log(req.body)
+            const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type, grade: req.body.grade });
+            const size = Number(req.body.storage) - 8
+            create_instance(instanceId, req.body.type, req.body.name, req.body.grade,
+                req.body.ubuntu_password, req.body.connect_password, size, req.body.source, id, res)
+        });
+
+        app.post('/reboot_instance', (req, res) => {
+            res.send(true)
+            reboot_instance('i-' + req.body.instance_id)
+        });
+
+        app.post('/start_instance', async (req, res) => {
+            const success = await start_instance('i-' + req.body.instance_id)
+            if (success) {
+                res.send(true)
             } else {
-                const status_one = await getInstanceStatus('i-' + instance[i].instance_id)
-                status[i] = { instance_id: instance[i].instance_id, status: status_one.instanceState }
+                res.send(false)
+            }
+        });
+
+        app.post('/stop_instance', (req, res) => {
+            res.send(true)
+            stop_instance('i-' + req.body.instance_id)
+        });
+
+        app.post('/delete_instance', (req, res) => {
+            res.send(true)
+            terminate_instance('i-' + req.body.instance_id)
+
+            db.collection('instance').deleteOne({
+                instance_id: req.body.instance_id
+            });
+        });
+
+
+        app.post('/instance_info', async (req, res) => {
+            const id = login_check(req)
+            const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
+            const state = await getInstanceStatus('i-' + req.body.instance_id)
+            res.send({ instance, state: state.instanceState })
+        });
+
+        app.post('/instance_info_ip', async (req, res) => {
+            login_check(req)
+            const state = await getInstanceStatus('i-' + req.body.instance_id)
+            if (state.instanceState === 'pending' || state.instanceState === 'running') {
+                const publicIp = await getPublicIP('i-' + req.body.instance_id);
+                res.send(publicIp)
+            } else {
+                res.send(false)
+            }
+        });
+
+        app.post('/port_info', async (req, res) => {
+            login_check(req)
+
+            const ports = await getOpenPorts('i-' + req.body.instance_id);
+            console.log("열려있는 포트:", ports);
+            res.send(ports)
+        });
+
+        app.post('/add_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/edit_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await removeIngressRule('i-' + req.body.instance_id, req.body.delete_port.protocol,
+                req.body.delete_port.fromPort, req.body.delete_port.toPort, req.body.delete_port.sources)
+
+            await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/remove_port', async (req, res) => {
+            login_check(req)
+
+            console.log(req.body)
+
+            await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
+                Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
+            res.send(true)
+        });
+
+        app.post('/instance_build', async (req, res) => {
+            const id = login_check(req)
+            const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
+            if (!instance || !instance.build) {
+                res.send(true)
+            } else {
+                res.send(false)
+            }
+        });
+
+
+
+
+
+
+        // 결제 페이지
+
+        // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
+        // @docs https://docs.tosspayments.com/reference/using-api/api-keys
+
+        app.post("/confirm", async function (req, res) {
+            // 클라이언트에서 받은 JSON 요청 바디입니다.
+            const { paymentKey, orderId, amount } = req.body;
+
+            // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
+            // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
+            const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+            const encryptedSecretKey =
+                "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
+
+            const id = login_check(req)
+
+            if (id === orderId.split("_")[0]) {
+                const { default: got } = await import('got');
+
+                // 결제를 승인하면 결제수단에서 금액이 차감돼요.
+                got.post("https://api.tosspayments.com/v1/payments/confirm", {
+                    headers: {
+                        Authorization: encryptedSecretKey,
+                        "Content-Type": "application/json",
+                    },
+                    json: {
+                        orderId: orderId,
+                        amount: amount,
+                        paymentKey: paymentKey,
+                    },
+                    responseType: "json",
+                })
+                    .then(async function (response) {
+                        // 결제 성공 비즈니스 로직을 구현하세요.
+                        const user_data = await db.collection('user').findOne({ id: id });
+
+                        sendEmail(user_data.email, "siliod 충전", response.body.totalAmount + "원 충전됨여여.")
+                        await db.collection('user').updateOne(
+                            { id: id }, // 조건
+                            { $inc: { amount: response.body.totalAmount } } // 수정 내용
+                        );
+
+                        await db.collection('receipt').insertOne({ id: id, amount: response.body.totalAmount, receipt: response.body.receipt.url });
+
+                        console.log(response.body);
+                        res.status(response.statusCode).json(response.body)
+                    })
+                    .catch(function (error) {
+                        // 결제 실패 비즈니스 로직을 구현하세요.
+                        console.log(error.response.body);
+                        res.status(error.response.statusCode).json(error.response.body)
+                    });
+            } else {
+                res.status(401).json({ message: "인증되지 않은 요청입니다." });
+            }
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+        // sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
+
+
+        // SMTP 설정
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: "siliod.official@gmail.com", // 본인 이메일
+                pass: process.env.GMAIL_APP_PASSWORD, // Gmail의 앱 비밀번호 사용
+            },
+        });
+
+        // 이메일 전송 함수
+        async function sendEmail(to, subject, text) {
+            try {
+                await transporter.sendMail({
+                    from: "siliod.official@gmail.com",
+                    to,
+                    subject,
+                    text,
+                });
+                console.log("이메일 전송 성공!");
+            } catch (error) {
+                console.error("이메일 전송 실패:", error);
             }
         }
 
-        res.send(status);
-    });
-
-    app.post('/create_instance', async (req, res) => {
-        const id = login_check(req)
-
-        console.log(req.body)
-        const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type, grade: req.body.grade });
-        const size = Number(req.body.storage) - 8
-        create_instance(instanceId, req.body.type, req.body.name, req.body.grade,
-            req.body.ubuntu_password, req.body.connect_password, size, req.body.source, id, res)
-    });
-
-    app.post('/reboot_instance', (req, res) => {
-        res.send(true)
-        reboot_instance('i-' + req.body.instance_id)
-    });
-
-    app.post('/start_instance', async (req, res) => {
-        const success = await start_instance('i-' + req.body.instance_id)
-        if (success) {
-            res.send(true)
-        } else {
-            res.send(false)
-        }
-    });
-
-    app.post('/stop_instance', (req, res) => {
-        res.send(true)
-        stop_instance('i-' + req.body.instance_id)
-    });
-
-    app.post('/delete_instance', (req, res) => {
-        res.send(true)
-        terminate_instance('i-' + req.body.instance_id)
-
-        db.collection('instance').deleteOne({
-            instance_id: req.body.instance_id
-        });
-    });
 
 
-    app.post('/instance_info', async (req, res) => {
-        const id = login_check(req)
-        const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
-        const state = await getInstanceStatus('i-' + req.body.instance_id)
-        res.send({ instance, state: state.instanceState })
-    });
+        //////////////////////////////////// 로그인 /////////////////////////////////////
 
-    app.post('/instance_info_ip', async (req, res) => {
-        login_check(req)
-        const state = await getInstanceStatus('i-' + req.body.instance_id)
-        if (state.instanceState === 'pending' || state.instanceState === 'running') {
-            const publicIp = await getPublicIP('i-' + req.body.instance_id);
-            res.send(publicIp)
-        } else {
-            res.send(false)
-        }
-    });
+        const secretKey = process.env.JWT_SECRET_KEY
 
-    app.post('/port_info', async (req, res) => {
-        login_check(req)
+        // 옵션 설정 (선택 사항)
+        const options = {
+            algorithm: 'HS256',
+            expiresIn: '15h'
+        };
 
-        const ports = await getOpenPorts('i-' + req.body.instance_id);
-        console.log("열려있는 포트:", ports);
-        res.send(ports)
-    });
+        function give_jwt(id, res) {
+            try {
+                console.log('받은 아이디')
+                console.log(id)
+                const payload = { id: id }
 
-    app.post('/add_port', async (req, res) => {
-        login_check(req)
+                const token = jwt.sign(payload, secretKey, options);
+                console.log(token); // 생성된 토큰을 콘솔에 출력하여 확인
 
-        console.log(req.body)
-
-        await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
-            Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
-        res.send(true)
-    });
-
-    app.post('/edit_port', async (req, res) => {
-        login_check(req)
-
-        console.log(req.body)
-
-        await removeIngressRule('i-' + req.body.instance_id, req.body.delete_port.protocol,
-            req.body.delete_port.fromPort, req.body.delete_port.toPort, req.body.delete_port.sources)
-
-        await addIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
-            Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
-        res.send(true)
-    });
-
-    app.post('/remove_port', async (req, res) => {
-        login_check(req)
-
-        console.log(req.body)
-
-        await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
-            Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
-        res.send(true)
-    });
-
-    app.post('/instance_build', async (req, res) => {
-        const id = login_check(req)
-        const instance = await db.collection('instance').findOne({ user: id, instance_id: req.body.instance_id })
-        if (!instance || !instance.build) {
-            res.send(true)
-        } else {
-            res.send(false)
-        }
-    });
-
-
-
-
-
-
-    // 결제 페이지
-
-    // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
-    // @docs https://docs.tosspayments.com/reference/using-api/api-keys
-
-    app.post("/confirm", async function (req, res) {
-        // 클라이언트에서 받은 JSON 요청 바디입니다.
-        const { paymentKey, orderId, amount } = req.body;
-
-        // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
-        // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
-        const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-        const encryptedSecretKey =
-            "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
-
-        const id = login_check(req)
-
-        if (id === orderId.split("_")[0]) {
-            const { default: got } = await import('got');
-
-            // 결제를 승인하면 결제수단에서 금액이 차감돼요.
-            got.post("https://api.tosspayments.com/v1/payments/confirm", {
-                headers: {
-                    Authorization: encryptedSecretKey,
-                    "Content-Type": "application/json",
-                },
-                json: {
-                    orderId: orderId,
-                    amount: amount,
-                    paymentKey: paymentKey,
-                },
-                responseType: "json",
-            })
-                .then(async function (response) {
-                    // 결제 성공 비즈니스 로직을 구현하세요.
-                    const user_data = await db.collection('user').findOne({ id: id });
-
-                    sendEmail(user_data.email, "siliod 충전", response.body.totalAmount + "원 충전됨여여.")
-                    await db.collection('user').updateOne(
-                        { id: id }, // 조건
-                        { $inc: { amount: response.body.totalAmount } } // 수정 내용
-                    );
-
-                    await db.collection('receipt').insertOne({ id: id, amount: response.body.totalAmount, receipt: response.body.receipt.url });
-
-                    console.log(response.body);
-                    res.status(response.statusCode).json(response.body)
-                })
-                .catch(function (error) {
-                    // 결제 실패 비즈니스 로직을 구현하세요.
-                    console.log(error.response.body);
-                    res.status(error.response.statusCode).json(error.response.body)
+                res.cookie('account', token, {
+                    httpOnly: true, // 클라이언트 측 스크립트에서 쿠키에 접근 불가
+                    secure: true, // HTTPS 연결에서만 쿠키 전송
+                    maxAge: 15 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
                 });
-        } else {
-            res.status(401).json({ message: "인증되지 않은 요청입니다." });
+                return true
+            } catch (error) {
+                return 'err'
+            }
         }
-    });
 
+        function login_check(req) {
+            if (req.cookies && req.cookies.account) {
+                const token = req.cookies.account;
 
-
-
-
-
-
-
-
-
-
-
-    // sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
-
-
-    // SMTP 설정
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: "siliod.official@gmail.com", // 본인 이메일
-            pass: process.env.GMAIL_APP_PASSWORD, // Gmail의 앱 비밀번호 사용
-        },
-    });
-
-    // 이메일 전송 함수
-    async function sendEmail(to, subject, text) {
-        try {
-            await transporter.sendMail({
-                from: "siliod.official@gmail.com",
-                to,
-                subject,
-                text,
-            });
-            console.log("이메일 전송 성공!");
-        } catch (error) {
-            console.error("이메일 전송 실패:", error);
-        }
-    }
-
-
-
-    //////////////////////////////////// 로그인 /////////////////////////////////////
-
-    const secretKey = process.env.JWT_SECRET_KEY
-
-    // 옵션 설정 (선택 사항)
-    const options = {
-        algorithm: 'HS256',
-        expiresIn: '15h'
-    };
-
-    function give_jwt(id, res) {
-        try {
-            console.log('받은 아이디')
-            console.log(id)
-            const payload = { id: id }
-
-            const token = jwt.sign(payload, secretKey, options);
-            console.log(token); // 생성된 토큰을 콘솔에 출력하여 확인
-
-            res.cookie('account', token, {
-                httpOnly: true, // 클라이언트 측 스크립트에서 쿠키에 접근 불가
-                secure: true, // HTTPS 연결에서만 쿠키 전송
-                maxAge: 15 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
-            });
-            return true
-        } catch (error) {
-            return 'err'
-        }
-    }
-
-    function login_check(req) {
-        if (req.cookies && req.cookies.account) {
-            const token = req.cookies.account;
-
-            const decoded = check_token(token);
-            if (decoded !== false) {  // 조건문 수정
-                return decoded.id;
+                const decoded = check_token(token);
+                if (decoded !== false) {  // 조건문 수정
+                    return decoded.id;
+                } else {
+                    return false;
+                }
             } else {
+                console.log('쿠키가 존재하지 않습니다.');
                 return false;
             }
-        } else {
-            console.log('쿠키가 존재하지 않습니다.');
-            return false;
         }
-    }
 
 
-    // JWT 검증 함수
-    function check_token(token) {
-        try {
-            return jwt.verify(token, secretKey);
-        } catch (err) {
-            console.log('fdggdfgd')
-            return false
+        // JWT 검증 함수
+        function check_token(token) {
+            try {
+                return jwt.verify(token, secretKey);
+            } catch (err) {
+                console.log('fdggdfgd')
+                return false
+            }
         }
-    }
 
-    ////////////////////////// 로그아웃 /////////////////////////////////
-    app.get('/logout', (req, res) => {
-        // 예시: JWT 쿠키 삭제
-        res.clearCookie('account');
-        res.send(true);
-    });
-
+        ////////////////////////// 로그아웃 /////////////////////////////////
+        app.get('/logout', (req, res) => {
+            // 예시: JWT 쿠키 삭제
+            res.clearCookie('account');
+            res.send(true);
+        });
 
 
-    //////////////////////////////////// 구글 로그인 /////////////////////////////////////
 
-    app.get('/login/google', (req, res) => {
-        console.log(req.query.state);
-        let url = 'https://accounts.google.com/o/oauth2/v2/auth';
+        //////////////////////////////////// 구글 로그인 /////////////////////////////////////
 
-        url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
+        app.get('/login/google', (req, res) => {
+            console.log(req.query.state);
+            let url = 'https://accounts.google.com/o/oauth2/v2/auth';
 
-        let redirectUri = 'https://siliod.com/login/google/redirect'
+            url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
 
-        url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
-        url += '&response_type=code';
-        url += '&scope=profile email';
+            let redirectUri = 'https://siliod.com/login/google/redirect'
 
-        res.redirect(url);
-    });
+            url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
+            url += '&response_type=code';
+            url += '&scope=profile email';
+
+            res.redirect(url);
+        });
 
 
-    const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
-    const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+        const GOOGLE_USERINFO_URL = 'https://www.googleapis.com/oauth2/v2/userinfo';
+        const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
-    app.get('/login/google/redirect', async (req, res) => {
-        google_login(req, res)
-    });
+        app.get('/login/google/redirect', async (req, res) => {
+            google_login(req, res)
+        });
 
-    async function google_login(req, res) {
-        const { code } = req.query;
-        console.log(`code: ${code}`);
+        async function google_login(req, res) {
+            const { code } = req.query;
+            console.log(`code: ${code}`);
 
-        try {
-            // access_token, refresh_token 등의 구글 토큰 정보 가져오기
-            const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    code,
-                    client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
-                    client_secret: process.env.GOOGLE_SECRET,
-                    redirect_uri: `https://siliod.com/login/google/redirect`,
-                    grant_type: 'authorization_code',
-                }),
-            });
-
-            const tokenData = await tokenResponse.json();
-
-            if (!tokenResponse.ok) {
-                throw new Error(`Error fetching tokens: ${tokenData.error}`);
-            }
-
-            // email, google id 등의 사용자 구글 계정 정보 가져오기
-            const userResponse = await fetch(GOOGLE_USERINFO_URL, {
-                method: 'GET',
-                headers: {
-                    Authorization: `Bearer ${tokenData.access_token}`,
-                },
-            });
-
-            const userData = await userResponse.json();
-
-            if (!userResponse.ok) {
-                throw new Error(`Error fetching user info: ${userData.error}`);
-            }
-
-            console.log('Google User Data:', userData);
-
-            // DB에서 사용자 조회
-            give_jwt(userData.id, res);
-            const user = await db.collection('user').findOne({ id: userData.id });
-
-            if (user) {
-                return res.redirect("/");
-            } else {
-                // 회원가입 진행
-                await db.collection('user').insertOne({
-                    id: userData.id,
-                    name: userData.name,
-                    avatar_url: userData.picture,
-                    email: userData.email,
-                    amount: 1000
+            try {
+                // access_token, refresh_token 등의 구글 토큰 정보 가져오기
+                const tokenResponse = await fetch(GOOGLE_TOKEN_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        code,
+                        client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
+                        client_secret: process.env.GOOGLE_SECRET,
+                        redirect_uri: `https://siliod.com/login/google/redirect`,
+                        grant_type: 'authorization_code',
+                    }),
                 });
 
-                // JWT 발급 후 로그인 처리
-                return res.redirect("/?new=new");
+                const tokenData = await tokenResponse.json();
+
+                if (!tokenResponse.ok) {
+                    throw new Error(`Error fetching tokens: ${tokenData.error}`);
+                }
+
+                // email, google id 등의 사용자 구글 계정 정보 가져오기
+                const userResponse = await fetch(GOOGLE_USERINFO_URL, {
+                    method: 'GET',
+                    headers: {
+                        Authorization: `Bearer ${tokenData.access_token}`,
+                    },
+                });
+
+                const userData = await userResponse.json();
+
+                if (!userResponse.ok) {
+                    throw new Error(`Error fetching user info: ${userData.error}`);
+                }
+
+                console.log('Google User Data:', userData);
+
+                // DB에서 사용자 조회
+                give_jwt(userData.id, res);
+                const user = await db.collection('user').findOne({ id: userData.id });
+
+                if (user) {
+                    return res.redirect("/");
+                } else {
+                    // 회원가입 진행
+                    await db.collection('user').insertOne({
+                        id: userData.id,
+                        name: userData.name,
+                        avatar_url: userData.picture,
+                        email: userData.email,
+                        amount: 1000
+                    });
+
+                    // JWT 발급 후 로그인 처리
+                    return res.redirect("/?new=new");
+                }
+            } catch (error) {
+                console.error('Google OAuth Error:', error);
+                res.status(500).json({ error: 'Failed to authenticate with Google' });
             }
-        } catch (error) {
-            console.error('Google OAuth Error:', error);
-            res.status(500).json({ error: 'Failed to authenticate with Google' });
         }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////
+
+        https.createServer(options, app).listen(port, () => {
+            console.log(`Server is listening on https://localhost:${port}`);
+        });
+    } catch (err) {
+        console.error('Error connecting to MongoDB:', err);
     }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////
-
-    app.listen(port, function () {
-        console.log(`Server is listening on port ${port}`);
-    });
-} catch (err) {
-    console.error('Error connecting to MongoDB:', err);
-}
 }
 
 // Call the top-level async function to start the server
