@@ -12,7 +12,7 @@ const dotenv = require("dotenv");
 const https = require('https');
 const fs = require('fs');
 
-const options = {
+const https_options = {
     key: fs.readFileSync('/etc/letsencrypt/live/siliod.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/siliod.com/fullchain.pem')
 };
@@ -1165,7 +1165,7 @@ async function startServer() {
         ////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
 
-        https.createServer(options, app).listen(port, () => {
+        https.createServer(https_options, app).listen(port, () => {
             console.log(`Server is listening on https://localhost:${port}`);
         });
     } catch (err) {
