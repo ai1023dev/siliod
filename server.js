@@ -72,7 +72,7 @@ async function startServer() {
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
 
-                await addIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+                await addIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32') // 서버의 아이피로 변경
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
                 return instanceId;
@@ -184,7 +184,7 @@ async function startServer() {
 
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "~/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
@@ -1068,7 +1068,7 @@ async function startServer() {
 
         url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
 
-        let redirectUri = 'http://localhost:8080/login/google/redirect'
+        let redirectUri = 'https://siliod.com/login/google/redirect'
 
         url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
         url += '&response_type=code';
@@ -1100,7 +1100,7 @@ async function startServer() {
                     code,
                     client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
                     client_secret: process.env.GOOGLE_SECRET,
-                    redirect_uri: `http://localhost:8080/login/google/redirect`,
+                    redirect_uri: `https://siliod.com/login/google/redirect`,
                     grant_type: 'authorization_code',
                 }),
             });
