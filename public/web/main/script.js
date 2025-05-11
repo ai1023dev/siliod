@@ -1,21 +1,50 @@
+let open_height
 $(function () {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     let isDragging = false;
+    
+    if (isMobile) {
+        $('<link rel="stylesheet" href="web/main/mobile.css"/>').appendTo('head');
+        open_height = 'calc(430px + 4.5rem)'
 
-    $('.deal-line-hover').on('mousedown', function (e) {
-        isDragging = true;
-        e.preventDefault(); // 드래그 선택 방지
-    });
+        // 모바일용 터치 이벤트로 드래그 구현
+        $('.deal-line-hover').on('touchstart', function (e) {
+            isDragging = true;
+            e.preventDefault(); // 스크롤 방지
+        });
 
-    $(document).on('mousemove', function (e) {
-        if (isDragging) {
-            $('.deal-container').css('height', `calc(100vh - ${e.pageY - 3}px + 2rem)`)
-            $('.cards-container').css('height', `calc(${e.pageY - 41}px - 2rem - 5.5rem)`)
-        }
-    });
+        $(document).on('touchmove', function (e) {
+            if (isDragging) {
+                const touch = e.originalEvent.touches[0]; // 첫 번째 손가락 기준
+                const pageY = touch.pageY;
+                $('.deal-container').css('height', `calc(100vh - ${pageY - 3}px)`);
+                $('.cards-container').css('height', `calc(${pageY - 41}px - 7rem)`);
+            }
+        });
 
-    $(document).on('mouseup', function () {
-        isDragging = false;
-    });
+        $(document).on('touchend touchcancel', function () {
+            isDragging = false;
+        });
+    }
+    else {
+        open_height = 'calc(430px + 7rem)'
+
+        $('.deal-line-hover').on('mousedown', function (e) {
+            isDragging = true;
+            e.preventDefault(); // 드래그 선택 방지
+        });
+
+        $(document).on('mousemove', function (e) {
+            if (isDragging) {
+                $('.deal-container').css('height', `calc(100vh - ${e.pageY - 3}px + 2rem)`)
+                $('.cards-container').css('height', `calc(${e.pageY - 41}px - 7.5rem)`)
+            }
+        });
+
+        $(document).on('mouseup', function () {
+            isDragging = false;
+        });
+    }
 });
 
 
@@ -88,7 +117,7 @@ function get_instance_data(first) {
                 if (first) {
                     $(".avatar").attr('src', data.user.avatar_url);
                     $(".username").text(data.user.name);
-                    $(".balance-amount").text(data.user.amount+'p');
+                    $(".balance-amount").text(data.user.amount + 'p');
                 } else {
                     $(".cards-container-data").empty()
                 }
@@ -202,7 +231,7 @@ $(document).on('click', '.connect-btn', function () {
 let main_data
 $(document).on('click', '.open-deal', function () {
     main_data = JSON.parse($(this).attr('data-field'))
-    $('.deal-container').css('height', 'calc(430px + 7rem)')
+    $('.deal-container').css('height', open_height)
     deal_open()
 })
 
@@ -236,6 +265,7 @@ function deal_open() {
         success: function (data) {
             console.log(data);
             $('#private-ip').text(data.instance.private_ip)
+            $('#instance-grade').text(data.instance.grade)
 
             console.log(data.state)
 
@@ -246,7 +276,6 @@ function deal_open() {
                 $('#no-connect').text('인스턴스가 생성중')
                 $('#no-connect').css('display', 'inline')
                 $('iframe').css('display', 'none')
-                $('iframe').attr('src', '')
 
                 $('#btn-start').css('display', 'none')
                 $('#btn-restart').css('display', 'none')
