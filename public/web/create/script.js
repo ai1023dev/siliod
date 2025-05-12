@@ -234,23 +234,27 @@ $("#create-instance-btn").click(function () {
         }),
         success: function (data) {
             console.log(data);
-            if (!data.ready) {
-                $("#dino-time").text('예상 소요시간 10분')
+            if (data) {
+                if (!data.ready) {
+                    $("#dino-time").text('예상 소요시간 10분')
+                }
+                $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
+    
+                setInterval(() => {
+                    $.ajax({
+                        method: 'POST',
+                        url: `/instance_build`,
+                        data: { instance_id: data.instanceId.substring(2) },
+                        success: function (build) {
+                            if (build) {
+                                window.location.href = '/?instance=' + data.instanceId.substring(2)
+                            }
+                        },
+                    });
+                }, 5000);
+            } else {
+                alert('특수문자가 비밀번호에 삽입되어있습니다.')
             }
-            $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
-
-            setInterval(() => {
-                $.ajax({
-                    method: 'POST',
-                    url: `/instance_build`,
-                    data: { instance_id: data.instanceId.substring(2) },
-                    success: function (build) {
-                        if (build) {
-                            window.location.href = '/?instance=' + data.instanceId.substring(2)
-                        }
-                    },
-                });
-            }, 5000);
         },
         error: function (xhr, status, error) {
             alert('서버 측 에러');

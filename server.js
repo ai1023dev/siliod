@@ -1,3 +1,12 @@
+
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -787,6 +796,12 @@ async function startServer() {
         const id = login_check(req)
 
         console.log(req.body)
+
+        const unsafeChars = /[;&|`$<>\\]/;
+        if (unsafeChars.test(req.body.ubuntu_password) || unsafeChars.test(req.body.connect_password)) {
+            res.send(false)
+            return
+        }
         const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type, grade: req.body.grade });
         const size = Number(req.body.storage) - 8
         create_instance(instanceId, req.body.type, req.body.name, req.body.grade,
