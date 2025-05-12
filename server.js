@@ -10,6 +10,7 @@ const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/cli
 const { exec } = require("child_process");
 const dotenv = require("dotenv");
 const https = require('https');
+const http = require('http');
 const fs = require('fs');
 
 const https_options = {
@@ -1167,6 +1168,17 @@ async function startServer() {
 
         https.createServer(https_options, app).listen(port, () => {
             console.log(`Server is listening on https://localhost:${port}`);
+        });
+
+        // 모든 HTTP 요청을 HTTPS로 리다이렉션
+        app.all('*', (req, res) => {
+            res.redirect(301, `https://${req.hostname}${req.url}`);
+        });
+
+        // HTTP 서버는 포트 80에서 실행
+        const httpPort = 80;
+        http.createServer(httpApp).listen(httpPort, () => {
+            console.log(`HTTP 서버가 http://siliod.com:${httpPort}에서 실행 중이며 HTTPS로 리다이렉션됩니다.`);
         });
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);

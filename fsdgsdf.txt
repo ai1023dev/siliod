@@ -9,3 +9,25 @@
 | t3.medium    | 0.0418   | 1.0000     | 10p     |
 | t3.large     | 0.0832   | 1.9904     | 20p     |
 | t3.xlarge    | 0.1664   | 3.9809     | 40p     |
+
+2. HTTP에서 HTTPS로 리다이렉션
+HTTP 포트 80에서 HTTPS 포트 443으로 리다이렉션을 설정해주는 것도 좋은 방법입니다. 만약 HTTP 요청이 들어오면 자동으로 HTTPS로 리다이렉션되게 할 수 있습니다.
+
+javascript
+복사
+편집
+const http = require('http');
+
+// HTTP 서버 설정
+const httpApp = express();
+
+// 모든 HTTP 요청을 HTTPS로 리다이렉션
+httpApp.all('*', (req, res) => {
+    res.redirect(301, `https://${req.hostname}${req.url}`);
+});
+
+// HTTP 서버는 포트 80에서 실행
+const httpPort = 80;
+http.createServer(httpApp).listen(httpPort, () => {
+    console.log(`HTTP 서버가 http://siliod.com:${httpPort}에서 실행 중이며 HTTPS로 리다이렉션됩니다.`);
+});
