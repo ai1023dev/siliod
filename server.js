@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require('path');
-const app = express();
+const app = express(); // HTTPS 용 앱
+const redirectApp = express(); // HTTP 리다이렉션 용 앱
 const port = 443;
+const httpPort = 80;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
@@ -13,6 +15,7 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
+// 인증서 로드
 const https_options = {
     key: fs.readFileSync('/etc/letsencrypt/live/siliod.com/privkey.pem'),
     cert: fs.readFileSync('/etc/letsencrypt/live/siliod.com/fullchain.pem')
@@ -1166,19 +1169,18 @@ async function startServer() {
         ////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
 
+        // HTTPS 서버 실행
         https.createServer(https_options, app).listen(port, () => {
             console.log(`Server is listening on https://localhost:${port}`);
         });
 
-        // 모든 HTTP 요청을 HTTPS로 리다이렉션
-        app.all('*', (req, res) => {
+        // HTTP → HTTPS 리다이렉션
+        redirectApp.all('*', (req, res) => {
             res.redirect(301, `https://${req.hostname}${req.url}`);
         });
 
-        // HTTP 서버는 포트 80에서 실행
-        const httpPort = 80;
-        http.createServer(httpApp).listen(httpPort, () => {
-            console.log(`HTTP 서버가 http://siliod.com:${httpPort}에서 실행 중이며 HTTPS로 리다이렉션됩니다.`);
+        http.createServer(redirectApp).listen(httpPort, () => {
+            console.log(`HTTP 리다이렉션 서버가 http://siliod.com:${httpPort}에서 실행 중입니다.`);
         });
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);
