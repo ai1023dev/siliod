@@ -218,6 +218,7 @@ $("#create-instance-btn").click(function () {
 
 
     $(".dino-modal-backdrop").removeClass("hidden");
+    $("iframe").attr('src', '/dino');
 
     $.ajax({
         method: 'POST',

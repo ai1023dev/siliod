@@ -199,7 +199,7 @@ a {
 }
 
 /* 인스턴스 버튼 스타일 */
-.sidebar-menu button {
+.sidebar-menu button, .sidebar-menu a {
     display: flex;
     align-items: center;
     /* 세로 정렬 중앙 */
@@ -215,7 +215,7 @@ a {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar-menu button img {
+.sidebar-menu button img, .sidebar-menu a img {
     width: 20px;
     height: 20px;
     object-fit: contain;
@@ -223,7 +223,7 @@ a {
     transform: translateY(1.5px);
 }
 
-.sidebar-menu button:hover {
+.sidebar-menu button:hover, .sidebar-menu a:hover {
     color: #3366cc;
     background-color: #f0f4ff;
 }

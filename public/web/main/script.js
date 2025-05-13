@@ -248,6 +248,12 @@ function deal_open() {
     $('#public-ip').text('로딩중')
     $('#btn-more').attr('href', `/more?id=${main_data[0]}`)
 
+    if (main_data[2] === 'GUI') {
+        $('#connect-label').text('인스턴스 접속')
+    } else {
+        $('#connect-label').text("인스턴스 접속 (id 필드에 'admin' 입력)")
+    }
+
     $('#instance-status-loading').text('lodeing')
     $('#instance-status-loading').addClass('loading')
     $('#instance-status-loading').removeClass('running')
