@@ -1,8 +1,22 @@
+$('#dino-btn').click(function () {
+    $(".dino-modal-backdrop").removeClass("hidden").fadeIn(300); // 천천히 보이게
+    $("#connect-iframe").attr('src', '/dino');
+})
+
+$('#dino-x').click(function () {
+    $(".dino-modal-backdrop").fadeOut(300, function () {
+        $(".dino-modal-backdrop").addClass("hidden");
+        $("#connect-iframe").attr('src', '');
+    });
+})
+
+
+
 let open_height
 $(function () {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
     let isDragging = false;
-    
+
     if (isMobile) {
         $('<link rel="stylesheet" href="web/main/mobile.css"/>').appendTo('head');
         open_height = 'calc(430px + 4.5rem)'
@@ -281,7 +295,7 @@ function deal_open() {
 
                 $('#no-connect').text('인스턴스가 생성중')
                 $('#no-connect').css('display', 'inline')
-                $('iframe').css('display', 'none')
+                $('#connect-iframe').css('display', 'none')
 
                 $('#btn-start').css('display', 'none')
                 $('#btn-restart').css('display', 'none')
@@ -297,8 +311,8 @@ function deal_open() {
                     $('#instance-status-loading').addClass('running')
                     $('.status-' + main_data[0]).addClass('running')
 
-                    $('iframe').css('display', 'inline')
-                    $('iframe').attr('src', 'https://' + main_data[0] + '.siliod.com')
+                    $('#connect-iframe').css('display', 'inline')
+                    $('#connect-iframe').attr('src', 'https://' + main_data[0] + '.siliod.com')
                     $('#no-connect').css('display', 'none')
 
                     $('#btn-start').css('display', 'none')
@@ -313,8 +327,8 @@ function deal_open() {
 
                     $('#no-connect').text('인스턴스가 실행되지않음')
                     $('#no-connect').css('display', 'inline')
-                    $('iframe').css('display', 'none')
-                    $('iframe').attr('src', '')
+                    $('#connect-iframe').css('display', 'none')
+                    $('#connect-iframe').attr('src', '')
 
                     $('#btn-start').css('display', 'inline')
                     $('#btn-restart').css('display', 'none')

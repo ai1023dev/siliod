@@ -25,7 +25,7 @@ a:not(.deal-incetance-link) {
 
 
 
-.login-modal-backdrop {
+.login-modal-backdrop, .dino-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -39,7 +39,7 @@ a:not(.deal-incetance-link) {
     animation: fadeIn 0.3s ease-out;
 }
 
-.login-modal {
+.modal {
     background: #fff;
     padding: 2.5rem;
     border-radius: 1.5rem;
@@ -97,6 +97,28 @@ a:not(.deal-incetance-link) {
 
 .hidden {
     display: none;
+}
+
+.dino-modal {
+    width: auto;
+}
+
+.dino-modal span {
+    font-size: 1.2rem;
+    display: block;
+}
+
+.dino-modal img {
+    height: 1.5rem;
+    float: right;
+    display: block;
+    margin-top: -1.4rem;
+}
+
+#dino-iframe {
+    margin-top: 1rem;
+    width: 50vw;
+    height: 15vw;
 }
 
 /* 애니메이션 효과 */
@@ -694,7 +716,7 @@ a:not(.deal-incetance-link) {
     font-weight: 600;
 }
 
-iframe {
+#connect-iframe {
     height:100%;
     width: 100%;
     border-radius: 8px;

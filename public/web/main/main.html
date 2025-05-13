@@ -11,7 +11,7 @@
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
-        <div class="login-modal">
+        <div class="modal">
             <p>지금 신규 가입하면</p>
             <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
 
@@ -19,6 +19,14 @@
                     <img src="image/google-icon.png" alt="Google" />
                     Google 계정으로 로그인
                 </button></a>
+        </div>
+    </div>
+
+    <!-- 공룡 게임 모달 -->
+    <div class="dino-modal-backdrop hidden">
+        <div class="modal dino-modal">
+            <span>머리 식힐 시간이에요. 잠깐 놀다가 와요!</span><img id="dino-x" src="image/x.svg">
+            <iframe id="dino-iframe" frameborder="0"></iframe>
         </div>
     </div>
 
@@ -42,7 +50,7 @@
                 <button><img src="image/refresh.svg"> 설정</button>
                 <button><img src="image/refresh.svg"> 배우기</button>
                 <button><img src="image/refresh.svg"> 문의</button>
-                <button><img src="image/refresh.svg"> API</button>
+                <button id="dino-btn"><img src="image/refresh.svg"> Dino Game</button>
             </nav>
             <button class="logout">logout</button>
 
@@ -147,7 +155,7 @@
 
                 <div class="iframe-container">
                     <div id="no-connect">연결 확인 중</div>
-                    <iframe src="" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
+                    <iframe id="connect-iframe" src="" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
                 </div>
             </div>
         </div>

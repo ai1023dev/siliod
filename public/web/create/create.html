@@ -106,6 +106,30 @@
                             <div class="strength" id="speac-strength"></div>
                         </div>
                     </div>
+                    <div class="width">
+                        <div class="form-group">
+                            <label for="instance-name">운영체제</label>
+                            <select class="custom-select" name="interface">
+                                <option selected>Ubuntu (24.04.2 LTS)</option>
+                            </select>
+
+                            <div class="strength" id="speac-strength"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="width">
+                        <div class="form-group">
+                            <label for="instance-name">스토리지</label>
+                            <div class="password-wrapper">
+                                <input type="number" id="storage-input" min="8" step="1" value="10" />
+                                <button type="button" class="gib">GiB</button>
+                            </div>
+                            <div class="strength" id="storage-strength">GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.</div>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <div class="form-group">
                             <label for="instance-name">접속 허용 IP (CIDR 표기 필수)</label>
@@ -114,15 +138,6 @@
                             <div class="strength" id="ip-strength">현재 ip</div>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="instance-name">스토리지</label>
-                    <div class="password-wrapper">
-                        <input type="number" id="storage-input" min="8" step="1" value="10" />
-                        <button type="button" class="gib">GiB</button>
-                    </div>
-                    <div class="strength" id="storage-strength">GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.</div>
                 </div>
 
 
