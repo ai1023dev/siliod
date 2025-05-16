@@ -1,3 +1,7 @@
+const params = new URLSearchParams(window.location.search);
+const point = params.get("point")
+const amount = point * 200
+
 let orderId
 
 $.ajax({
@@ -5,7 +9,7 @@ $.ajax({
     url: '/login_check',
     success: function (data) {
         console.log(data)
-        orderId = data.id + '_' +Date.now()
+        orderId = data.id + '_' + Date.now()
         console.log(orderId)
 
         if (data) {
@@ -21,9 +25,6 @@ $.ajax({
     }
 });
 
-const params = new URLSearchParams(window.location.search);
-const point = params.get("point")
-const amount = point * 200
 
 
 $(".point").html(`<span class="bold">${point}</span>p`)

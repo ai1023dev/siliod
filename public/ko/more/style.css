@@ -25,7 +25,7 @@ a:not(.deal-incetance-link) {
 
 
 
-.login-modal-backdrop, .dino-modal-backdrop {
+.login-modal-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -39,7 +39,7 @@ a:not(.deal-incetance-link) {
     animation: fadeIn 0.3s ease-out;
 }
 
-.modal {
+.login-modal {
     background: #fff;
     padding: 2.5rem;
     border-radius: 1.5rem;
@@ -97,28 +97,6 @@ a:not(.deal-incetance-link) {
 
 .hidden {
     display: none;
-}
-
-.dino-modal {
-    width: auto;
-}
-
-.dino-modal span {
-    font-size: 1.2rem;
-    display: block;
-}
-
-.dino-modal img {
-    height: 1.5rem;
-    float: right;
-    display: block;
-    margin-top: -1.4rem;
-}
-
-#dino-iframe {
-    margin-top: 1rem;
-    width: 50vw;
-    height: 15vw;
 }
 
 /* 애니메이션 효과 */
@@ -221,7 +199,7 @@ a:not(.deal-incetance-link) {
 }
 
 /* 인스턴스 버튼 스타일 */
-.sidebar-menu button {
+.sidebar-menu button, .sidebar-menu a {
     display: flex;
     align-items: center;
     /* 세로 정렬 중앙 */
@@ -237,7 +215,7 @@ a:not(.deal-incetance-link) {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar-menu button img {
+.sidebar-menu button img, .sidebar-menu a img {
     width: 20px;
     height: 20px;
     object-fit: contain;
@@ -245,40 +223,22 @@ a:not(.deal-incetance-link) {
     transform: translateY(1.5px);
 }
 
-.sidebar-menu button:hover {
+.sidebar-menu button:hover, .sidebar-menu a:hover {
     color: #3366cc;
     background-color: #f0f4ff;
 }
 
-/* Firefox 전용 스크롤 스타일 */
-.scroll {
-    scrollbar-width: thin;
-    scrollbar-color: #c3d4ff transparent;
+
+
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
 }
-
-/* WebKit (Chrome, Edge, Safari 등) */
-.scroll::-webkit-scrollbar {
-    width: 6px;
-}
-
-.scroll::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.scroll::-webkit-scrollbar-thumb {
-    background-color: #c3d4ff;
-    border-radius: 6px;
-    border: 2px solid transparent;
-    background-clip: content-box;
-}
-
-.scroll::-webkit-scrollbar-thumb:hover {
-    background-color: #99b8ff;
-}
-
-
-
-
 
 
 
@@ -314,6 +274,7 @@ a:not(.deal-incetance-link) {
     margin-right: 1rem;
     font-weight: bold;
 }
+
 
 /* 상태 새로고침 버튼 */
 .header-left button {
@@ -367,7 +328,6 @@ a:not(.deal-incetance-link) {
     animation: spin 1.3s linear infinite;
 }
 
-
 /* 오른쪽 정렬된 부분 */
 .header-right {
     display: flex;
@@ -397,50 +357,18 @@ a:not(.deal-incetance-link) {
     height: 40px;
 }
 
-.cards-container {
-    height: calc(100vh - 400px - 39px - 5.5rem);
-    padding-bottom: 8px;
-    margin-left: -0.5rem;
-    margin-right: -1rem;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
 
-.card {
-    float: left;
-    margin: 0.5rem;
-    background-color: #f5f8ff;
-    border: 1px solid #c2d4ff;
-    border-radius: 0.75rem;
-    padding: 1.3rem;
-    width: calc((100vw - 230px - 9rem) / 4);
-    height: auto;
-    align-self: flex-start;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    transition: 0.2s;
-}
 
-.card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
+/********************** 메인 **********************/
 
-.card h2 {
-    font-size: 18px;
-    margin-bottom: 1rem;
+.main-section {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    overflow-y: auto !important;
+    height: calc(100vh - 154px);
+    padding-left: 0.5rem;
 }
-
-.card h2 span {
-    font-size: 14px;
-    margin-left: 8px;
-    color: #777;
-}
-
-.card hr {
-    border: none;
-    border-top: 1px solid #d4e4ff;
-    margin-bottom: 1rem;
-}
-
 
 .status-row {
     display: flex;
@@ -451,7 +379,7 @@ a:not(.deal-incetance-link) {
 
 .status {
     font-size: 0.9rem;
-    padding: 0.3rem 0.7rem;
+    padding: 0.2rem 0.7rem 0.4rem;
     border-radius: 1rem;
     /* text-transform: uppercase; */
 }
@@ -473,63 +401,6 @@ a:not(.deal-incetance-link) {
     color: #cc3333;
     border: 1px solid #f2cccc;
 }
-
-.connect-btn {
-    background-color: #3393ff;
-    color: #fff;
-    font-size: 0.9rem;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out;
-}
-
-.connect-btn:hover {
-    background-color: #2277dd;
-}
-
-
-.specs {
-    font-size: 0.95rem;
-    color: #777;
-    margin-left: 4px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.add-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed #cbe0ff;
-    color: #3393ff;
-    background-color: #fafdff;
-    cursor: pointer;
-    opacity: 0.6;
-    position: relative;
-    /* 추가 */
-}
-
-
-.add-card-hight {
-    opacity: 0;
-}
-
-.add-card:hover {
-    opacity: 1;
-}
-
-.plus-icon {
-    position: absolute;
-    font-size: 3rem;
-    line-height: 1;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) translateY(-3px);
-}
-
 
 
 .deal-container {
@@ -582,7 +453,7 @@ a:not(.deal-incetance-link) {
 .deal-name .type {
     color: #666;
     font-size: 0.9rem;
-    margin-left: 6px;
+    margin-left: 8px;
     margin-right: 1rem;
     transform: translateY(2.5px);
 }
@@ -617,6 +488,37 @@ a:not(.deal-incetance-link) {
 }
 
 
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px 6px 9px;
+    background-color: #68aeff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 5px;
+    transform: translateY(1px);
+    transition: background-color 0.2s ease;
+}
+
+#copy-connect-url {
+    transform: translateY(3px) !important;
+}
+
+.copy-btn img {
+    height: 1rem;
+    margin-right: 4px;
+}
+
+.copy-btn:hover {
+    background-color: #3393ff;
+}
+
+.copy-btn:active {
+    background-color: #3366ff;
+}
 
 
 .instance-info {
@@ -633,6 +535,15 @@ a:not(.deal-incetance-link) {
     margin-right: 30px;
 }
 
+.instance-info-wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+    /* ID와 IP 사이 간격 */
+    align-items: flex-start;
+    /* 위쪽 정렬 */
+}
+
 .info-pair-incetance {
     margin-bottom: 0.5rem;
 }
@@ -646,7 +557,11 @@ a:not(.deal-incetance-link) {
 }
 
 .deal-instance-connect {
-    margin: 0.5rem 0;
+    margin: 3rem 0;
+}
+
+.action-btn-container {
+    margin-top: -2.5rem;
 }
 
 .action-btn {
@@ -657,13 +572,22 @@ a:not(.deal-incetance-link) {
     padding: 0.5rem 0.8rem;
     border-radius: 0.5rem;
     cursor: pointer;
+    width: 100px;
     transition: background-color 0.2s ease-in-out;
-    margin-right: 5px;
-    display: none;
+    margin-right: 0.3rem;
 }
 
-.action-btn:hover {
-    background-color: #2277dd;
+#delete-incetance {
+    margin-top: -4rem;
+    width: 125px;
+}
+
+#add-rule {
+    background-color: #6baffc;
+}
+
+#add-rule:hover {
+    background-color: #3388f0;
 }
 
 .red {
@@ -672,6 +596,12 @@ a:not(.deal-incetance-link) {
 
 .red:hover {
     background-color: #ca504c;
+}
+
+.ip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2.6rem;
 }
 
 .ip-label {
@@ -684,43 +614,114 @@ a:not(.deal-incetance-link) {
 }
 
 
-.deal-button-group-more {
-    margin-bottom: 0;
+.rules-label {
+    margin-bottom: -1.5rem;
+    font-size: 1.2rem;
+    color: #777;
+    font-weight: bold;
 }
 
-.deal-button-group-more .action-btn {
-    margin-bottom: 0;
-    background-color: #aaa;
-    display: inline;
-}
-
-.deal-button-group-more .action-btn:hover {
-    background-color: #777;
-}
-
-
-.iframe-container {
-    height: calc(100% - 3rem);
-    width: calc(100vw - 800px);
-    float: right;
-    border-radius: 8px;
-    background-color: #ddd;
+#rule-list {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.iframe-container div {
-    font-size: 2rem;
+.form-rule {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
     font-weight: 600;
+    color: #444;
 }
 
-#connect-iframe {
-    height:100%;
-    width: 100%;
-    border-radius: 8px;
-    display: none;
+.form-group input[type="text"] {
+    padding: 0.6rem;
+    border: 1px solid #c2d4ff;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    width: 250px;
+    outline: none;
+    /* 기본 아웃라인 제거 */
+    transition: all 0.2s ease;
+    /* 부드럽게 변하게 */
+}
+
+.form-group input[type="text"]:focus {
+    border-color: #7aa5ff;
+    /* 포커스 시 테두리 색 변경 */
+    box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
+    /* 부드러운 그림자 추가 */
+}
+
+select {
+    appearance: none;
+    /* 기본 브라우저 스타일 제거 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #fff;
+    border: 1px solid #c2d4ff;
+    border-radius: 0.5rem;
+    padding: 0.6rem 2.5rem 0.6rem 0.8rem;
+    font-size: 1rem;
+    width: 250px;
+    height: 42px;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="none" stroke="%237aa5ff" stroke-width="2" d="M1 1l5 5 5-5"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 12px 8px;
+    transition: border-color 0.2s ease;
+}
+
+select:focus {
+    border-color: #7aa5ff;
+    box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
+    outline: none;
+}
+
+.remove-port-btn {
+    background-color: #f35e59;
+    color: white;
+    border: none;
+    padding: 0.8rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    height: 42px;
+    font-size: 1rem;
+    transform: translateY(26px);
+    transition: 0.2s ease;
+}
+
+.remove-port-btn:hover {
+    background-color: #ca504c;
+}
+
+.add-port-btn,
+.edit-port-btn {
+    background-color: #3393ff;
+    color: white;
+    border: none;
+    padding: 0.8rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    height: 42px;
+    font-size: 1rem;
+    transform: translateY(26px);
+    transition: 0.2s ease;
+}
+
+.add-port-btn:hover {
+    background-color: #3086e9;
 }
 
 

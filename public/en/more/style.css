@@ -13,7 +13,7 @@ body {
     overflow: hidden;
 }
 
-a {
+a:not(.deal-incetance-link) {
     text-decoration: none;
     color: #fff;
 }
@@ -370,26 +370,6 @@ a {
     padding-left: 0.5rem;
 }
 
-#instance-name {
-    padding: 0.5rem 0.8rem;
-    border: 1px solid #c2d4ff;
-    border-radius: 0.5rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    width: 200px;
-    outline: none;
-    /* 기본 아웃라인 제거 */
-    transition: all 0.2s ease;
-    /* 부드럽게 변하게 */
-}
-
-#instance-name:focus {
-    border-color: #7aa5ff;
-    /* 포커스 시 테두리 색 변경 */
-    box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
-    /* 부드러운 그림자 추가 */
-}
-
 .status-row {
     display: flex;
     justify-content: space-between;
@@ -473,7 +453,7 @@ a {
 .deal-name .type {
     color: #666;
     font-size: 0.9rem;
-    margin-left: 6px;
+    margin-left: 8px;
     margin-right: 1rem;
     transform: translateY(2.5px);
 }
@@ -508,6 +488,37 @@ a {
 }
 
 
+.copy-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px 6px 9px;
+    background-color: #68aeff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 5px;
+    transform: translateY(1px);
+    transition: background-color 0.2s ease;
+}
+
+#copy-connect-url {
+    transform: translateY(3px) !important;
+}
+
+.copy-btn img {
+    height: 1rem;
+    margin-right: 4px;
+}
+
+.copy-btn:hover {
+    background-color: #3393ff;
+}
+
+.copy-btn:active {
+    background-color: #3366ff;
+}
 
 
 .instance-info {

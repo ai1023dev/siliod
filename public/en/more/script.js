@@ -33,7 +33,7 @@ function main_data() {
         success: function (data) {
             console.log(data);
             
-            $('#instance-name').val(data.instance.name)
+            $('.instance-name').text(data.instance.name)
             if (data.instance.type) {
                 $('#instance-type-label').text('GUI')
             } else {

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="ko/setting/style.css" />
+</head>
+
+<body>
+    <!-- 로그인 모달 -->
+    <div class="login-modal-backdrop hidden">
+        <div class="modal">
+            <p>지금 신규 가입하면</p>
+            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
+        </div>
+    </div>
+
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="/"><img src="image/siliod_logo_black.png" alt="logo" /></a>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유 포인트</div>
+                <div class="balance-amount"></div>
+                <a href="/point"><button class="charge-btn">충전하기</button></a>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="/"><img src="image/refresh.svg"> 대쉬보드</button></a>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
+                <button><img src="image/refresh.svg"> 문의</button>
+                <button><img src="image/refresh.svg"> API</button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>인스턴스 생성</h2>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar" src="image/profile.png" alt="Profile" />
+                    <div class="username">Login</div>
+                </div>
+            </header>
+
+            <!-- 언어 선택 | 로그아웃 | 결제 내역 -->
+
+            <div class="form-group">
+                <label for="instance-name">언어 (language)</label>
+                <select class="custom-select" name="interface">
+                    <option>English</option>
+                    <option selected>한국어</option>
+                </select>
+            </div>
+
+            <button class="logout">로그아웃</button>
+
+            <div class="form-group">
+                <label>결제 내역</label>
+                <div class="receipt-container"></div>
+            </div>
+        </div>
+
+        <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="ko/setting/script.js"></script>
+</body>
+
+</html>

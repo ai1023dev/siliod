@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="en/pay/style.css" />
+</head>
+
+<body>
+    <!-- 로그인 모달 -->
+    <div class="login-modal-backdrop hidden">
+        <div class="modal">
+            <p>지금 신규 가입하면</p>
+            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
+        </div>
+    </div>
+
+
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="/"><img src="image/siliod_logo_black.png" alt="logo" /></a>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유금액</div>
+                <div class="balance-amount"></div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="/"><button><img src="image/refresh.svg"> 대쉬보드</button></a>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
+                <button><img src="image/refresh.svg"> 문의</button>
+                <button><img src="image/refresh.svg"> API</button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>포인트 충전</h2>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar" src="image/profile.png" alt="Profile" />
+                    <div class="username">Login</div>
+                </div>
+            </header>
+
+            <span class="point"></span>
+            <span class="amount"></span>
+
+            <div class="line"></div>
+
+            <!-- 결제 UI -->
+            <div id="payment-method"></div>
+            <!-- 이용약관 UI -->
+            <div id="agreement"></div>
+
+            <div class="main-btn-container">
+                <button id="payment-button" class="main-btn">결제하기</button>
+                <a href="/point"><button class="main-btn">상품 다시 선택</button></a>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://js.tosspayments.com/v2/standard"></script>
+    <script src="en/pay/script.js"></script>
+</body>
+
+</html>

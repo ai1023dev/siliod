@@ -1,15 +1,17 @@
 $('#dino-btn').click(function () {
     $(".dino-modal-backdrop").removeClass("hidden").fadeIn(300); // 천천히 보이게
-    $("#connect-iframe").attr('src', '/dino');
+    $("#dino-iframe").attr('src', '/dino');
 })
 
 $('#dino-x').click(function () {
     $(".dino-modal-backdrop").fadeOut(300, function () {
         $(".dino-modal-backdrop").addClass("hidden");
-        $("#connect-iframe").attr('src', '');
+        $("#dino-iframe").attr('src', '');
     });
 })
 
+
+new ClipboardJS('.copy-btn');
 
 
 let open_height
@@ -19,7 +21,7 @@ $(function () {
 
     if (isMobile) {
         $('<link rel="stylesheet" href="web/main/mobile.css"/>').appendTo('head');
-        open_height = 'calc(430px + 4.5rem)'
+        open_height = '502px'
 
         // 모바일용 터치 이벤트로 드래그 구현
         $('.deal-line-hover').on('touchstart', function (e) {
@@ -41,7 +43,7 @@ $(function () {
         });
     }
     else {
-        open_height = 'calc(430px + 7rem)'
+        open_height = '558px'
 
         $('.deal-line-hover').on('mousedown', function (e) {
             isDragging = true;
@@ -60,20 +62,6 @@ $(function () {
         });
     }
 });
-
-
-$('.logout').click(function () {
-    $.ajax({
-        method: 'GET',
-        url: 'logout',
-        success: function (data) {
-            window.location.href = '/';
-        },
-        error: function (xhr, status, error) {
-            alert('서버 측 에러')
-        }
-    });
-})
 
 
 
@@ -107,8 +95,6 @@ if (params.get("result") === 'success') {
             // 결제 실패 비즈니스 로직을 구현하세요.
             console.log(json);
             window.location.href = `/?result=fail&message=${json.message}&code=${json.code}`;
-        } else {
-            alert('결제성공')
         }
 
         // 결제 성공 비즈니스 로직을 구현하세요.
@@ -154,7 +140,7 @@ function get_instance_data(first) {
                                     data-field="${data.instance[i].instance_id}">로딩중</button>
                             </div>
                             <div class="specs">
-                                nano - ${data.instance[i].instance_id}
+                                ${data.instance[i].grade} - ${data.instance[i].instance_id}
                             </div>
                         </div>`);
                 }
@@ -259,6 +245,7 @@ function deal_open() {
     $('#instance-id').text(main_data[0])
     $('#instance-connect-url').text(main_data[0] + '.siliod.com')
     $('#instance-connect-url').attr('href', 'https://' + main_data[0] + '.siliod.com')
+    $('#copy-connect-url').attr('data-clipboard-text', 'https://' + main_data[0] + '.siliod.com')
     $('#public-ip').text('로딩중')
     $('#btn-more').attr('href', `/more?id=${main_data[0]}`)
 
@@ -285,6 +272,7 @@ function deal_open() {
         success: function (data) {
             console.log(data);
             $('#private-ip').text(data.instance.private_ip)
+            $('#copy-private-ip').attr('data-clipboard-text', data.instance.private_ip)
             $('#instance-grade').text(data.instance.grade)
 
             console.log(data.state)
@@ -352,8 +340,11 @@ function deal_open() {
             console.log(data);
             if (data) {
                 $('#public-ip').text(data)
+                $('#copy-public-ip').attr('data-clipboard-text', data)
+                $('#copy-public-ip').css('display', 'inline')
             } else {
                 $('#public-ip').text('인스턴트가 시작 되지 않음')
+                $('#copy-public-ip').css('display', 'none')
             }
         },
         error: function (xhr, status, error) {

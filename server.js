@@ -735,13 +735,8 @@ async function startServer() {
 
 
         // 메인 페이지
-        app.get('/test', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/test/test.html'));
-        });
-
-        // 메인 페이지
         app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/main/main.html'));
+            res.sendFile(path.join(__dirname, 'public/en/main/main.html'));
         });
 
         app.get('/create', (req, res) => {
@@ -762,6 +757,10 @@ async function startServer() {
 
         app.get('/pay', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
+        });
+
+        app.get('/setting', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/web/setting/setting.html'));
         });
 
 
@@ -921,6 +920,12 @@ async function startServer() {
             }
         });
 
+        app.get('/receipt', async (req, res) => {
+            const id = get_user_id(req)
+            const receipt = await db.collection('receipt').find({ id }).toArray();
+            res.send(receipt)
+        });
+
 
 
 
@@ -969,7 +974,7 @@ async function startServer() {
                             { $inc: { amount: response.body.totalAmount } } // 수정 내용
                         );
 
-                        await db.collection('receipt').insertOne({ id: id, amount: response.body.totalAmount, receipt: response.body.receipt.url });
+                        await db.collection('receipt').insertOne({ id: id, date: Date.now(), amount: response.body.totalAmount, receipt: response.body.receipt.url });
 
                         console.log(response.body);
                         res.status(response.statusCode).json(response.body)

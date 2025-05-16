@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>siliod</title>
+    <link rel="stylesheet" href="en/point/style.css" />
+</head>
+
+<body>
+    <!-- 로그인 모달 -->
+    <div class="login-modal-backdrop hidden">
+        <div class="modal">
+            <p>지금 신규 가입하면</p>
+            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+
+            <a href="/login/google"><button class="social-login google-login">
+                    <img src="image/google-icon.png" alt="Google" />
+                    Google 계정으로 로그인
+                </button></a>
+        </div>
+    </div>
+
+
+    <div class="layout">
+        <!-- 왼쪽 사이드바 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <a href="/"><img src="image/siliod_logo_black.png" alt="logo" /></a>
+            </div>
+
+            <div class="balance-section">
+                <div class="balance-label">보유금액</div>
+                <div class="balance-amount"></div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <a href="/"><img src="image/refresh.svg"> 대쉬보드</button></a>
+                <button><img src="image/refresh.svg"> 설정</button>
+                <button><img src="image/refresh.svg"> 배우기</button>
+                <button><img src="image/refresh.svg"> 문의</button>
+                <button><img src="image/refresh.svg"> API</button>
+            </nav>
+        </aside>
+
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h2>포인트 충전</h2>
+                </div>
+
+                <div class="header-right">
+                    <img class="avatar" src="image/profile.png" alt="Profile" />
+                    <div class="username">Login</div>
+                </div>
+            </header>
+
+            <div class="point-container">
+                <div class="point-card select" data-field="240">
+                    <div class="badge">인기</div>
+                    <div class="point top">240p</div>
+                    <div class="price">4,320원</div>
+                    <div class="discount">10% 할인 4800 -> 4320</div>
+                </div>
+                
+                <div class="point-card" data-field="7200">
+                    <div class="point">7200p</div>
+                    <div class="price">100,800원</div>
+                    <div class="discount">30% 할인 144,000 -> 100800</div>
+                </div>
+                
+                <div class="point-card" data-field="1680">
+                    <div class="point">1680p</div>
+                    <div class="price">26,880원</div>
+                    <div class="discount">20% 할인 33,600 -> 26880</div>
+                </div>
+                
+                <div class="point-card" data-field="1000">
+                    <div class="point">1000p</div>
+                    <div class="price">17,000원</div>
+                    <div class="discount">15% 할인 20000 -> 17000</div>
+                </div>
+                
+                <div class="point-card" data-field="500">
+                    <div class="point">500p</div>
+                    <div class="price">9,000원</div>
+                    <div class="discount">10% 할인 10,000 -> 9000</div>
+                </div>
+                
+                <div class="point-card" data-field="150">
+                    <div class="point">150p</div>
+                    <div class="price">3,000원</div>
+                    <div class="discount">할인 없음</div>
+                </div>
+                
+                <div class="point-card" data-field="100">
+                    <div class="point">100p</div>
+                    <div class="price">2,000원</div>
+                    <div class="discount">할인 없음</div>
+                </div>
+                
+                <div class="point-card" data-field="50">
+                    <div class="point">50p</div>
+                    <div class="price">1,000원</div>
+                    <div class="discount">할인 없음</div>
+                </div>                
+            </div>
+
+            <div class="explanation">
+                <span id="explanation-point">240p 충전시</span>
+                <select class="custom-select" name="interface">
+                    <option value="3">nano</option>
+                    <option value="5">micro</option>
+                    <option value="7">small</option>
+                    <option value="10" selected>medium (권장)</option>
+                    <option value="20">large</option>
+                    <option value="40">xlarge</option>
+                </select>
+                <span id="explanation-time">인스턴스 24시간 사용 가능</span>
+            </div>
+            
+            <a class="move-pay" href="/pay?point=240"><button class="pay-btn">충전하기</button></a>
+        </div>
+    </div>
+
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="en/point/script.js"></script>
+</body>
+
+</html>

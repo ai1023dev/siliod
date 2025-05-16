@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>siliod</title>
-    <link rel="stylesheet" href="web/main/style.css" />
+    <link rel="stylesheet" href="ko/main/style.css" />
 </head>
 
 <body>
@@ -47,12 +47,11 @@
             </div>
 
             <nav class="sidebar-menu">
-                <button><img src="image/refresh.svg"> 설정</button>
+                <a href="/setting"><img src="image/refresh.svg"> 설정</a>
                 <button><img src="image/refresh.svg"> 배우기</button>
                 <button><img src="image/refresh.svg"> 문의</button>
                 <button id="dino-btn"><img src="image/refresh.svg"> Dino Game</button>
             </nav>
-            <button class="logout">logout</button>
 
         </aside>
 
@@ -115,7 +114,7 @@
                         <div class="ip-label" id="connect-label">인스턴스 접속</div>
                         <div class="ip-value">
                             <a class="deal-incetance-link" target="_blank" id="instance-connect-url">-</a>
-                            <button class="copy-btn" id="copy-connect-url">복사</button>
+                            <button class="copy-btn" id="copy-connect-url"><img src="image/copy.svg">복사</button>
                         </div>
                     </div>
 
@@ -129,7 +128,7 @@
                         <div class="ip-label">퍼블릭 IP</div>
                         <div class="ip-value">
                             <span id="public-ip">-</span>
-                            <button class="copy-btn" id="copy-public-ip">복사</button>
+                            <button class="copy-btn" id="copy-public-ip"><img src="image/copy.svg">복사</button>
                         </div>
                     </div>
 
@@ -137,7 +136,7 @@
                         <div class="ip-label">프라이빗 IP</div>
                         <div class="ip-value">
                             <span id="private-ip">-</span>
-                            <button class="copy-btn" id="copy-private-ip">복사</button>
+                            <button class="copy-btn" id="copy-private-ip"><img src="image/copy.svg">복사</button>
                         </div>
                     </div>
 
@@ -164,7 +163,8 @@
 
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="web/main/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
+    <script src="ko/main/script.js"></script>
 </body>
 
 </html>
