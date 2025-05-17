@@ -12,7 +12,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server error')
     }
 });
 
@@ -54,7 +54,7 @@ function main_data() {
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 
@@ -67,11 +67,11 @@ function main_data() {
             if (data) {
                 $('#public-ip').text(data)
             } else {
-                $('#public-ip').text('인스턴트가 시작 되지 않음')
+                $('#public-ip').text('Instance not started')
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 
@@ -92,7 +92,7 @@ function main_data() {
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 }
@@ -108,13 +108,13 @@ $('#refresh').click(function () {
     $('#instance-status-loading').removeClass('running')
     $('#instance-status-loading').removeClass('stopped')
 
-    $('#public-ip').text('로딩중')
+    $('#public-ip').text('Loading')
 
     main_data()
 })
 
 $('#delete-incetance').click(function () {
-    if (confirm("정말 인스턴스를 삭제 하시겠습니까?")) {
+    if (confirm("Are you sure you want to delete this instance?")) {
         $.ajax({
             method: 'POST',
             url: `/delete_instance`,
@@ -123,7 +123,7 @@ $('#delete-incetance').click(function () {
                 window.location.href = window.location.origin;
             },
             error: function (xhr, status, error) {
-                alert('서버 측 에러')
+                alert('Server error')
             }
         });
     }
@@ -138,7 +138,7 @@ $.ajax({
         my_ip = data.ip + '/32'
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러');
+        alert('Server error');
     }
 });
 
@@ -155,25 +155,25 @@ function createRule(i, rule = {}) {
         <div class="rule-list">
             <div class="form-rule" data-field="${i}">
                 <div class="form-group">
-                    <label>프로토콜</label>
+                    <label>Protocol</label>
                     <select class="protocol">
                         <option value="tcp" ${protocol === 'TCP' ? 'selected' : ''}>TCP</option>
                         <option value="udp" ${protocol === 'UDP' ? 'selected' : ''}>UDP</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>포트 범위 (범위 표기는 '-'으로 구분)</label>
-                    <input type="text" class="port-range" placeholder="예: 80 또는 1000-2000" value="${portRange}">
+                    <label>Port Range (Use '-' for ranges)</label>
+                    <input type="text" class="port-range" placeholder="e.g., 80 or 1000-2000" value="${portRange}">
                 </div>
                 <div class="form-group">
-                    <label>허용 IP (CIDR 표기 필수)</label>
+                    <label>Allowed IP (CIDR notation required)</label>
                     <select class="allowed-ip-option">
-                        <option value="0.0.0.0/0" ${!isCustomIP ? 'selected' : ''}>모든 IP 허용 (0.0.0.0/0)</option>
-                        <option value="custom" ${isCustomIP ? 'selected' : ''}>지정 IP</option>
+                        <option value="0.0.0.0/0" ${!isCustomIP ? 'selected' : ''}>Allow all IPs (0.0.0.0/0)</option>
+                        <option value="custom" ${isCustomIP ? 'selected' : ''}>Custom IP</option>
                     </select>
-                    <input type="text" class="custom-ip" placeholder="IP 입력" value="${isCustomIP ? source : my_ip}" style="${isCustomIP ? '' : 'display:none;'}">
+                    <input type="text" class="custom-ip" placeholder="Enter IP" value="${isCustomIP ? source : my_ip}" style="${isCustomIP ? '' : 'display:none;'}">
                 </div>
-                ${rule.protocol ? '<button class="remove-port-btn">삭제</button>' : '<button class="add-port-btn">추가</button>'}
+                ${rule.protocol ? '<button class="remove-port-btn">Delete</button>' : '<button class="add-port-btn">Add</button>'}
             </div>
         </div>
     `;
@@ -206,7 +206,7 @@ $('#rules-container').on('input change', '.form-rule .protocol, .form-rule .port
         $button
             .removeClass('remove-port-btn')
             .addClass('edit-port-btn')
-            .text('수정');
+            .text('Edit');
     }
 });
 
@@ -223,12 +223,12 @@ $('#rules-container').on('click', '.add-port-btn', function () {
     console.log('Allowed IP:', customIP);
 
     if (!isValidPortRange(portRange)) {
-        alert('포트 범위 형식이 잘못되었습니다.');
+        alert('Invalid port range format.');
         return;
     }
 
     if (!isValidCIDR(customIP)) {
-        alert('IP주소 형식이 잘못 되었습니다.');
+        alert('Invalid IP address format.');
         return;
     }
 
@@ -264,12 +264,12 @@ $('#rules-container').on('click', '.add-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 });
@@ -285,12 +285,12 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
     console.log('Allowed IP:', customIP);
 
     if (!isValidPortRange(portRange)) {
-        alert('포트 범위 형식이 잘못되었습니다.');
+        alert('Invalid port range format.');
         return;
     }
 
     if (!isValidCIDR(customIP)) {
-        alert('IP주소 형식이 잘못 되었습니다.');
+        alert('Invalid IP address format.');
         return;
     }
 
@@ -329,12 +329,12 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 });
@@ -381,12 +381,12 @@ $('#rules-container').on('click', '.remove-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 

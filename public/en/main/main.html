@@ -1,5 +1,6 @@
+
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -12,12 +13,12 @@
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal">
-            <p>지금 신규 가입하면</p>
-            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+            <p>Sign up now and get</p>
+            <h2><span class="highlight">$5</span> free credit!</h2>
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Login with Google
                 </button></a>
         </div>
     </div>
@@ -25,7 +26,7 @@
     <!-- 공룡 게임 모달 -->
     <div class="dino-modal-backdrop hidden">
         <div class="modal dino-modal">
-            <span>머리 식힐 시간이에요. 잠깐 놀다가 와요!</span><img id="dino-x" src="image/x.svg">
+            <span>Time to clear your mind. Let's play for a bit!</span><img id="dino-x" src="image/x.svg">
             <iframe id="dino-iframe" frameborder="0"></iframe>
         </div>
     </div>
@@ -41,15 +42,15 @@
             </div>
 
             <div class="balance-section">
-                <div class="balance-label">보유 포인트</div>
+                <div class="balance-label">Available Points</div>
                 <div class="balance-amount"></div>
-                <a href="/point"><button class="charge-btn">충전하기</button></a>
+                <a href="/point"><button class="charge-btn">Add Points</button></a>
             </div>
 
             <nav class="sidebar-menu">
-                <a href="/setting"><img src="image/refresh.svg"> 설정</a>
-                <button><img src="image/refresh.svg"> 배우기</button>
-                <button><img src="image/refresh.svg"> 문의</button>
+                <a href="/setting"><img src="image/refresh.svg"> Settings</a>
+                <button><img src="image/refresh.svg"> Learn</button>
+                <button><img src="image/refresh.svg"> Contact</button>
                 <button id="dino-btn"><img src="image/refresh.svg"> Dino Game</button>
             </nav>
 
@@ -59,10 +60,10 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2 class="summation">? 인스턴스 / ? 실행중</h2>
+                    <h2 class="summation">? Instances / ? Running</h2>
                     <button>
                         <img src="image/refresh.svg" alt="refresh">
-                        <span>상태 새로고침</span>
+                        <span>Refresh Status</span>
                     </button>
                 </div>
 
@@ -101,48 +102,48 @@
 
                     <div class="instance-info">
                         <div class="info-pair info-pair-incetance">
-                            <div class="info-label">인스턴스 ID :</div>
+                            <div class="info-label">Instance ID:</div>
                             <div class="info-value" id="instance-id">-</div>
                         </div>
                         <div class="info-pair">
-                            <div class="info-label">인스턴스 유형 :</div>
+                            <div class="info-label">Instance Type:</div>
                             <div class="info-value" id="instance-grade">-</div>
                         </div>
                     </div>
 
                     <div class="instance-info-row deal-instance-connect">
-                        <div class="ip-label" id="connect-label">인스턴스 접속</div>
+                        <div class="ip-label" id="connect-label">Instance Connection</div>
                         <div class="ip-value">
                             <a class="deal-incetance-link" target="_blank" id="instance-connect-url">-</a>
-                            <button class="copy-btn" id="copy-connect-url"><img src="image/copy.svg">복사</button>
+                            <button class="copy-btn" id="copy-connect-url"><img src="image/copy.svg">Copy</button>
                         </div>
                     </div>
 
                     <div class="deal-button-group">
-                        <button class="action-btn restart" id="btn-start">인스턴스 시작</button>
-                        <button class="action-btn restart" id="btn-restart">인스턴스 재시작</button>
-                        <button class="action-btn red stop" id="btn-stop">인스턴스 중지</button>
+                        <button class="action-btn restart" id="btn-start">Start Instance</button>
+                        <button class="action-btn restart" id="btn-restart">Restart Instance</button>
+                        <button class="action-btn red stop" id="btn-stop">Stop Instance</button>
                     </div>
 
                     <div class="instance-info-row">
-                        <div class="ip-label">퍼블릭 IP</div>
+                        <div class="ip-label">Public IP</div>
                         <div class="ip-value">
                             <span id="public-ip">-</span>
-                            <button class="copy-btn" id="copy-public-ip"><img src="image/copy.svg">복사</button>
+                            <button class="copy-btn" id="copy-public-ip"><img src="image/copy.svg">Copy</button>
                         </div>
                     </div>
 
                     <div class="instance-info-row">
-                        <div class="ip-label">프라이빗 IP</div>
+                        <div class="ip-label">Private IP</div>
                         <div class="ip-value">
                             <span id="private-ip">-</span>
-                            <button class="copy-btn" id="copy-private-ip"><img src="image/copy.svg">복사</button>
+                            <button class="copy-btn" id="copy-private-ip"><img src="image/copy.svg">Copy</button>
                         </div>
                     </div>
 
                     <div class="deal-button-group deal-button-group-more">
                         <a id="btn-more" href="">
-                            <button class="action-btn">더보기</button>
+                            <button class="action-btn">More</button>
                         </a>
                     </div>
                 </div>
@@ -153,7 +154,7 @@
 
 
                 <div class="iframe-container">
-                    <div id="no-connect">연결 확인 중</div>
+                    <div id="no-connect">Checking connection</div>
                     <iframe id="connect-iframe" src="" frameborder="0" allowfullscreen allow="fullscreen"></iframe>
                 </div>
             </div>

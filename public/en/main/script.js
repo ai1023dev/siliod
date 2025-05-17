@@ -104,7 +104,7 @@ if (params.get("result") === 'success') {
 }
 
 if (params.get("result") === 'fail') {
-    alert('결제 실패')
+    alert('Payment Failed')
 }
 
 function get_instance_data(first) {
@@ -137,7 +137,7 @@ function get_instance_data(first) {
                             <div class="status-row">
                                 <span class="status loading status-${data.instance[i].instance_id}">loading</span>
                                 <button class="connect-btn deal-instance-${data.instance[i].instance_id}"
-                                    data-field="${data.instance[i].instance_id}">로딩중</button>
+                                    data-field="${data.instance[i].instance_id}">Loading</button>
                             </div>
                             <div class="specs">
                                 ${data.instance[i].grade} - ${data.instance[i].instance_id}
@@ -146,14 +146,14 @@ function get_instance_data(first) {
                 }
 
                 if (params.get("new") === 'new') {
-                    alert('새고객')
+                    alert('New Customer')
                 }
             } else {
                 $(".login-modal-backdrop").removeClass("hidden");
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 
@@ -168,7 +168,7 @@ function get_instance_data(first) {
                 console.log('.status-' + data[i].instance_id)
                 if (data[i].status === 'building') {
                     $('.status-' + data[i].instance_id).text('building')
-                    $('.deal-instance-' + data[i].instance_id).text('생성중')
+                    $('.deal-instance-' + data[i].instance_id).text('Creating')
                 } else {
                     if (data[i].status) {
                         $('.status-' + data[i].instance_id).text(data[i].status)
@@ -176,11 +176,11 @@ function get_instance_data(first) {
 
                         if (data[i].status === 'running') {
                             running = running + 1
-                            $('.deal-instance-' + data[i].instance_id).text('접속하기')
+                            $('.deal-instance-' + data[i].instance_id).text('Connect')
                             $('.status-' + data[i].instance_id).addClass('running')
                             $('.deal-instance-' + data[i].instance_id).attr('running', 'true')
                         } else {
-                            $('.deal-instance-' + data[i].instance_id).text('시작하기')
+                            $('.deal-instance-' + data[i].instance_id).text('Start')
                             $('.status-' + data[i].instance_id).addClass('stopped')
                             $('.deal-instance-' + data[i].instance_id).attr('running', 'false')
                         }
@@ -190,10 +190,10 @@ function get_instance_data(first) {
                 }
             }
 
-            $(".summation").text(`${data.length} 인스턴스 / ${running} 실행중`)
+            $(".summation").text(`${data.length} Instances / ${running} Running`)
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 } get_instance_data(true)
@@ -222,7 +222,7 @@ $(document).on('click', '.connect-btn', function () {
                 }
             },
             error: function (xhr, status, error) {
-                alert('서버 측 에러')
+                alert('Server-side Error')
             }
         });
     }
@@ -246,16 +246,16 @@ function deal_open() {
     $('#instance-connect-url').text(main_data[0] + '.siliod.com')
     $('#instance-connect-url').attr('href', 'https://' + main_data[0] + '.siliod.com')
     $('#copy-connect-url').attr('data-clipboard-text', 'https://' + main_data[0] + '.siliod.com')
-    $('#public-ip').text('로딩중')
+    $('#public-ip').text('Loading')
     $('#btn-more').attr('href', `/more?id=${main_data[0]}`)
 
     if (main_data[2] === 'GUI') {
-        $('#connect-label').text('인스턴스 접속')
+        $('#connect-label').text('Instance Connection')
     } else {
-        $('#connect-label').text("인스턴스 접속 (id 필드에 'admin' 입력)")
+        $('#connect-label').text("Instance Connection (enter 'admin' in id field)")
     }
 
-    $('#instance-status-loading').text('lodeing')
+    $('#instance-status-loading').text('loading')
     $('#instance-status-loading').addClass('loading')
     $('#instance-status-loading').removeClass('running')
     $('#instance-status-loading').removeClass('stopped')
@@ -281,7 +281,7 @@ function deal_open() {
                 $('.status-' + main_data[0]).text('buliding')
                 $('#instance-status-loading').text('buliding')
 
-                $('#no-connect').text('인스턴스가 생성중')
+                $('#no-connect').text('Instance is being created')
                 $('#no-connect').css('display', 'inline')
                 $('#connect-iframe').css('display', 'none')
 
@@ -289,7 +289,7 @@ function deal_open() {
                 $('#btn-restart').css('display', 'none')
                 $('#btn-stop').css('display', 'none')
 
-                $('.deal-instance-' + main_data[0]).text('생성중')
+                $('.deal-instance-' + main_data[0]).text('Creating')
             } else {
                 $('.status-' + main_data[0]).text(data.state)
                 $('#instance-status-loading').text(data.state)
@@ -307,13 +307,13 @@ function deal_open() {
                     $('#btn-restart').css('display', 'inline')
                     $('#btn-stop').css('display', 'inline')
 
-                    $('.deal-instance-' + main_data[0]).text('접속하기')
+                    $('.deal-instance-' + main_data[0]).text('Connect')
                     $('.deal-instance-' + main_data[0]).attr('running', 'true')
                 } else {
                     $('#instance-status-loading').addClass('stopped')
                     $('.status-' + main_data[0]).addClass('stopped')
 
-                    $('#no-connect').text('인스턴스가 실행되지않음')
+                    $('#no-connect').text('Instance is not running')
                     $('#no-connect').css('display', 'inline')
                     $('#connect-iframe').css('display', 'none')
                     $('#connect-iframe').attr('src', '')
@@ -322,13 +322,13 @@ function deal_open() {
                     $('#btn-restart').css('display', 'none')
                     $('#btn-stop').css('display', 'none')
 
-                    $('.deal-instance-' + main_data[0]).text('시작하기')
+                    $('.deal-instance-' + main_data[0]).text('Start')
                     $('.deal-instance-' + main_data[0]).attr('running', 'false')
                 }
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 
@@ -343,12 +343,12 @@ function deal_open() {
                 $('#copy-public-ip').attr('data-clipboard-text', data)
                 $('#copy-public-ip').css('display', 'inline')
             } else {
-                $('#public-ip').text('인스턴트가 시작 되지 않음')
+                $('#public-ip').text('Instance is not running')
                 $('#copy-public-ip').css('display', 'none')
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 }
@@ -376,7 +376,7 @@ $(document).on('click', '#btn-start', function () {
             console.log(data);
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 });
@@ -400,7 +400,7 @@ $(document).on('click', '#btn-restart', function () {
             console.log(data);
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 });
@@ -424,7 +424,7 @@ $(document).on('click', '#btn-stop', function () {
             console.log(data);
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server-side Error')
         }
     });
 });

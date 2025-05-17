@@ -12,7 +12,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server-side error')
     }
 });
 
@@ -25,8 +25,8 @@ $('.point-card').click(function () {
     const grade = $('.custom-select').val()
     const point = $(this).attr('data-field')
     
-    $('#explanation-point').text(`${ $(this).attr('data-field') }p 충전시`)
-    $('#explanation-time').text(`인스턴스 ${ parseFloat((point / grade).toFixed(2)) }시간 사용 가능`)
+    $('#explanation-point').text(`When charging ${$(this).attr('data-field')} points`)
+    $('#explanation-time').text(`Instance can be used for ${parseFloat((point / grade).toFixed(2))} hours`)
 
     $('.move-pay').attr('href', '/pay?point=' + point)
 })
@@ -35,6 +35,6 @@ $('.custom-select').change(function () {
     const grade = $(this).val()
     const point = $('.select').attr('data-field')
     
-    $('#explanation-point').text(`${ $('.select').attr('data-field') }p 충전시`)
-    $('#explanation-time').text(`인스턴스 ${ parseFloat((point / grade).toFixed(2)) }시간 사용 가능`)
+    $('#explanation-point').text(`When charging ${$('.select').attr('data-field')} points`)
+    $('#explanation-time').text(`Instance can be used for ${parseFloat((point / grade).toFixed(2))} hours`)
 })

@@ -17,10 +17,12 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "geoip-lite": "^1.4.10",
     "got": "^14.4.7",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.13.0",
     "nodemailer": "^6.10.0",
+    "request-ip": "^3.3.0",
     "socket.io": "^4.8.1"
   }
 }

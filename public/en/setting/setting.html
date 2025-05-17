@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>siliod</title>
-    <link rel="stylesheet" href="web/setting/style.css" />
+    <link rel="stylesheet" href="en/setting/style.css" />
 </head>
 
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal">
-            <p>지금 신규 가입하면</p>
-            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+            <p>Sign up now and get</p>
+            <h2><span class="highlight">$5</span> free credit!</h2>
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Sign in with Google
                 </button></a>
         </div>
     </div>
@@ -30,16 +30,16 @@
             </div>
 
             <div class="balance-section">
-                <div class="balance-label">보유 포인트</div>
+                <div class="balance-label">Points Balance</div>
                 <div class="balance-amount"></div>
-                <a href="/point"><button class="charge-btn">충전하기</button></a>
+                <a href="/point"><button class="charge-btn">Add Points</button></a>
             </div>
 
             <nav class="sidebar-menu">
-                <a href="/"><img src="image/refresh.svg"> 대쉬보드</button></a>
-                <button><img src="image/refresh.svg"> 설정</button>
-                <button><img src="image/refresh.svg"> 배우기</button>
-                <button><img src="image/refresh.svg"> 문의</button>
+                <a href="/"><img src="image/refresh.svg"> Dashboard</button></a>
+                <button><img src="image/refresh.svg"> Settings</button>
+                <button><img src="image/refresh.svg"> Learn</button>
+                <button><img src="image/refresh.svg"> Contact</button>
                 <button><img src="image/refresh.svg"> API</button>
             </nav>
         </aside>
@@ -48,7 +48,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>인스턴스 생성</h2>
+                    <h2>Create Instance</h2>
                 </div>
 
                 <div class="header-right">
@@ -60,23 +60,23 @@
             <!-- 언어 선택 | 로그아웃 | 결제 내역 -->
 
             <div class="form-group">
-                <label for="instance-name">언어 (language)</label>
+                <label for="instance-name">Language</label>
                 <select class="custom-select" name="interface">
-                    <option>English</option>
-                    <option selected>한국어</option>
+                    <option selected>English</option>
+                    <option>Korean</option>
                 </select>
             </div>
 
-            <button class="logout">로그아웃</button>
+            <button class="logout">Logout</button>
 
             <div class="form-group">
-                <label>결제 내역</label>
+                <label>Payment History</label>
                 <div class="receipt-container"></div>
             </div>
         </div>
 
         <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script src="web/setting/script.js"></script>
+        <script src="en/setting/script.js"></script>
 </body>
 
 </html>

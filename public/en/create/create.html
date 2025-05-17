@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -12,12 +12,12 @@
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal">
-            <p>지금 신규 가입하면</p>
-            <h2><span class="highlight">$5</span> 무료 크레딧 제공!</h2>
+            <p>Sign up now and get</p>
+            <h2><span class="highlight">$5</span> free credit!</h2>
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Login with Google
                 </button></a>
         </div>
     </div>
@@ -25,11 +25,11 @@
     <!-- 공룡 게임 모달 -->
     <div class="dino-modal-backdrop hidden">
         <div class="modal dino-modal">
-            <span id="dino-time">예상 소요시간 1분</span>
-            <a id="dino-dashboard"><button>대쉬보드로 이동</button></a><br>
+            <span id="dino-time">Estimated time: 1 minute</span>
+            <a id="dino-dashboard"><button>Go to Dashboard</button></a><br>
             <iframe frameborder="0"></iframe>
 
-            <div>게임 한 판 어때요? 인스턴스가 곧 시작돼요!</div>
+            <div>How about a game? Your instance will start soon!</div>
         </div>
     </div>
 
@@ -41,16 +41,16 @@
             </div>
 
             <div class="balance-section">
-                <div class="balance-label">보유 포인트</div>
+                <div class="balance-label">Available Points</div>
                 <div class="balance-amount"></div>
-                <a href="/point"><button class="charge-btn">충전하기</button></a>
+                <a href="/point"><button class="charge-btn">Add Points</button></a>
             </div>
 
             <nav class="sidebar-menu">
-                <a href="/"><img src="image/refresh.svg"> 대쉬보드</button></a>
-                <button><img src="image/refresh.svg"> 설정</button>
-                <button><img src="image/refresh.svg"> 배우기</button>
-                <button><img src="image/refresh.svg"> 문의</button>
+                <a href="/"><img src="image/refresh.svg"> Dashboard</button></a>
+                <button><img src="image/refresh.svg"> Settings</button>
+                <button><img src="image/refresh.svg"> Learn</button>
+                <button><img src="image/refresh.svg"> Contact</button>
                 <button><img src="image/refresh.svg"> API</button>
             </nav>
         </aside>
@@ -59,7 +59,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>인스턴스 생성</h2>
+                    <h2>Create Instance</h2>
                 </div>
 
                 <div class="header-right">
@@ -70,12 +70,12 @@
 
             <div class="form-section">
                 <div class="form-group">
-                    <label for="instance-name">인스턴스 이름</label>
-                    <input type="text" id="instance-name" placeholder="예: my-instance (띄어쓰기 불가)" />
+                    <label for="instance-name">Instance Name</label>
+                    <input type="text" id="instance-name" placeholder="Example: my-instance (no spaces allowed)" />
                 </div>
 
                 <div class="form-group">
-                    <label>접속 방식</label>
+                    <label>Connection Method</label>
                     <div class="radio-group">
                         <label class="custom-radio">
                             <input type="radio" name="interface" value="gui" />
@@ -93,22 +93,22 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">인스턴스 등급</label>
+                            <label for="instance-name">Instance Tier</label>
                             <select class="custom-select" name="interface">
                                 <option value="nano">nano</option>
                                 <option value="micro">micro</option>
                                 <option value="small">small</option>
-                                <option value="medium" selected>medium (권장)</option>
+                                <option value="medium" selected>medium (recommended)</option>
                                 <option value="large">large</option>
                                 <option value="xlarge">xlarge</option>
                             </select>
 
-                            <div class="strength" id="speac-strength"></div>
+                            <div class="strength" id="speac-strength">vCPU 2 / Memory 4GiB / Base CPU Performance 20% / Hourly Rate 10p</div>
                         </div>
                     </div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">운영체제</label>
+                            <label for="instance-name">Operating System</label>
                             <select class="custom-select" name="interface">
                                 <option selected>Ubuntu (24.04.2 LTS)</option>
                             </select>
@@ -121,21 +121,21 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">스토리지</label>
+                            <label for="instance-name">Storage</label>
                             <div class="password-wrapper">
                                 <input type="number" id="storage-input" min="8" step="1" value="10" />
                                 <button type="button" class="gib">GiB</button>
                             </div>
-                            <div class="strength" id="storage-strength">GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.</div>
+                            <div class="strength" id="storage-strength">GUI requires 6GiB, CLI requires 3GiB by default.</div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="form-group">
-                            <label for="instance-name">접속 허용 IP (CIDR 표기 필수)</label>
+                            <label for="instance-name">Allowed IP Address (CIDR notation required)</label>
                             <input id="ip" type="text">
 
-                            <div class="strength" id="ip-strength">현재 ip</div>
+                            <div class="strength" id="ip-strength">Current IP</div>
                         </div>
                     </div>
                 </div>
@@ -144,41 +144,41 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="ubuntu-password">Ubuntu 비밀번호</label>
+                            <label for="ubuntu-password">Ubuntu Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="ubuntu-password" />
-                                <button type="button" class="toggle-password" data-target="#ubuntu-password">보기</button>
+                                <button type="button" class="toggle-password" data-target="#ubuntu-password">Show</button>
                             </div>
                             <div class="strength" id="ubuntu-strength"></div>
                         </div><br>
 
                         <div class="form-group">
-                            <label for="ubuntu-password-confirm">Ubuntu 비밀번호 확인</label>
+                            <label for="ubuntu-password-confirm">Confirm Ubuntu Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="ubuntu-password-confirm" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#ubuntu-password-confirm">보기</button>
+                                    data-target="#ubuntu-password-confirm">Show</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="width">
                         <div class="form-group">
-                            <label for="connect-password">접속 비밀번호</label>
+                            <label for="connect-password">Connection Password</label>
                             <div class="password-wrapper">
-                                <input type="password" id="connect-password" placeholder="Connect 비밀번호 (6~8자리)" />
+                                <input type="password" id="connect-password" placeholder="Connection password (6-8 characters)" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#connect-password">보기</button>
+                                    data-target="#connect-password">Show</button>
                             </div>
                             <div class="strength" id="connect-strength"></div>
                         </div><br>
 
                         <div class="form-group">
-                            <label for="connect-password-confirm">접속 비밀번호 확인</label>
+                            <label for="connect-password-confirm">Confirm Connection Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="connect-password-confirm" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#connect-password-confirm">보기</button>
+                                    data-target="#connect-password-confirm">Show</button>
                             </div>
                         </div>
                     </div>
@@ -186,7 +186,7 @@
 
 
                 <div class="form-actions">
-                    <button type="button" id="create-instance-btn">인스턴스 생성</button>
+                    <button type="button" id="create-instance-btn">Create Instance</button>
                 </div>
             </div>
         </div>

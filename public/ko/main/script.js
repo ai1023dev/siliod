@@ -69,10 +69,9 @@ $(function () {
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("result") === 'success') {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentKey = urlParams.get("paymentKey");
-    const orderId = urlParams.get("orderId");
-    const amount = urlParams.get("amount");
+    const paymentKey = params.get("paymentKey");
+    const orderId = params.get("orderId");
+    const amount = params.get("amount");
 
     async function confirm() {
         const requestData = {
@@ -80,6 +79,8 @@ if (params.get("result") === 'success') {
             orderId: orderId,
             amount: amount,
         };
+
+        console.log(requestData)
 
         const response = await fetch("/confirm", {
             method: "POST",
@@ -99,12 +100,15 @@ if (params.get("result") === 'success') {
 
         // 결제 성공 비즈니스 로직을 구현하세요.
         console.log(json);
+        alert('결제성공')
+        window.location.href = '/'
     }
     confirm();
 }
 
 if (params.get("result") === 'fail') {
-    alert('결제 실패')
+    alert(params.get("message"))
+    window.location.href = '/'
 }
 
 function get_instance_data(first) {

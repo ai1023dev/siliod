@@ -1,6 +1,36 @@
 const params = new URLSearchParams(window.location.search);
 const point = params.get("point")
-const amount = point * 200
+let amount;
+
+switch (point) {
+    case "240":
+        amount = 4320;
+        break;
+    case "7200":
+        amount = 100800;
+        break;
+    case "1680":
+        amount = 26880;
+        break;
+    case "1000":
+        amount = 17000;
+        break;
+    case "500":
+        amount = 9000;
+        break;
+    case "150":
+        amount = 3000;
+        break;
+    case "100":
+        amount = 2000;
+        break;
+    case "50":
+        amount = 1000;
+        break;
+    default:
+        amount = 0; // 기본값 또는 에러 처리
+        break;
+}
 
 let orderId
 
@@ -9,13 +39,13 @@ $.ajax({
     url: '/login_check',
     success: function (data) {
         console.log(data)
-        orderId = data.id + '_' + Date.now()
+        orderId = data.id + '_' + point + '_' + Date.now()
         console.log(orderId)
 
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".balance-amount").text(data.amount+'p');
+            $(".balance-amount").text(data.amount + 'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }

@@ -16,6 +16,9 @@ const nodemailer = require("nodemailer");
 const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
+const requestIp = require('request-ip');
+app.use(requestIp.mw());
+const geoip = require('geoip-lite');
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -733,34 +736,46 @@ async function startServer() {
 
 
 
+        function check_country(req, res, page) {
+            const ip = req.clientIp;
+            const geo = geoip.lookup(ip);
+            // const country = geo?.country || 'US';
+            const country = geo?.country || 'KR';
+
+            const filePath = country === 'KR'
+                ? path.join(__dirname, `public/ko/${page}/${page}.html`)
+                : path.join(__dirname, `public/en/${page}/${page}.html`);
+
+            res.sendFile(filePath);
+        }
 
         // 메인 페이지
         app.get('/', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/en/main/main.html'));
+            check_country(req, res, 'main')
         });
 
         app.get('/create', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/create/create.html'));
+            check_country(req, res, 'create')
         });
 
         app.get('/more', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/more/more.html'));
-        });
-
-        app.get('/dino', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/dino/index.html'));
+            check_country(req, res, 'more')
         });
 
         app.get('/point', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/point/point.html'));
+            check_country(req, res, 'point')
         });
 
         app.get('/pay', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/pay/pay.html'));
+            check_country(req, res, 'pay')
         });
 
         app.get('/setting', (req, res) => {
-            res.sendFile(path.join(__dirname, 'public/web/setting/setting.html'));
+            check_country(req, res, 'setting')
+        });
+
+        app.get('/dino', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/dino/index.html'));
         });
 
 
@@ -947,8 +962,39 @@ async function startServer() {
                 "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
 
             const id = get_user_id(req)
+            const point = orderId.split("_")[1]
+            let check_amount;
+            switch (point) {
+                case "240":
+                    check_amount = '4320';
+                    break;
+                case "7200":
+                    check_amount = '100800';
+                    break;
+                case "1680":
+                    check_amount = '26880';
+                    break;
+                case "1000":
+                    check_amount = '17000';
+                    break;
+                case "500":
+                    check_amount = '9000';
+                    break;
+                case "150":
+                    check_amount = '3000';
+                    break;
+                case "100":
+                    check_amount = '2000';
+                    break;
+                case "50":
+                    check_amount = '1000';
+                    break;
+                default:
+                    check_amount = 'err'; // 기본값 또는 에러 처리
+                    break;
+            }
 
-            if (id === orderId.split("_")[0]) {
+            if (id === orderId.split("_")[0] && amount === check_amount) {
                 const { default: got } = await import('got');
 
                 // 결제를 승인하면 결제수단에서 금액이 차감돼요.
@@ -968,13 +1014,13 @@ async function startServer() {
                         // 결제 성공 비즈니스 로직을 구현하세요.
                         const user_data = await db.collection('user').findOne({ id: id });
 
-                        sendEmail(user_data.email, "siliod 충전", response.body.totalAmount + "원 충전됨여여.")
                         await db.collection('user').updateOne(
                             { id: id }, // 조건
-                            { $inc: { amount: response.body.totalAmount } } // 수정 내용
+                            { $inc: { amount: Number(point) } } // 수정 내용
                         );
 
-                        await db.collection('receipt').insertOne({ id: id, date: Date.now(), amount: response.body.totalAmount, receipt: response.body.receipt.url });
+                        await db.collection('receipt').insertOne({ id, date: Date.now(), point, amount: response.body.totalAmount, receipt: response.body.receipt.url });
+                        await sendEmail(user_data.email, "siliod 충전", point + 'p     ' + response.body.totalAmount + "원 충전됨여여.")
 
                         console.log(response.body);
                         res.status(response.statusCode).json(response.body)
@@ -1062,7 +1108,7 @@ async function startServer() {
         function get_user_id(req) {
             if (req.cookies && req.cookies.account) {
                 const token = req.cookies.account;
-    
+
                 const decoded = check_token(token);
                 if (decoded !== false) {  // 조건문 수정
                     return decoded.id;

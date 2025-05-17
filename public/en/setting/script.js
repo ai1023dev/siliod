@@ -12,7 +12,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server error')
     }
 });
 
@@ -25,7 +25,7 @@ function formatDate(timestamp) {
 }
 
 function formatAmount(amount) {
-    return amount.toLocaleString('ko-KR') + '원';
+    return amount.toLocaleString('en-US') + ' KRW';
 }
 
 $.ajax({
@@ -49,7 +49,7 @@ $.ajax({
         });
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server error')
     }
 });
 
@@ -62,7 +62,7 @@ $('.logout').click(function () {
             window.location.href = '/';
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
-})
+});

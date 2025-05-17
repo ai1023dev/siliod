@@ -21,14 +21,14 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server error')
     }
 });
 
 
 
 $(".point").html(`<span class="bold">${point}</span>p`)
-$(".amount").html(`<span class="bold">${amount}</span>원`)
+$(".amount").html(`<span class="bold">${amount}</span>won`)
 
 
 async function main() {
@@ -61,7 +61,7 @@ async function main() {
     button.addEventListener("click", async function () {
         await widgets.requestPayment({
             orderId: orderId,
-            orderName: `siliod ${point}p 충전`,
+            orderName: `siliod ${point}p charge`,
             successUrl: window.location.origin + "/?result=success&",
             failUrl: window.location.origin + "/?result=fail&",
         });
