@@ -632,12 +632,12 @@ a:not(.deal-incetance-link) {
     cursor: pointer;
     font-size: 0.8rem;
     margin-left: 5px;
-    transform: translateY(1px);
+    transform: translateY(2px);
     transition: background-color 0.2s ease;
 }
 
-#copy-connect-url {
-    transform: translateY(3px) !important;
+#copy-public-ip {
+    display: none;
 }
 
 .copy-btn img {

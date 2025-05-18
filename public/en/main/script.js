@@ -346,7 +346,7 @@ if (params.get("result")) {
                 if (data) {
                     $('#public-ip').text(data)
                     $('#copy-public-ip').attr('data-clipboard-text', data)
-                    $('#copy-public-ip').css('display', 'inline')
+                    $('#copy-public-ip').css('display', 'inline-flex')
                 } else {
                     $('#public-ip').text('Instance is not running')
                     $('#copy-public-ip').css('display', 'none')

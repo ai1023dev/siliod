@@ -44,6 +44,9 @@ function main_data() {
             $('#private-ip').text(data.instance.private_ip)
             $('#instance-status-loading').text(data.state)
             $('#instance-status-loading').removeClass('loading')
+            $('#storage-input').val(data.instance.size)
+            $('#storage-input').attr('min', data.instance.size)
+
             $('.status-' + instance_id).text(data.state)
 
             console.log(data.state)
@@ -128,6 +131,37 @@ $('#delete-incetance').click(function () {
         });
     }
 })
+
+$('#resize-volume').click(function () {
+    if (confirm("Are you sure you want to change the volume size?")) {
+        const size = $('#storage-input').val();
+
+        $.ajax({
+            method: 'POST',
+            url: `/resize_volume`,
+            data: { instance_id, size },
+            success: function (data) {
+                console.log(data)
+                if (data !== '6time err') {
+                    alert('Volume size changed successfully.');
+                    // window.location.href = window.location.origin + '/가이드/대충 볼륨 연결하는거';
+                } else {
+                    alert("You've reached the maximum modification rate per volume limit. Wait at least 6 hours between modifications per volume.");
+                }
+            },
+            error: function (xhr, status, error) {
+                if (xhr.status === 429 && xhr.responseJSON?.message) {
+                    alert(xhr.responseJSON.message); // 6시간 제한 메시지
+                } else if (xhr.responseJSON?.message) {
+                    alert('Error: ' + xhr.responseJSON.message); // 기타 서버 측 메시지
+                } else {
+                    alert('Server error');
+                }
+            }
+        });
+    }
+});
+
 
 
 let my_ip

@@ -13,7 +13,7 @@ const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
+const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, DescribeVolumesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, ModifyVolumeCommand, waitUntilVolumeModified, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
 const requestIp = require('request-ip');
@@ -157,41 +157,50 @@ async function startServer() {
         }
 
 
-        const attachVolume = async (instanceId, size) => {
+        // const attachVolume = async (instanceId, size) => {
+        const modifyAttachedVolume = async (instanceId, newSize) => {
             try {
-                // 1. 인스턴스 AZ 조회
+                // 1. 인스턴스 정보 조회
                 const descCommand = new DescribeInstancesCommand({ InstanceIds: [instanceId] });
                 const descResult = await aws_client.send(descCommand);
-                const az = descResult.Reservations[0].Instances[0].Placement.AvailabilityZone;
-                console.log(`🔍 인스턴스 ${instanceId} 의 AZ: ${az}`);
+                const instance = descResult.Reservations[0].Instances[0];
 
-                // 2. 볼륨 생성
-                const createParams = {
-                    AvailabilityZone: az,
-                    Size: size,
-                    VolumeType: "gp3"
-                };
-                const createCommand = new CreateVolumeCommand(createParams);
-                const createResult = await aws_client.send(createCommand);
-                const volumeId = createResult.VolumeId;
-                console.log("✅ 볼륨 생성 완료:", volumeId);
+                // 2. 루트 디바이스 또는 /dev/xvdf 같은 이름으로 붙은 볼륨 찾기
+                const volume = instance.BlockDeviceMappings.find(b => b.DeviceName === '/dev/sda1'); // 필요시 변경
+                if (!volume) throw new Error("지정된 디바이스에 연결된 볼륨이 없습니다.");
 
-                await waitUntilVolumeAvailable({ client: aws_client, maxWaitTime: 60 }, { VolumeIds: [volumeId] });
-                console.log("✅ 볼륨이 사용 가능 상태입니다.");
+                const volumeId = volume.Ebs.VolumeId;
+                console.log(`🔍 연결된 볼륨 ID: ${volumeId}`);
 
-                // 3. 볼륨 연결
-                const attachParams = {
-                    Device: "/dev/xvdf",
-                    InstanceId: instanceId,
-                    VolumeId: volumeId
-                };
-                const attachCommand = new AttachVolumeCommand(attachParams);
-                await aws_client.send(attachCommand);
-                console.log(`✅ ${volumeId} 볼륨을 ${instanceId} 인스턴스에 연결 완료`);
+                // 3. 볼륨 정보 조회
+                const volDesc = new DescribeVolumesCommand({ VolumeIds: [volumeId] });
+                const volResult = await aws_client.send(volDesc);
+                const currentSize = volResult.Volumes[0].Size;
+
+                console.log(`📏 현재 크기: ${currentSize} GiB, 요청 크기: ${newSize} GiB`);
+
+                if (newSize <= currentSize) {
+                    throw new Error("ℹ️ 요청한 크기가 현재보다 작거나 같으므로 변경하지 않습니다.");
+                }
+
+                // 4. 볼륨 크기 수정
+                const modifyCommand = new ModifyVolumeCommand({
+                    VolumeId: volumeId,
+                    Size: newSize
+                });
+                await aws_client.send(modifyCommand);
+                console.log("🔧 볼륨 크기 수정 요청 완료");
+
+                // ⚠️ 파일 시스템 확장은 EC2 내부에서 실행 필요 (수동 또는 SSM 사용)
+                console.log("⚠️ 인스턴스 내부에서 파일 시스템도 확장해 주세요.");
+                return true
+
             } catch (error) {
-                console.error("❌ 볼륨 생성 또는 연결 실패:", error);
+                console.error("❌ 볼륨 크기 확장 실패:", error);
+                return error
             }
         };
+
 
 
         async function runSSHCommand(ip, command) {
@@ -363,8 +372,8 @@ async function startServer() {
         // ready_instance(instanceId1, true, false, 'medium')
         // const instanceId2 = await createEC2Instance('medium');
         // ready_instance(instanceId2, true, false, 'medium')
-        // const instanceId3 = await createEC2Instance('large');
-        // ready_instance(instanceId3, true, false, 'large')
+        // const instanceId3 = await createEC2Instance('medium');
+        // ready_instance(instanceId3, true, false, 'medium')
         // const instanceId4 = await createEC2Instance('medium');
         // ready_instance(instanceId4, true, true, 'medium')
         // const instanceId5 = await createEC2Instance('medium');
@@ -493,6 +502,7 @@ async function startServer() {
                         name,
                         type,
                         grade,
+                        size,
                         build: true,
                         instance_id: instanceId.substring(2),
                         private_ip: privateIP
@@ -516,6 +526,7 @@ async function startServer() {
                         name,
                         type,
                         grade,
+                        size,
                         build: true,
                         instance_id: instanceId.substring(2),
                         private_ip: privateIP
@@ -575,9 +586,8 @@ async function startServer() {
             ];
 
             const ebs_command = [
-                `sudo mkfs -t ext4 /dev/nvme1n1`,
-                `sudo mkdir /mnt/ebs`,
-                `sudo mount /dev/nvme1n1 /mnt/ebs`,
+                `sudo growpart /dev/nvme0n1 1`,
+                `sudo resize2fs /dev/nvme0n1p1`
             ];
 
             let command
@@ -587,8 +597,8 @@ async function startServer() {
                 command = cli_command
             }
 
-            if (size !== 0) {
-                await attachVolume(instanceId, size);
+            if (size !== 8) {
+                await modifyAttachedVolume(instanceId, size);
                 for (const cmd of ebs_command) {
                     await runSSHCommand(publicIp, cmd);
                 }
@@ -739,8 +749,8 @@ async function startServer() {
         function check_country(req, res, page) {
             const ip = req.clientIp;
             const geo = geoip.lookup(ip);
-            const country = geo?.country || 'US';
-            // const country = geo?.country || 'KR';
+            // const country = geo?.country || 'US';
+            const country = geo?.country || 'KR';
 
             const filePath = country === 'KR'
                 ? path.join(__dirname, `public/ko/${page}/${page}.html`)
@@ -828,7 +838,7 @@ async function startServer() {
                 return
             }
             const instanceId = await db.collection('ready_instance').findOne({ type: req.body.type, grade: req.body.grade });
-            const size = Number(req.body.storage) - 8
+            const size = Number(req.body.storage)
             create_instance(instanceId, req.body.type, req.body.name, req.body.grade,
                 req.body.ubuntu_password, req.body.connect_password, size, req.body.source, id, res)
         });
@@ -923,6 +933,30 @@ async function startServer() {
             await removeIngressRule('i-' + req.body.instance_id, req.body.rule.protocol,
                 Number(req.body.rule.fromPort), Number(req.body.rule.toPort), req.body.rule.sources)
             res.send(true)
+        });
+
+        app.post('/resize_volume', async (req, res) => {
+            await login_test(req, req.body.instance_id)
+
+            console.log(req.body)
+
+            const resize_volume_result = await modifyAttachedVolume('i-' + req.body.instance_id, req.body.size);
+
+            // DB 업데이트
+            console.log(resize_volume_result);
+            if (resize_volume_result === true) {
+                await db.collection('instance').updateOne(
+                    { instance_id: req.body.instance_id },
+                    { $set: { size: req.body.size } }
+                );
+                res.send(true)
+            } else {
+                if (resize_volume_result.Code === 'VolumeModificationRateExceeded') {
+                    res.send('6time err');
+                } else {
+                    res.status(500).send('server error');
+                }
+            }
         });
 
         app.post('/instance_build', async (req, res) => {

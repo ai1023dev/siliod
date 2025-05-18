@@ -32,7 +32,7 @@ if (params.get("result") === 'success') {
             } else {
                 // 결제 성공 비즈니스 로직을 구현하세요.
                 console.log(json);
-                alert('결제 완료')
+                alert('결제 성공')
                 window.location.href = '/'
             }
         }
@@ -350,7 +350,7 @@ if (params.get("result") === 'success') {
                 if (data) {
                     $('#public-ip').text(data)
                     $('#copy-public-ip').attr('data-clipboard-text', data)
-                    $('#copy-public-ip').css('display', 'inline')
+                    $('#copy-public-ip').css('display', 'inline-flex')
                 } else {
                     $('#public-ip').text('인스턴트가 시작 되지 않음')
                     $('#copy-public-ip').css('display', 'none')

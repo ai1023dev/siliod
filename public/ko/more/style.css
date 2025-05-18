@@ -572,7 +572,7 @@ a:not(.deal-incetance-link) {
     padding: 0.5rem 0.8rem;
     border-radius: 0.5rem;
     cursor: pointer;
-    width: 100px;
+    width: 95px;
     transition: background-color 0.2s ease-in-out;
     margin-right: 0.3rem;
 }
@@ -644,7 +644,7 @@ a:not(.deal-incetance-link) {
     color: #444;
 }
 
-.form-group input[type="text"] {
+input {
     padding: 0.6rem;
     border: 1px solid #c2d4ff;
     border-radius: 0.5rem;
@@ -656,11 +656,36 @@ a:not(.deal-incetance-link) {
     /* 부드럽게 변하게 */
 }
 
-.form-group input[type="text"]:focus {
+input:focus {
     border-color: #7aa5ff;
     /* 포커스 시 테두리 색 변경 */
     box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
     /* 부드러운 그림자 추가 */
+}
+
+.password-wrapper {
+    position: relative;
+    width: 250px;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.password-wrapper input {
+    padding-right: 2.5rem;
+    /* 버튼 공간 확보 */
+}
+
+.gib {
+    position: absolute;
+    right: 0.8rem;
+    top: 50%;
+    transform: translateY(-55%);
+    background: transparent;
+    border: none;
+    color: #3b82f6;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.9rem;
 }
 
 select {
