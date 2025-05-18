@@ -28,7 +28,7 @@ switch (point) {
         amount = 1000;
         break;
     default:
-        amount = 0; // 기본값 또는 에러 처리
+        amount = 'err'; // 기본값 또는 에러 처리
         break;
 }
 
@@ -39,7 +39,7 @@ $.ajax({
     url: '/login_check',
     success: function (data) {
         console.log(data)
-        orderId = data.id + '_' + point + '_' + Date.now()
+        orderId = data.id + '_' + point + '_KRW_' + Date.now()
         console.log(orderId)
 
         if (data) {

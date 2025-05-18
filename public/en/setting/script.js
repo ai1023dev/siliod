@@ -25,7 +25,7 @@ function formatDate(timestamp) {
 }
 
 function formatAmount(amount) {
-    return amount.toLocaleString('en-US') + ' KRW';
+    return amount.toLocaleString('en-US');
 }
 
 $.ajax({
@@ -41,11 +41,11 @@ $.ajax({
                     <div>${formatDate(item.date)}</div>
                     <div class="receipt-bottom">
                         <span class="point">${item.point}p</span>
-                        <span>${formatAmount(item.amount)}</span>
+                        <span>${formatAmount(item.amount)} ${item.currency}</span>
                     </div>
                 </div>
             `;
-            $container.append(html);
+            $container.prepend(html);
         });
     },
     error: function (xhr, status, error) {

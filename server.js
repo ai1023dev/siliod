@@ -739,8 +739,8 @@ async function startServer() {
         function check_country(req, res, page) {
             const ip = req.clientIp;
             const geo = geoip.lookup(ip);
-            // const country = geo?.country || 'US';
-            const country = geo?.country || 'KR';
+            const country = geo?.country || 'US';
+            // const country = geo?.country || 'KR';
 
             const filePath = country === 'KR'
                 ? path.join(__dirname, `public/ko/${page}/${page}.html`)
@@ -963,36 +963,38 @@ async function startServer() {
 
             const id = get_user_id(req)
             const point = orderId.split("_")[1]
+            const currency = orderId.split("_")[2]
             let check_amount;
             switch (point) {
                 case "240":
-                    check_amount = '4320';
+                    check_amount = currency === 'KRW' ? '4320' : '3.24';
                     break;
                 case "7200":
-                    check_amount = '100800';
+                    check_amount = currency === 'KRW' ? '108000' : '75.6';
                     break;
                 case "1680":
-                    check_amount = '26880';
+                    check_amount = currency === 'KRW' ? '25200' : '20.16';
                     break;
                 case "1000":
-                    check_amount = '17000';
+                    check_amount = currency === 'KRW' ? '17000' : '12.75';
                     break;
                 case "500":
-                    check_amount = '9000';
+                    check_amount = currency === 'KRW' ? '9000' : '6.75';
                     break;
                 case "150":
-                    check_amount = '3000';
+                    check_amount = currency === 'KRW' ? '3000' : '2.25';
                     break;
                 case "100":
-                    check_amount = '2000';
+                    check_amount = currency === 'KRW' ? '2000' : '1.5';
                     break;
                 case "50":
-                    check_amount = '1000';
+                    check_amount = currency === 'KRW' ? '1000' : '0.75';
                     break;
                 default:
                     check_amount = 'err'; // 기본값 또는 에러 처리
                     break;
             }
+
 
             if (id === orderId.split("_")[0] && amount === check_amount) {
                 const { default: got } = await import('got');
@@ -1019,8 +1021,8 @@ async function startServer() {
                             { $inc: { amount: Number(point) } } // 수정 내용
                         );
 
-                        await db.collection('receipt').insertOne({ id, date: Date.now(), point, amount: response.body.totalAmount, receipt: response.body.receipt.url });
-                        await sendEmail(user_data.email, "siliod 충전", point + 'p     ' + response.body.totalAmount + "원 충전됨여여.")
+                        await db.collection('receipt').insertOne({ id, date: Date.now(), currency, point, amount: response.body.totalAmount, receipt: response.body.receipt.url });
+                        await sendEmail(user_data.email, "siliod 충전", point + 'p     ' + response.body.totalAmount + currency + " 충전됨여여.")
 
                         console.log(response.body);
                         res.status(response.statusCode).json(response.body)
@@ -1220,7 +1222,7 @@ async function startServer() {
                         name: userData.name,
                         avatar_url: userData.picture,
                         email: userData.email,
-                        amount: 1000
+                        amount: 50
                     });
 
                     // JWT 발급 후 로그인 처리
