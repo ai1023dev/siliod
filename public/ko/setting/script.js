@@ -25,7 +25,7 @@ function formatDate(timestamp) {
 }
 
 function formatAmount(amount) {
-    return amount.toLocaleString('ko-KR') + '원';
+    return amount.toLocaleString('ko-KR');
 }
 
 $.ajax({
@@ -41,7 +41,7 @@ $.ajax({
                     <div>${formatDate(item.date)}</div>
                     <div class="receipt-bottom">
                         <span class="point">${item.point}p</span>
-                        <span>${formatAmount(item.amount)}</span>
+                        <span>${formatAmount(item.amount)} ${item.currency}</span>
                     </div>
                 </div>
             `;
@@ -60,6 +60,21 @@ $('.logout').click(function () {
         url: 'logout',
         success: function (data) {
             window.location.href = '/';
+        },
+        error: function (xhr, status, error) {
+            alert('서버 측 에러')
+        }
+    });
+})
+
+$('select').change(function () {
+    console.log($('select').val())
+    $.ajax({
+        method: 'POST',
+        url: 'change_language',
+        data: { language: $('select').val() },
+        success: function (data) {
+            location.reload(true);
         },
         error: function (xhr, status, error) {
             alert('서버 측 에러')

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siliod</title>
+  <link rel="stylesheet" href="en/home/style.css">
+</head>
+
+<body>
+  <div class="language-selector">
+    <select id="language-select">
+      <option value="US">English</option>
+      <option value="KR">한국어 (ko)</option>
+    </select>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <p class="subtitle">The Easiest Cloud Computing</p>
+      <div class="logo-container">
+        <img src="/image/siliod_logo_white.png" alt="Siliod Logo" class="logo-full">
+      </div>
+      <a href="/" class="cta-button">Get Started Now</a>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="content-section">
+    <h2 class="section-title">Create Your Own <br>Cloud Desktop in 1 Minute</h2>
+    <p class="section-description">Log in with your Google account and <br>launch a GUI environment instantly.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img src="/image/create-form-en.png" alt="Simple form input after Google login" class="feature-image border">
+        <h3 class="feature-title">Simple Form Input After Google Login</h3>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="feature-card">
+        <img src="/image/novnc.png" alt="GUI or CLI environment accessible from web browser" class="feature-image">
+        <h3 class="feature-title">GUI or CLI Environment Accessible from Web Browser</h3>
+        <p class="feature-description">Automatic driver and HTTPS (TLS) certificate setup</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compatibility Section -->
+  <section class="compatibility-section">
+    <div class="compatibility-content">
+      <h2 class="compatibility-title">Endless Possibilities</h2>
+      <p class="compatibility-description">
+        Use it as a server, shared PC, or freely run AI applications and high-spec games that are difficult to execute
+        locally.
+      </p>
+      <img src="/image/devices.png" alt="Image showing compatibility with various devices" class="devices-image">
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="footer-section">
+    <p class="footer-subtitle">The Easiest Cloud Computing</p>
+    <div class="footer-logo-container">
+      <img src="/image/siliod_logo_white.png" alt="Siliod Logo" class="footer-logo-full">
+    </div>
+    <a href="/" class="cta-button">Get Started Now</a>
+
+    <p class="footer-text">
+      This service is in beta and may be discontinued without notice, and user data loss may occur.<br>
+      Please keep this in mind when using the service.
+    </p>
+  </section>
+
+
+  <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script>
+    $('select').change(function () {
+      console.log($('select').val())
+      $.ajax({
+        method: 'POST',
+        url: 'change_language',
+        data: { language: $('select').val() },
+        success: function (data) {
+          location.reload(true);
+        },
+        error: function (xhr, status, error) {
+          alert('server error')
+        }
+      });
+    })
+  </script>
+</body>
+
+</html>

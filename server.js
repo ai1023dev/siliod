@@ -6,6 +6,7 @@ process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+require('express-async-errors');
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -20,6 +21,7 @@ const requestIp = require('request-ip');
 app.use(requestIp.mw());
 const geoip = require('geoip-lite');
 const dotenv = require("dotenv");
+// const helmet = require('helmet');
 
 dotenv.config();
 
@@ -29,6 +31,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+// app.use(helmet());
+
 const { MongoClient } = require('mongodb');
 let db;
 
@@ -747,17 +751,26 @@ async function startServer() {
 
 
         function check_country(req, res, page) {
-            const ip = req.clientIp;
-            const geo = geoip.lookup(ip);
-            // const country = geo?.country || 'US';
-            const country = geo?.country || 'KR';
-
+            let country
+            if (req.cookies.language) {
+                country = req.cookies.language
+            } else {
+                const ip = req.clientIp;
+                const geo = geoip.lookup(ip);
+                country = geo?.country || 'US';
+                console.log('ssssssssss')
+            }
             const filePath = country === 'KR'
                 ? path.join(__dirname, `public/ko/${page}/${page}.html`)
                 : path.join(__dirname, `public/en/${page}/${page}.html`);
 
             res.sendFile(filePath);
         }
+
+        // 홈 페이지
+        app.get('/home', (req, res) => {
+            check_country(req, res, 'home')
+        });
 
         // 메인 페이지
         app.get('/', (req, res) => {
@@ -975,6 +988,18 @@ async function startServer() {
             res.send(receipt)
         });
 
+        app.post('/change_language', (req, res) => {
+            const hundred_year = new Date();
+            hundred_year.setFullYear(hundred_year.getFullYear() + 100);
+
+            res.cookie('language', req.body.language, {
+                httpOnly: true,
+                secure: true,
+                expires: hundred_year, // <-- 만료일 설정으로 영구 쿠키
+            });
+            res.send(true)
+        });
+
 
 
 
@@ -1133,7 +1158,7 @@ async function startServer() {
                 res.cookie('account', token, {
                     httpOnly: true, // 클라이언트 측 스크립트에서 쿠키에 접근 불가
                     secure: true, // HTTPS 연결에서만 쿠키 전송
-                    maxAge: 15 * 60 * 60 * 1000, // 3hour 유효한 쿠키 생성
+                    maxAge: 15 * 60 * 60 * 1000, // 15hour 유효한 쿠키 생성
                 });
                 return true
             } catch (error) {
@@ -1272,6 +1297,11 @@ async function startServer() {
         ////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////
+
+        app.use((err, req, res, next) => {
+            console.error(err.stack); // 서버 로그
+            res.status(500).json({ message: 'Internal Server Error' }); // 사용자에게는 노출 X
+        });
 
         app.listen(port, function () {
             console.log(`Server is listening on port ${port}`);

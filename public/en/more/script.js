@@ -133,7 +133,7 @@ $('#delete-incetance').click(function () {
 })
 
 $('#resize-volume').click(function () {
-    if (confirm("Are you sure you want to change the volume size?")) {
+    if (confirm("Are you sure you want to change the volume size? For storage exceeding 8GiB, 1 point is consumed per hour for each additional 1GiB.")) {
         const size = $('#storage-input').val();
 
         $.ajax({

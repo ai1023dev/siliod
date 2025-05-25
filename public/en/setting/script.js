@@ -66,3 +66,18 @@ $('.logout').click(function () {
         }
     });
 });
+
+$('select').change(function () {
+    console.log($('select').val())
+    $.ajax({
+        method: 'POST',
+        url: 'change_language',
+        data: { language: $('select').val() },
+        success: function (data) {
+            location.reload(true);
+        },
+        error: function (xhr, status, error) {
+            alert('서버 측 에러')
+        }
+    });
+})

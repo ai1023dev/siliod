@@ -133,7 +133,7 @@ $('#delete-incetance').click(function () {
 })
 
 $('#resize-volume').click(function () {
-    if (confirm("Are you sure you want to change the volume size?")) {
+    if (confirm("볼륨 크기를 변경하시겠습니까? 8GiB를 초과하는 용량에 대해, 1GiB당 시간당 1포인트가 사용됩니다.")) {
         const size = $('#storage-input').val();
 
         $.ajax({
@@ -143,20 +143,14 @@ $('#resize-volume').click(function () {
             success: function (data) {
                 console.log(data)
                 if (data !== '6time err') {
-                    alert('Volume size changed successfully.');
+                    alert("볼륨 크기가 성공적으로 변경되었습니다.");
                     // window.location.href = window.location.origin + '/가이드/대충 볼륨 연결하는거';
                 } else {
-                    alert("You've reached the maximum modification rate per volume limit. Wait at least 6 hours between modifications per volume.");
+                    alert("볼륨당 최대 수정 횟수에 도달했습니다. 볼륨별로 수정 간 최소 6시간을 기다려 주세요.");
                 }
             },
             error: function (xhr, status, error) {
-                if (xhr.status === 429 && xhr.responseJSON?.message) {
-                    alert(xhr.responseJSON.message); // 6시간 제한 메시지
-                } else if (xhr.responseJSON?.message) {
-                    alert('Error: ' + xhr.responseJSON.message); // 기타 서버 측 메시지
-                } else {
-                    alert('Server error');
-                }
+                alert('Server error');
             }
         });
     }
