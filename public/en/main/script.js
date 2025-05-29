@@ -50,7 +50,7 @@ if (params.get("result")) {
         $("#dino-iframe").attr('src', '/dino');
     })
 
-    $('#dino-x').click(function () {
+    $('#dino-x, .dino-modal-backdrop').click(function () {
         $(".dino-modal-backdrop").fadeOut(300, function () {
             $(".dino-modal-backdrop").addClass("hidden");
             $("#dino-iframe").attr('src', '');

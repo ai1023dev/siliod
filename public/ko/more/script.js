@@ -144,7 +144,7 @@ $('#resize-volume').click(function () {
                 console.log(data)
                 if (data !== '6time err') {
                     alert("볼륨 크기가 성공적으로 변경되었습니다.");
-                    // window.location.href = window.location.origin + '/가이드/대충 볼륨 연결하는거';
+                    window.location.href = '/guide#storage';
                 } else {
                     alert("볼륨당 최대 수정 횟수에 도달했습니다. 볼륨별로 수정 간 최소 6시간을 기다려 주세요.");
                 }

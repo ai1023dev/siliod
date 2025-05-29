@@ -758,7 +758,6 @@ async function startServer() {
                 const ip = req.clientIp;
                 const geo = geoip.lookup(ip);
                 country = geo?.country || 'US';
-                console.log('ssssssssss')
             }
             const filePath = country === 'KR'
                 ? path.join(__dirname, `public/ko/${page}/${page}.html`)
@@ -783,6 +782,10 @@ async function startServer() {
 
         app.get('/more', (req, res) => {
             check_country(req, res, 'more')
+        });
+
+        app.get('/guide', (req, res) => {
+            check_country(req, res, 'guide')
         });
 
         app.get('/point', (req, res) => {
