@@ -1,27 +1,29 @@
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-require('express-async-errors');
 const express = require('express');
 const path = require('path');
-const app = express();
-const port = 8080;
+const app = express(); // HTTPS 용 앱
+const redirectApp = express(); // HTTP 리다이렉션 용 앱
+const port = 443;
+const httpPort = 80;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
-const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, DescribeVolumesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, ModifyVolumeCommand, waitUntilVolumeModified, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
+const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
-const requestIp = require('request-ip');
-app.use(requestIp.mw());
-const geoip = require('geoip-lite');
 const dotenv = require("dotenv");
-// const helmet = require('helmet');
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+const compression = require('compression')
+app.use(compression())
+const helmet = require('helmet');
+app.use(helmet());
+
+// 인증서 로드
+const https_options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/siliod.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/siliod.com/fullchain.pem')
+};
 
 dotenv.config();
 
@@ -87,7 +89,7 @@ async function startServer() {
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
 
-                await addIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+                await addIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32') // 서버의 아이피로 변경
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
                 return instanceId;
@@ -208,7 +210,7 @@ async function startServer() {
 
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "~/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
@@ -614,7 +616,7 @@ async function startServer() {
             }
 
 
-            await removeIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+            await removeIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32') // 서버의 아이피로 변경
             await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
             // 인스턴스 DB에 등록
@@ -1319,8 +1321,18 @@ async function startServer() {
             res.status(500).json({ message: 'Internal Server Error' }); // 사용자에게는 노출 X
         });
 
-        app.listen(port, function () {
-            console.log(`Server is listening on port ${port}`);
+        // HTTPS 서버 실행
+        https.createServer(https_options, app).listen(port, () => {
+            console.log(`Server is listening on https://localhost:${port}`);
+        });
+
+        // HTTP → HTTPS 리다이렉션
+        redirectApp.all('*', (req, res) => {
+            res.redirect(301, `https://siliod.com${req.url}`);
+        });
+
+        http.createServer(redirectApp).listen(httpPort, () => {
+            console.log(`HTTP 리다이렉션 서버가 http://siliod.com:${httpPort}에서 실행 중입니다.`);
         });
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);
