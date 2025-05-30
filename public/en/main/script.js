@@ -57,6 +57,10 @@ if (params.get("result")) {
         });
     })
 
+    $('.dino-modal').click(function (e) {
+        e.stopPropagation();
+    })
+
 
     new ClipboardJS('.copy-btn');
 

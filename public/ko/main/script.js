@@ -1,7 +1,7 @@
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("result")) {
-if (params.get("result") === 'success') {
+    if (params.get("result") === 'success') {
         const paymentKey = params.get("paymentKey");
         const orderId = params.get("orderId");
         const amount = params.get("amount");
@@ -47,7 +47,7 @@ if (params.get("result") === 'success') {
 
 
 
-    
+
     $('#dino-btn').click(function () {
         $(".dino-modal-backdrop").removeClass("hidden").fadeIn(300); // 천천히 보이게
         $("#dino-iframe").attr('src', '/dino');
@@ -58,6 +58,10 @@ if (params.get("result") === 'success') {
             $(".dino-modal-backdrop").addClass("hidden");
             $("#dino-iframe").attr('src', '');
         });
+    })
+
+    $('.dino-modal').click(function (e) {
+        e.stopPropagation();
     })
 
 
