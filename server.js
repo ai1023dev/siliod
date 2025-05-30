@@ -29,7 +29,8 @@ app.use(helmet({
         "'self'",
         "https://code.jquery.com",
         "https://js.tosspayments.com",
-        "https://cdnjs.cloudflare.com"
+        "https://cdnjs.cloudflare.com",
+        "https://lh3.googleusercontent.com"
       ],
       // 모든 iframe 소스 허용
       "frame-src": ["*"],
