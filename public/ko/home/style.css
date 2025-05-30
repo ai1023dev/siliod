@@ -258,9 +258,13 @@ body {
     line-height: 1.5;
 }
 
+.footer-text a {
+    color: #FFF;
+}
 
 
-br {
+
+br:not(.footer-br) {
     display: none;
 }
 
@@ -306,6 +310,7 @@ br {
     br {
         display: block;
     }
+
 
     .compatibility-title {
         font-size: 24px;

@@ -751,19 +751,32 @@ async function startServer() {
 
 
         function check_country(req, res, page) {
-            let country
-            if (req.cookies.language) {
-                country = req.cookies.language
-            } else {
-                const ip = req.clientIp;
-                const geo = geoip.lookup(ip);
-                country = geo?.country || 'US';
-            }
-            const filePath = country === 'KR'
-                ? path.join(__dirname, `public/ko/${page}/${page}.html`)
-                : path.join(__dirname, `public/en/${page}/${page}.html`);
+            if (req.cookies.visited) {
+                let country
+                if (req.cookies.language) {
+                    country = req.cookies.language
+                } else {
+                    const ip = req.clientIp;
+                    const geo = geoip.lookup(ip);
+                    country = geo?.country || 'US';
+                }
+                const filePath = country === 'KR'
+                    ? path.join(__dirname, `public/ko/${page}/${page}.html`)
+                    : path.join(__dirname, `public/en/${page}/${page}.html`);
 
-            res.sendFile(filePath);
+                res.sendFile(filePath);
+            } else {
+                // 방문한 적이 없음 → 쿠키 설정하고 /home으로 리디렉션
+                const hundred_year = new Date();
+                hundred_year.setFullYear(hundred_year.getFullYear() + 100);
+
+                res.cookie('visited', 'true', {
+                    httpOnly: true,
+                    secure: true,
+                    expires: hundred_year,
+                });
+                res.redirect('/home');
+            }
         }
 
         // 홈 페이지

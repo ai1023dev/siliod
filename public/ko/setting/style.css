@@ -270,7 +270,6 @@ iframe {
     height: 20px;
     object-fit: contain;
     vertical-align: middle;
-    transform: translateY(1.5px);
 }
 
 .sidebar-menu button:hover, .sidebar-menu a:hover {
