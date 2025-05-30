@@ -18,7 +18,25 @@ const compression = require('compression')
 const geoip = require('geoip-lite');
 app.use(compression())
 const helmet = require('helmet');
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      // 외부 스크립트 허용 (jQuery, Toss Payments)
+      "script-src": [
+        "'self'",
+        "https://code.jquery.com",
+        "https://js.tosspayments.com"
+      ],
+      // 모든 iframe 소스 허용
+      "frame-src": ["*"],
+      // 필요한 경우 스타일 관련도 허용
+      "style-src": ["'self'", "'unsafe-inline'"]
+    }
+  },
+  // frameguard 비활성화 (기본 X-Frame-Options 헤더 제거)
+  frameguard: false
+}));
 
 // 인증서 로드
 const https_options = {
