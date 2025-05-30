@@ -155,7 +155,8 @@ if (params.get("result") === 'success') {
                     }
 
                     if (params.get("new") === 'new') {
-                        alert('새고객')
+                        alert('Siliod 회원 가입을 축하합니다! 50p가 충전 되었어요!')
+                        window.location.href = '/'
                     }
                 } else {
                     $(".login-modal-backdrop").removeClass("hidden");
@@ -226,9 +227,6 @@ if (params.get("result") === 'success') {
                 data: { instance_id: $(this).attr('data-field') },
                 success: function (data) {
                     console.log(data);
-                    if (!data) {
-                        alert('!!!!!!!!!!')
-                    }
                 },
                 error: function (xhr, status, error) {
                     alert('서버 측 에러')

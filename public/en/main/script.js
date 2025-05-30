@@ -151,7 +151,8 @@ if (params.get("result")) {
                     }
 
                     if (params.get("new") === 'new') {
-                        alert('New Customer')
+                        alert("Welcome to Siliod! You've successfully signed up and received 50 points!")
+                        window.location.href = '/'
                     }
                 } else {
                     $(".login-modal-backdrop").removeClass("hidden");
@@ -222,9 +223,6 @@ if (params.get("result")) {
                 data: { instance_id: $(this).attr('data-field') },
                 success: function (data) {
                     console.log(data);
-                    if (!data) {
-                        alert('!!!!!!!!!!')
-                    }
                 },
                 error: function (xhr, status, error) {
                     alert('Server-side Error')
