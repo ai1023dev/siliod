@@ -843,6 +843,10 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/dino/index.html'));
         });
 
+        app.get('/terms', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/terms.html'));
+        });
+
 
 
 
