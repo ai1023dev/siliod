@@ -15,6 +15,8 @@ const https = require('https');
 const http = require('http');
 const fs = require('fs');
 const compression = require('compression')
+const requestIp = require('request-ip');
+app.use(requestIp.mw());
 const geoip = require('geoip-lite');
 app.use(compression())
 const helmet = require('helmet');
