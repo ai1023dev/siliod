@@ -1247,7 +1247,7 @@ async function startServer() {
 
             url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
 
-            let redirectUri = 'http://localhost:8080/login/google/redirect'
+            let redirectUri = 'https://siliod.com/login/google/redirect'
 
             url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
             url += '&response_type=code';
@@ -1279,7 +1279,7 @@ async function startServer() {
                         code,
                         client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
                         client_secret: process.env.GOOGLE_SECRET,
-                        redirect_uri: `http://localhost:8080/login/google/redirect`,
+                        redirect_uri: `https://siliod.com/login/google/redirect`,
                         grant_type: 'authorization_code',
                     }),
                 });
