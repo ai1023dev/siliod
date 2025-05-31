@@ -409,18 +409,55 @@ async function startServer() {
 
 
 
-        // const instanceId1 = await createEC2Instance('medium');
-        // ready_instance(instanceId1, true, false, 'medium')
-        // const instanceId2 = await createEC2Instance('medium');
-        // ready_instance(instanceId2, true, false, 'medium')
-        // const instanceId3 = await createEC2Instance('medium');
-        // ready_instance(instanceId3, true, false, 'medium')
-        // const instanceId4 = await createEC2Instance('medium');
-        // ready_instance(instanceId4, true, true, 'medium')
-        // const instanceId5 = await createEC2Instance('medium');
-        // ready_instance(instanceId5, true, true, 'medium')
-        // const instanceId6 = await createEC2Instance('large');
-        // ready_instance(instanceId6, true, true, 'large')
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('nano');
+            await ready_instance(instanceId, true, false, 'nano')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('micro');
+            await ready_instance(instanceId, true, false, 'micro')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('small');
+            await ready_instance(instanceId, true, false, 'small')
+        }
+        for (let i = 0; i < 20; i++) {
+            const instanceId = await createEC2Instance('medium');
+            await ready_instance(instanceId, true, false, 'medium')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('large');
+            await ready_instance(instanceId, true, false, 'large')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('xlarge');
+            await ready_instance(instanceId, true, false, 'xlarge')
+        }
+
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('nano');
+            await ready_instance(instanceId, true, true, 'nano')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('micro');
+            await ready_instance(instanceId, true, true, 'micro')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('small');
+            await ready_instance(instanceId, true, true, 'small')
+        }
+        for (let i = 0; i < 20; i++) {
+            const instanceId = await createEC2Instance('medium');
+            await ready_instance(instanceId, true, true, 'medium')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('large');
+            await ready_instance(instanceId, true, true, 'large')
+        }
+        for (let i = 0; i < 10; i++) {
+            const instanceId = await createEC2Instance('xlarge');
+            await ready_instance(instanceId, true, true, 'xlarge')
+        }
 
 
         async function ready_instance(instanceId, ready, type, grade) {
@@ -449,13 +486,6 @@ async function startServer() {
                     `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
                     `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
                 ];
-                // const gui_ready_commands = [
-                //     "sudo apt-get update -y",
-                //     "sudo apt-get upgrade -y",
-                //     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
-                //     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                //     "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
-                // ];
 
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
@@ -525,8 +555,8 @@ async function startServer() {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
-                    // const ready_instanceId = await createEC2Instance();
-                    // ready_instance(ready_instan true,ceId, true)
+                    const ready_instanceId = await createEC2Instance();
+                    ready_instance(ready_instanceId, true, type, grade)
 
                     const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
