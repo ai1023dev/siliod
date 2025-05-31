@@ -21,25 +21,28 @@ const geoip = require('geoip-lite');
 app.use(compression())
 const helmet = require('helmet');
 app.use(helmet({
-  contentSecurityPolicy: {
-    useDefaults: true,
-    directives: {
-      "script-src": [
-        "'self'",
-        "https://code.jquery.com",
-        "https://js.tosspayments.com",
-        "https://cdnjs.cloudflare.com",
-        "https://api.ipify.org"
-      ],
-      "frame-src": ["*"],
-      "style-src": ["'self'", "'unsafe-inline'"],
-      "img-src": [
-        "'self'",
-        "https://lh3.googleusercontent.com"  // ✅ 이미지 허용 도메인 추가
-      ]
-    }
-  },
-  frameguard: false
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "script-src": [
+                "'self'",
+                "https://code.jquery.com",
+                "https://js.tosspayments.com",
+                "https://cdnjs.cloudflare.com"
+            ],
+            "connect-src": [
+                "'self'",
+                "https://api.ipify.org"
+            ],
+            "frame-src": ["*"],
+            "style-src": ["'self'", "'unsafe-inline'"],
+            "img-src": [
+                "'self'",
+                "https://lh3.googleusercontent.com"  // ✅ 이미지 허용 도메인 추가
+            ]
+        }
+    },
+    frameguard: false
 }));
 
 
