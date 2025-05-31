@@ -29,14 +29,12 @@ app.use(helmet({
                 "https://code.jquery.com",
                 "https://js.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
-                "https://cdn.us.heap-api.com",
-                "https://c.us.heap-api.com"
+                "https://us.i.posthog.com",
             ],
             "connect-src": [
                 "'self'",
                 "https://api.ipify.org",
-                "https://cdn.us.heap-api.com",
-                "https://c.us.heap-api.com"
+                "https://us.i.posthog.com",
             ],
             "frame-src": ["*"],
             "style-src": ["'self'", "'unsafe-inline'"],
