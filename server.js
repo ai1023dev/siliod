@@ -37,7 +37,8 @@ app.use(helmet({
                 "'self'",
                 "https://api.ipify.org",
                 "https://us.i.posthog.com",
-                "https://log.tosspayments.com"
+                "https://log.tosspayments.com",
+                "https://js.tosspayments.com"
             ],
             "frame-src": ["*"],
             "style-src": ["'self'", "'unsafe-inline'"],
