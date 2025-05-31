@@ -409,55 +409,55 @@ async function startServer() {
 
 
 
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('nano');
-            await ready_instance(instanceId, true, false, 'nano')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('micro');
-            await ready_instance(instanceId, true, false, 'micro')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('small');
-            await ready_instance(instanceId, true, false, 'small')
-        }
-        for (let i = 0; i < 20; i++) {
-            const instanceId = await createEC2Instance('medium');
-            await ready_instance(instanceId, true, false, 'medium')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('large');
-            await ready_instance(instanceId, true, false, 'large')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('xlarge');
-            await ready_instance(instanceId, true, false, 'xlarge')
-        }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('nano');
+        //     await ready_instance(instanceId, true, false, 'nano')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('micro');
+        //     await ready_instance(instanceId, true, false, 'micro')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('small');
+        //     await ready_instance(instanceId, true, false, 'small')
+        // }
+        // for (let i = 0; i < 20; i++) {
+        //     const instanceId = await createEC2Instance('medium');
+        //     await ready_instance(instanceId, true, false, 'medium')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('large');
+        //     await ready_instance(instanceId, true, false, 'large')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('xlarge');
+        //     await ready_instance(instanceId, true, false, 'xlarge')
+        // }
 
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('nano');
-            await ready_instance(instanceId, true, true, 'nano')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('micro');
-            await ready_instance(instanceId, true, true, 'micro')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('small');
-            await ready_instance(instanceId, true, true, 'small')
-        }
-        for (let i = 0; i < 20; i++) {
-            const instanceId = await createEC2Instance('medium');
-            await ready_instance(instanceId, true, true, 'medium')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('large');
-            await ready_instance(instanceId, true, true, 'large')
-        }
-        for (let i = 0; i < 10; i++) {
-            const instanceId = await createEC2Instance('xlarge');
-            await ready_instance(instanceId, true, true, 'xlarge')
-        }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('nano');
+        //     await ready_instance(instanceId, true, true, 'nano')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('micro');
+        //     await ready_instance(instanceId, true, true, 'micro')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('small');
+        //     await ready_instance(instanceId, true, true, 'small')
+        // }
+        // for (let i = 0; i < 20; i++) {
+        //     const instanceId = await createEC2Instance('medium');
+        //     await ready_instance(instanceId, true, true, 'medium')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('large');
+        //     await ready_instance(instanceId, true, true, 'large')
+        // }
+        // for (let i = 0; i < 10; i++) {
+        //     const instanceId = await createEC2Instance('xlarge');
+        //     await ready_instance(instanceId, true, true, 'xlarge')
+        // }
 
 
         async function ready_instance(instanceId, ready, type, grade) {
