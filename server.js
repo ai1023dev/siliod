@@ -245,7 +245,7 @@ async function startServer() {
 
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "~/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "/home/ubuntu/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
