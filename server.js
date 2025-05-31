@@ -29,7 +29,7 @@ app.use(helmet({
         "https://code.jquery.com",
         "https://js.tosspayments.com",
         "https://cdnjs.cloudflare.com",
-        "https://lh3.googleusercontent.com"
+        "https://api.ipify.org"
       ],
       "frame-src": ["*"],
       "style-src": ["'self'", "'unsafe-inline'"],

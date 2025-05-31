@@ -74,7 +74,7 @@ if (params.get("result")) {
         let isDragging = false;
 
         if (isMobile) {
-            $('<link rel="stylesheet" href="web/main/mobile.css"/>').appendTo('head');
+            $('<link rel="stylesheet" href="ko/main/mobile.css"/>').appendTo('head');
             open_height = '502px'
 
             // 모바일용 터치 이벤트로 드래그 구현
