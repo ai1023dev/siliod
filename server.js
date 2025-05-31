@@ -29,7 +29,7 @@ app.use(helmet({
                 "https://code.jquery.com",
                 "https://js.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
-                "https://cdn.posthog.com"
+                "https://us.i.posthog.com"
             ],
             "connect-src": [
                 "'self'",
