@@ -176,6 +176,15 @@
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.10/clipboard.min.js"></script>
     <script src="ko/main/script.js"></script>
+    <script src="https://cdn.posthog.com/posthog.js"></script>
+    <script>
+        posthog.init('phc_8aLLOQWlOi8AVhgzgoWvZP7NiAwMYqVvPMimyxxprjS', {
+            api_host: 'https://us.i.posthog.com'
+        })
+
+        posthog.capture('custom_event', { foo: 'bar' })
+    </script>
+
 </body>
 
 </html>
