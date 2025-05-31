@@ -38,6 +38,7 @@ app.use(helmet({
             "style-src": ["'self'", "'unsafe-inline'"],
             "img-src": [
                 "'self'",
+                "data:",
                 "https://lh3.googleusercontent.com"  // ✅ 이미지 허용 도메인 추가
             ]
         }
