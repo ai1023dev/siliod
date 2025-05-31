@@ -28,6 +28,7 @@ app.use(helmet({
                 "'self'",
                 "https://code.jquery.com",
                 "https://js.tosspayments.com",
+                "https://log.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
                 "https://us.i.posthog.com",
                 "https://us-assets.i.posthog.com"
