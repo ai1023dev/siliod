@@ -28,7 +28,6 @@ app.use(helmet({
                 "'self'",
                 "https://code.jquery.com",
                 "https://js.tosspayments.com",
-                "https://log.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
                 "https://us.i.posthog.com",
                 "https://us-assets.i.posthog.com"
@@ -39,7 +38,8 @@ app.use(helmet({
                 "https://us.i.posthog.com",
                 "https://log.tosspayments.com",
                 "https://js.tosspayments.com",
-                "https://event.tosspayments.com"
+                "https://event.tosspayments.com",
+                "https://api.tosspayments.com"
             ],
             "frame-src": ["*"],
             "style-src": ["'self'", "'unsafe-inline'"],
