@@ -135,7 +135,7 @@ async function startServer() {
 
         async function createSecurityGroup() {
             const params = {
-                GroupName: "SecurityGroup" + Date.now(),  // 고유한 이름 생성
+                GroupName: "SecurityGroup" + Date.now() + Math.random(),  // 고유한 이름 생성
                 VpcId: "vpc-0899762b3597175ba",          // VPC ID
                 Description: "temporary"
             };
