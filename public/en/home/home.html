@@ -64,8 +64,7 @@
     <div class="compatibility-content">
       <h2 class="compatibility-title">Endless Possibilities</h2>
       <p class="compatibility-description">
-        Use it as a server, shared PC, or freely run AI applications and high-spec games that are difficult to execute
-        locally.
+        You can freely run applications that are difficult to execute locally or on a shared PC, including AI tools and automated gameplay features.
       </p>
       <img src="/image/devices.webp" alt="Image showing compatibility with various devices" class="devices-image">
     </div>
@@ -93,21 +92,7 @@
 
 
   <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-  <script>
-    $('select').change(function () {
-      console.log($('select').val())
-      $.ajax({
-        method: 'POST',
-        url: 'change_language',
-        data: { language: $('select').val() },
-        success: function (data) {
-          location.reload(true);
-        },
-        error: function (xhr, status, error) {
-          alert('server error')
-        }
-      });
-    })
+  <script src="en/home/script.js"></script>
   </script>
 </body>
 
