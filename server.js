@@ -410,12 +410,12 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                { type: 'nano', count: 10 },
-                { type: 'micro', count: 10 },
-                { type: 'small', count: 10 },
-                { type: 'medium', count: 20 },
-                { type: 'large', count: 10 },
-                { type: 'xlarge', count: 10 },
+                { type: 'nano', count: 5 },
+                { type: 'micro', count: 5 },
+                { type: 'small', count: 5 },
+                { type: 'medium', count: 10 },
+                { type: 'large', count: 5 },
+                { type: 'xlarge', count: 5 },
             ];
 
             // 첫 번째 그룹: `ready_instance(..., false, ...)`
