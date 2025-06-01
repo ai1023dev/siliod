@@ -124,7 +124,7 @@ async function startServer() {
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
 
-                await addIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32') // 서버의 아이피로 변경
+                await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
                 return instanceId;
