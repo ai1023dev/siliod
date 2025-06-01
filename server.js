@@ -408,44 +408,44 @@ async function startServer() {
 
 
 
-        async function launchInstances() {
-            const types = [
-                { type: 'nano', count: 5 },
-                { type: 'micro', count: 5 },
-                { type: 'small', count: 5 },
-                { type: 'medium', count: 10 },
-                { type: 'large', count: 5 },
-                { type: 'xlarge', count: 5 },
-            ];
+        // async function launchInstances() {
+        //     const types = [
+        //         { type: 'nano', count: 5 },
+        //         { type: 'micro', count: 5 },
+        //         { type: 'small', count: 5 },
+        //         { type: 'medium', count: 10 },
+        //         { type: 'large', count: 5 },
+        //         { type: 'xlarge', count: 5 },
+        //     ];
 
-            // 첫 번째 그룹: `ready_instance(..., false, ...)`
-            const tasks1 = types.map(({ type, count }) => {
-                return Promise.all(
-                    Array.from({ length: count }, async () => {
-                        const instanceId = await createEC2Instance(type);
-                        await ready_instance(instanceId, true, false, type);
-                        await new Promise(resolve => setTimeout(resolve, 10000));
-                    })
-                );
-            });
+        //     // 첫 번째 그룹: `ready_instance(..., false, ...)`
+        //     const tasks1 = types.map(({ type, count }) => {
+        //         return Promise.all(
+        //             Array.from({ length: count }, async () => {
+        //                 const instanceId = await createEC2Instance(type);
+        //                 await ready_instance(instanceId, true, false, type);
+        //                 await new Promise(resolve => setTimeout(resolve, 10000));
+        //             })
+        //         );
+        //     });
 
-            // 두 번째 그룹: `ready_instance(..., true, ...)`
-            const tasks2 = types.map(({ type, count }) => {
-                return Promise.all(
-                    Array.from({ length: count }, async () => {
-                        const instanceId = await createEC2Instance(type);
-                        await ready_instance(instanceId, true, true, type);
-                        await new Promise(resolve => setTimeout(resolve, 15000));
-                    })
-                );
-            });
+        //     // 두 번째 그룹: `ready_instance(..., true, ...)`
+        //     const tasks2 = types.map(({ type, count }) => {
+        //         return Promise.all(
+        //             Array.from({ length: count }, async () => {
+        //                 const instanceId = await createEC2Instance(type);
+        //                 await ready_instance(instanceId, true, true, type);
+        //                 await new Promise(resolve => setTimeout(resolve, 15000));
+        //             })
+        //         );
+        //     });
 
-            await Promise.all([...tasks1, ...tasks2]);
-        }
+        //     await Promise.all([...tasks1, ...tasks2]);
+        // }
 
-        launchInstances().then(() => {
-            console.log('All instances launched and ready.');
-        }).catch(console.error);
+        // launchInstances().then(() => {
+        //     console.log('All instances launched and ready.');
+        // }).catch(console.error);
 
 
 
