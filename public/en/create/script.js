@@ -248,7 +248,7 @@ $("#create-instance-btn").click(function () {
                         data: { instance_id: data.instanceId.substring(2) },
                         success: function (build) {
                             if (build) {
-                                window.location.href = '/?instance=' + data.instanceId.substring(2)
+                                window.location.href = '/'
                             }
                         },
                     });
