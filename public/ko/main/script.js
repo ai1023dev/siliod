@@ -7,6 +7,7 @@ $('.test-login').click(function () {
             url: 'test_login',
             success: function (data) {
                 console.log(data);
+                window.location.href = '/'
             },
             error: function (xhr, status, error) {
                 alert('서버 측 에러')

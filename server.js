@@ -884,7 +884,7 @@ async function startServer() {
 
         app.get('/test_login', async (req, res) => {
             give_jwt('test_login', res);
-            return res.redirect("/");
+            res.send(true);
         });
 
 
