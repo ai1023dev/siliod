@@ -882,6 +882,16 @@ async function startServer() {
 
 
 
+        app.get('/test_login', async (req, res) => {
+            give_jwt('test_login', res);
+            return res.redirect("/");
+        });
+
+
+
+
+
+
         app.get('/my_data', async (req, res) => {
             const id = get_user_id(req)
             const user = await db.collection('user').findOne({ id });
