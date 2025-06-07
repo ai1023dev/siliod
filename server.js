@@ -424,7 +424,7 @@ async function startServer() {
                     Array.from({ length: count }, async () => {
                         const instanceId = await createEC2Instance(type);
                         await ready_instance(instanceId, true, false, type);
-                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await new Promise(resolve => setTimeout(resolve, 100000));
                     })
                 );
             });
@@ -435,7 +435,7 @@ async function startServer() {
                     Array.from({ length: count }, async () => {
                         const instanceId = await createEC2Instance(type);
                         await ready_instance(instanceId, true, true, type);
-                        await new Promise(resolve => setTimeout(resolve, 15000));
+                        await new Promise(resolve => setTimeout(resolve, 150000));
                     })
                 );
             });
