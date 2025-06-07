@@ -418,34 +418,42 @@ async function startServer() {
                 { type: 'xlarge', count: 5 },
             ];
 
-            // 첫 번째 그룹: `ready_instance(..., false, ...)`
-            const tasks1 = types.map(({ type, count }) => {
-                return Promise.all(
-                    Array.from({ length: count }, async () => {
+            const allJobs = [];
+
+            // 첫 번째 그룹: ready_instance(..., true, false, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
                         const instanceId = await createEC2Instance(type);
                         await ready_instance(instanceId, true, false, type);
                         await new Promise(resolve => setTimeout(resolve, 100000));
-                    })
-                );
-            });
+                    });
+                }
+            }
 
-            // 두 번째 그룹: `ready_instance(..., true, ...)`
-            const tasks2 = types.map(({ type, count }) => {
-                return Promise.all(
-                    Array.from({ length: count }, async () => {
+            // 두 번째 그룹: ready_instance(..., true, true, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
                         const instanceId = await createEC2Instance(type);
                         await ready_instance(instanceId, true, true, type);
                         await new Promise(resolve => setTimeout(resolve, 150000));
-                    })
-                );
-            });
+                    });
+                }
+            }
 
-            await Promise.all([...tasks1, ...tasks2]);
+            // 순차 실행
+            for (const job of allJobs) {
+                await job(); // 한 작업이 끝날 때까지 기다림
+            }
         }
 
-        launchInstances().then(() => {
-            console.log('All instances launched and ready.');
-        }).catch(console.error);
+        launchInstances()
+            .then(() => {
+                console.log('모든 인스턴스 생성 및 준비 완료 (순차 실행)');
+            })
+            .catch(console.error);
+
 
 
 
