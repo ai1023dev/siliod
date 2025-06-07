@@ -257,7 +257,7 @@ async function startServer() {
                     if (stderr) {
                         console.error(`⚠️ SSH stderr: ${stderr}`);
                     }
-                    console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
+                    // console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
                     resolve(stdout);
                 });
             });
