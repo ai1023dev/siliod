@@ -16,7 +16,8 @@ const cookieParser = require('cookie-parser');
 const nodemailer = require("nodemailer");
 const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, DescribeVolumesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, ModifyVolumeCommand, waitUntilVolumeModified, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
-const { exec } = require("child_process");
+const { exec, spawn } = require("child_process");
+const WebSocket = require('ws');
 const requestIp = require('request-ip');
 app.use(requestIp.mw());
 const geoip = require('geoip-lite');
@@ -813,10 +814,80 @@ async function startServer() {
             check_country(req, res, 'setting')
         });
 
+        app.get('/backup', (req, res) => {
+            check_country(req, res, 'backup')
+        });
+
         app.get('/dino', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/dino/index.html'));
         });
 
+
+
+
+
+        const ws = new WebSocket.Server({ port: 8000 });
+
+        ws.on('connection', (ws) => {
+            console.log('클라이언트 연결됨');
+            let sshProcess = null;
+
+            ws.on('message', (message) => {
+                const msg = JSON.parse(message);
+
+                if (msg.type === 'run') {
+                    const command = msg.command.trim();
+                    if (!command) return;
+
+                    if (sshProcess) {
+                        ws.send('[⚠️ 이미 실행 중인 명령이 있습니다. 중단 후 다시 실행하세요]');
+                        return;
+                    }
+
+                    const sshArgs = [
+                        '-i', 'C:/Users/포토박스반짝/Desktop/keypair.pem',
+                        '-o', 'StrictHostKeyChecking=no',
+                        '-o', 'ConnectTimeout=180',
+                        `ubuntu@ec2-${msg.ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com`,
+                        command
+                    ];
+
+                    sshProcess = spawn('ssh', sshArgs);
+
+                    sshProcess.stdout.on('data', (data) => {
+                        ws.send(data.toString());
+                    });
+
+                    sshProcess.stderr.on('data', (data) => {
+                        ws.send('[stderr] ' + data.toString());
+                    });
+
+                    sshProcess.on('close', (code) => {
+                        ws.send(`\n`);
+                        sshProcess = null;
+                    });
+
+                    sshProcess.on('error', (err) => {
+                        ws.send(`[❌ SSH 에러] ${err.message}`);
+                        sshProcess = null;
+                    });
+                }
+
+                if (msg.type === 'stop') {
+                    if (sshProcess) {
+                        sshProcess.kill('SIGTERM'); // 또는 SIGKILL
+                        ws.send(`\n`);
+                    } else {
+                        ws.send('[ℹ️ 실행 중인 프로세스가 없습니다]');
+                    }
+                }
+            });
+
+            ws.on('close', () => {
+                if (sshProcess) sshProcess.kill('SIGTERM');
+                console.log('클라이언트 연결 종료');
+            });
+        });
 
 
 
