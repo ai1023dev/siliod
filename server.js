@@ -1102,8 +1102,6 @@ async function startServer() {
 
 
 
-        const wss = new WebSocket.Server({ port: server });
-
         wss.on('connection', (ws) => {
             console.log('클라이언트 연결됨');
             let sshProcess = null;
@@ -1472,6 +1470,8 @@ async function startServer() {
         const server = https.createServer(https_options, app).listen(port, () => {
             console.log(`Server is listening on https://localhost:${port}`);
         });
+
+        const wss = new WebSocket.Server({ port: server });
 
         // HTTP → HTTPS 리다이렉션
         redirectApp.all('*', (req, res) => {
