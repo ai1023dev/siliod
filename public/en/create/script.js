@@ -267,6 +267,12 @@ $("#create-instance-btn").click(function () {
     });
 });
 
+$('#create-instance-btn').on('keydown keyup', function (e) {
+    if (e.code === 'Space' || e.keyCode === 32) {
+        e.preventDefault();
+    }
+});
+
 $.ajax({
     method: 'GET',
     url: `https://api.ipify.org?format=json`,

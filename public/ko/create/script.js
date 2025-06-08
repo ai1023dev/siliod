@@ -9,7 +9,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".balance-amount").text(data.amount+'p');
+            $(".balance-amount").text(data.amount + 'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -243,7 +243,7 @@ $("#create-instance-btn").click(function () {
                     $("#dino-time").text('예상 소요시간 10분')
                 }
                 $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
-    
+
                 setInterval(() => {
                     $.ajax({
                         method: 'POST',
@@ -265,6 +265,14 @@ $("#create-instance-btn").click(function () {
         }
     });
 });
+
+
+$('#create-instance-btn').on('keydown keyup', function (e) {
+    if (e.code === 'Space' || e.keyCode === 32) {
+        e.preventDefault();
+    }
+});
+
 
 $.ajax({
     method: 'GET',

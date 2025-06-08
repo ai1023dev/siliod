@@ -52,6 +52,13 @@ if (params.get("result")) {
         $(".dino-modal-backdrop").removeClass("hidden").fadeIn(300); // 천천히 보이게
         $("#dino-iframe").attr('src', '/dino');
     })
+    
+    $('#dino-btn').on('keydown keyup', function (e) {
+        if (e.code === 'Space' || e.keyCode === 32) {
+            e.preventDefault();
+        }
+    });
+
 
     $('#dino-x, .dino-modal-backdrop').click(function () {
         $(".dino-modal-backdrop").fadeOut(300, function () {
