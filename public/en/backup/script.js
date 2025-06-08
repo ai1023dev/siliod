@@ -16,7 +16,7 @@ $.ajax({
             const ip = data; // 받아온 IP
 
             // WebSocket 연결
-            const ws = new WebSocket('wss://siliod.com:8443');
+            const ws = new WebSocket('wss://siliod.com');
 
             const output = document.getElementById('output');
 

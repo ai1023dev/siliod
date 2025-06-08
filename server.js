@@ -1102,7 +1102,7 @@ async function startServer() {
 
 
 
-        const wss = new WebSocket.Server({ port: 443 });
+        const wss = new WebSocket.Server({ port: https_options });
 
         wss.on('connection', (ws) => {
             console.log('클라이언트 연결됨');
