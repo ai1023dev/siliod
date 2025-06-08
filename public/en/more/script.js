@@ -28,7 +28,7 @@ function main_data() {
     $('#instance-id').text(instance_id)
     $('#instance-connect-url').text(instance_id + '.siliod.com')
     $('#instance-connect-url').attr('href', 'https://' + instance_id + '.siliod.com')
-    $('#backup-ssh').attr('href', 'http://localhost:8080/backup?instance=' + instance_id)
+    $('#backup-ssh').attr('href', 'https://siliod.com/backup?instance=' + instance_id)
 
     $.ajax({
         method: 'POST',
