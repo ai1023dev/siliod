@@ -10,6 +10,7 @@ const nodemailer = require("nodemailer");
 const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec } = require("child_process");
+const WebSocket = require('ws');
 const dotenv = require("dotenv");
 const https = require('https');
 const http = require('http');
