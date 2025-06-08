@@ -9,7 +9,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".balance-amount").text(data.amount+'p');
+            $(".balance-amount").text(data.amount + 'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -28,6 +28,7 @@ function main_data() {
     $('#instance-id').text(instance_id)
     $('#instance-connect-url').text(instance_id + '.siliod.com')
     $('#instance-connect-url').attr('href', 'https://' + instance_id + '.siliod.com')
+    $('#backup-ssh').attr('href', 'http://localhost:8080/backup?instance=' + instance_id)
 
     $.ajax({
         method: 'POST',
@@ -35,7 +36,7 @@ function main_data() {
         data: { instance_id },
         success: function (data) {
             console.log(data);
-            
+
             $('.instance-name').text(data.instance.name)
             if (data.instance.type) {
                 $('#instance-type-label').text('GUI')
