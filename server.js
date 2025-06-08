@@ -1102,7 +1102,7 @@ async function startServer() {
 
 
 
-        const wss = new WebSocket.Server({ port: https_options });
+        const wss = new WebSocket.Server({ port: server });
 
         wss.on('connection', (ws) => {
             console.log('클라이언트 연결됨');
@@ -1469,7 +1469,7 @@ async function startServer() {
         });
 
         // HTTPS 서버 실행
-        https.createServer(https_options, app).listen(port, () => {
+        const server = https.createServer(https_options, app).listen(port, () => {
             console.log(`Server is listening on https://localhost:${port}`);
         });
 
