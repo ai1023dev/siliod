@@ -31,7 +31,8 @@ app.use(helmet({
                 "https://js.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
                 "https://us.i.posthog.com",
-                "https://us-assets.i.posthog.com"
+                "https://us-assets.i.posthog.com",
+                "wss://siliod.com:8443"
             ],
             "connect-src": [
                 "'self'",
