@@ -31,8 +31,7 @@ app.use(helmet({
                 "https://js.tosspayments.com",
                 "https://cdnjs.cloudflare.com",
                 "https://us.i.posthog.com",
-                "https://us-assets.i.posthog.com",
-                "wss://siliod.com:8443"
+                "https://us-assets.i.posthog.com"
             ],
             "connect-src": [
                 "'self'",
@@ -41,7 +40,8 @@ app.use(helmet({
                 "https://log.tosspayments.com",
                 "https://js.tosspayments.com",
                 "https://event.tosspayments.com",
-                "https://api.tosspayments.com"
+                "https://api.tosspayments.com",
+                "wss://siliod.com:8443"
             ],
             "frame-src": ["*"],
             "style-src": ["'self'", "'unsafe-inline'"],
