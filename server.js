@@ -1102,70 +1102,6 @@ async function startServer() {
 
 
 
-        wss.on('connection', (ws) => {
-            console.log('클라이언트 연결됨');
-            let sshProcess = null;
-
-            ws.on('message', (message) => {
-                const msg = JSON.parse(message);
-
-                if (msg.type === 'run') {
-                    const command = msg.command.trim();
-                    if (!command) return;
-
-                    if (sshProcess) {
-                        ws.send('[⚠️ A command is already running. Please stop it before starting a new one.]');
-                        return;
-                    }
-
-                    const sshArgs = [
-                        '-i', '/home/ubuntu/siliod/keypair.pem',
-                        '-o', 'StrictHostKeyChecking=no',
-                        '-o', 'ConnectTimeout=180',
-                        `ubuntu@ec2-${msg.ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com`,
-                        command
-                    ];
-
-                    sshProcess = spawn('ssh', sshArgs);
-
-                    sshProcess.stdout.on('data', (data) => {
-                        ws.send(data.toString());
-                    });
-
-                    sshProcess.stderr.on('data', (data) => {
-                        ws.send('[stderr] ' + data.toString());
-                    });
-
-                    sshProcess.on('close', (code) => {
-                        ws.send(`\n`);
-                        sshProcess = null;
-                    });
-
-                    sshProcess.on('error', (err) => {
-                        ws.send(`[❌ SSH error] ${err.message}`);
-                        sshProcess = null;
-                    });
-                }
-
-                if (msg.type === 'stop') {
-                    if (sshProcess) {
-                        sshProcess.kill('SIGTERM'); // 또는 SIGKILL
-                        ws.send(`\n`);
-                    } else {
-                        ws.send('[ℹ️ No process is currently running.]');
-                    }
-                }
-            });
-
-            ws.on('close', () => {
-                if (sshProcess) sshProcess.kill('SIGTERM');
-                console.log('클라이언트 연결 종료');
-            });
-        });
-
-
-
-
 
 
         // 결제 페이지
@@ -1472,6 +1408,67 @@ async function startServer() {
         });
 
         const wss = new WebSocket.Server({ port: server });
+
+                wss.on('connection', (ws) => {
+            console.log('클라이언트 연결됨');
+            let sshProcess = null;
+
+            ws.on('message', (message) => {
+                const msg = JSON.parse(message);
+
+                if (msg.type === 'run') {
+                    const command = msg.command.trim();
+                    if (!command) return;
+
+                    if (sshProcess) {
+                        ws.send('[⚠️ A command is already running. Please stop it before starting a new one.]');
+                        return;
+                    }
+
+                    const sshArgs = [
+                        '-i', '/home/ubuntu/siliod/keypair.pem',
+                        '-o', 'StrictHostKeyChecking=no',
+                        '-o', 'ConnectTimeout=180',
+                        `ubuntu@ec2-${msg.ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com`,
+                        command
+                    ];
+
+                    sshProcess = spawn('ssh', sshArgs);
+
+                    sshProcess.stdout.on('data', (data) => {
+                        ws.send(data.toString());
+                    });
+
+                    sshProcess.stderr.on('data', (data) => {
+                        ws.send('[stderr] ' + data.toString());
+                    });
+
+                    sshProcess.on('close', (code) => {
+                        ws.send(`\n`);
+                        sshProcess = null;
+                    });
+
+                    sshProcess.on('error', (err) => {
+                        ws.send(`[❌ SSH error] ${err.message}`);
+                        sshProcess = null;
+                    });
+                }
+
+                if (msg.type === 'stop') {
+                    if (sshProcess) {
+                        sshProcess.kill('SIGTERM'); // 또는 SIGKILL
+                        ws.send(`\n`);
+                    } else {
+                        ws.send('[ℹ️ No process is currently running.]');
+                    }
+                }
+            });
+
+            ws.on('close', () => {
+                if (sshProcess) sshProcess.kill('SIGTERM');
+                console.log('클라이언트 연결 종료');
+            });
+        });
 
         // HTTP → HTTPS 리다이렉션
         redirectApp.all('*', (req, res) => {
