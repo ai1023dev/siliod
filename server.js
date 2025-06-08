@@ -1102,7 +1102,7 @@ async function startServer() {
 
 
 
-        const wss = new WebSocket.Server({ port: 8443 });
+        const wss = new WebSocket.Server({ port: 443 });
 
         wss.on('connection', (ws) => {
             console.log('클라이언트 연결됨');
