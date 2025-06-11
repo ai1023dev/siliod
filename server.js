@@ -13,7 +13,9 @@ const app = express();
 const port = 8080;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
-const nodemailer = require("nodemailer");
+const bodyParser = require('body-parser');
+const { PortOneClient } = require('@portone/server-sdk');
+const nodemailer = require('nodemailer');
 const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, DescribeVolumesCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, ModifyVolumeCommand, waitUntilVolumeModified, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec, spawn } = require("child_process");
@@ -1094,8 +1096,17 @@ async function startServer() {
 
         // 결제 페이지
 
-        // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
-        // @docs https://docs.tosspayments.com/reference/using-api/api-keys
+        app.post('/create-order', async (req, res) => {
+            const { point, amount } = req.body;
+            const user = req.user; // 인증된 유저
+            const merchantUid = `${user.id}_${point}_KRW_${Date.now()}`;
+
+            // DB에 주문 저장
+            await db.collection('orders').insertOne({
+                merchantUid, userId: user.id, point, amount, status: 'created', createdAt: Date.now()
+            });
+            res.json({ merchantUid });
+        });
 
         app.post("/confirm", async function (req, res) {
             // 클라이언트에서 받은 JSON 요청 바디입니다.

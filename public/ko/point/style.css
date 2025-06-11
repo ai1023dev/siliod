@@ -24,6 +24,21 @@ a {
 }
 
 
+ul {
+    margin-left: 2rem;
+}
+
+#payment-button {
+    background-color: #3366ff;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
 
 .login-modal-backdrop,
 .dino-modal-backdrop {
@@ -201,7 +216,8 @@ a {
 }
 
 /* 인스턴스 버튼 스타일 */
-.sidebar-menu button, .sidebar-menu a {
+.sidebar-menu button,
+.sidebar-menu a {
     display: flex;
     align-items: center;
     /* 세로 정렬 중앙 */
@@ -217,14 +233,16 @@ a {
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.sidebar-menu button img, .sidebar-menu a img {
+.sidebar-menu button img,
+.sidebar-menu a img {
     width: 20px;
     height: 20px;
     object-fit: contain;
     vertical-align: middle;
 }
 
-.sidebar-menu button:hover, .sidebar-menu a:hover {
+.sidebar-menu button:hover,
+.sidebar-menu a:hover {
     color: #3366cc;
     background-color: #f0f4ff;
 }
@@ -372,7 +390,8 @@ a {
 }
 
 select {
-    appearance: none; /* 기본 브라우저 스타일 제거 */
+    appearance: none;
+    /* 기본 브라우저 스타일 제거 */
     -webkit-appearance: none;
     -moz-appearance: none;
     background-color: #fff;
