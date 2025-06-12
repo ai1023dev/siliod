@@ -1,3 +1,14 @@
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+require('express-async-errors');
+
+
 const express = require('express');
 const path = require('path');
 const app = express(); // HTTPS 용 앱
