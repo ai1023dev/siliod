@@ -39,6 +39,7 @@ app.use(helmet({
                 "https://us.i.posthog.com",
                 "https://log.tosspayments.com",
                 "https://js.tosspayments.com",
+                "https://apigw-sandbox.tosspayments.com",
                 "https://event.tosspayments.com",
                 "https://api.tosspayments.com",
                 "wss://siliod.com:8443"
