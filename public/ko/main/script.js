@@ -155,7 +155,7 @@ if (params.get("result")) {
                     if (first) {
                         $(".avatar").attr('src', data.user.avatar_url);
                         $(".username").text(data.user.name);
-                        $(".balance-amount").text(data.user.amount + 'p');
+                        // $(".balance-amount").text(data.user.amount + 'p');
                     } else {
                         $(".cards-container-data").empty()
                     }
