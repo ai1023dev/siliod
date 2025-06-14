@@ -84,7 +84,7 @@ $('#time-select').change(function () {
     $('#amount').text(Number(selectedValue) * Number(time_selectValue)) + '원';
 });
 
-$('.custom-select').change(function () {
+$('#instance-grade').change(function () {
     const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
     const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
     let specs;
@@ -240,7 +240,7 @@ $("#create-instance-btn").click(function () {
         data: JSON.stringify({
             name: instanceName,
             type,
-            grade: $(".custom-select").val(),
+            grade: $("#instance-grade").val(),
             source: $("#ip").val(),
             storage,
             ubuntu_password: ubuntuPassword,
