@@ -81,7 +81,7 @@ $('#time-select').change(function () {
     const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
 
     // 선택된 값에 맞는 사양 표시
-    $('#amount').text(Number(selectedValue) * Number(time_selectValue));
+    $('#amount').text(Number(selectedValue) * Number(time_selectValue)) + '원';
 });
 
 $('.custom-select').change(function () {
@@ -114,7 +114,7 @@ $('.custom-select').change(function () {
 
     // 선택된 값에 맞는 사양 표시
     $('#speac-strength').text(specs);
-    $('#amount').text(Number(selectedValue) * Number(time_selectValue));
+    $('#amount').text(Number(selectedValue) * Number(time_selectValue) + '원');
 });
 
 $('#storage-input').on('input', function () {
