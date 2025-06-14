@@ -82,22 +82,22 @@ $('.custom-select').change(function () {
 
     switch (selectedValue) {
         case 'nano':
-            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 3p';
+            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 30원';
             break;
         case 'micro':
-            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 5p';
+            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 50원';
             break;
         case 'small':
-            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 7p';
+            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 70원';
             break;
         case 'medium':
-            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 10p';
+            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 100원';
             break;
         case 'large':
-            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 20p';
+            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 200원';
             break;
         case 'xlarge':
-            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 40p';
+            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 400원';
             break;
         default:
             specs = '';
