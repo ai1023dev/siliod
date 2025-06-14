@@ -89,17 +89,17 @@
                     <div class="width">
                         <div class="form-group">
                             <label for="instance-name">월 납입료</label>
-                            <h2>1000원</h2>
+                            <h2 id="amount">1000원</h2>
                         </div>
                         
-                        <br><div class="strength" id="speac-strength">월 결제 금액은 '월별 예정 실행 시간'에 '인스턴스 등급별 단가'를 곱하여 산정됩니다.
+                        <br><div class="strength">월 결제 금액은 '월별 예정 실행 시간'에 '인스턴스 등급별 단가'를 곱하여 산정됩니다.
                         </div>
                     </div>
 
                     <div class="width">
                         <div class="form-group">
                             <label for="instance-name">월별 인스턴스 실행 예정 시간</label>
-                            <select class="custom-select" name="interface">
+                            <select class="time-select" name="interface">
                                 <option value="10">10시간</option>
                                 <option value="20">20시간</option>
                                 <option value="30">30시간</option>
@@ -110,6 +110,9 @@
                                 <option value="80">80시간</option>
                                 <option value="90">90시간</option>
                                 <option value="100">100시간</option>
+                                <option value="200">200시간</option>
+                                <option value="300">300시간</option>
+                                <option value="400">400시간</option>
                                 <option value="720">무제한 & 무중단 (약 720시간)</option>
                             </select>
                         </div>
@@ -145,7 +148,7 @@
                                 <option value="xlarge">xlarge</option>
                             </select>
 
-                            <div class="strength" id="speac-strength">vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 10p
+                            <div class="strength" id="speac-strength">vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 100원
                             </div>
                         </div>
                     </div>
