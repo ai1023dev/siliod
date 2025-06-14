@@ -82,7 +82,7 @@ $('#time-select').change(function () {
     const storage = $('#storage-input').val(); // 선택된 값 가져오기
 
     // 선택된 값에 맞는 사양 표시
-    $('#amount').text(Number(selectedValue) * Number(time_selectValue) * ((Number(storage) - 8) * 120) + '원');
+    $('#amount').text((Number(selectedValue) + ((Number(storage) - 8) * 120)) * Number(time_selectValue) + '원');
 });
 
 $('#instance-grade').change(function () {
@@ -116,7 +116,7 @@ $('#instance-grade').change(function () {
 
     // 선택된 값에 맞는 사양 표시
     $('#speac-strength').text(specs);
-    $('#amount').text(Number(selectedValue) * Number(time_selectValue) * ((Number(storage) - 8) * 120) + '원');
+    $('#amount').text((Number(selectedValue) + ((Number(storage) - 8) * 120)) * Number(time_selectValue) + '원');
 });
 
 $('#storage-input').on('input', function () {
@@ -126,7 +126,7 @@ $('#storage-input').on('input', function () {
 
         const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
         const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
-        $('#amount').text(Number(selectedValue) * Number(time_selectValue) * ((Number(storage) - 8) * 120) + '원');
+        $('#amount').text((Number(selectedValue) + ((Number(storage) - 8) * 120)) * Number(time_selectValue) + '원');
     } else {
         $('#storage-strength').text('최소 스토리지 용량은 8GiB입니다.').removeClass("weak medium strong").addClass('weak');
     }
