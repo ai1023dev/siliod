@@ -77,7 +77,7 @@ updateStrengthIndicator("#connect-password", "#connect-strength");
 
 
 $('#time-select').change(function () {
-    const selectedValue = $('.custom-select').val(); // 선택된 값 가져오기
+    const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
     const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
 
     // 선택된 값에 맞는 사양 표시
@@ -85,7 +85,7 @@ $('#time-select').change(function () {
 });
 
 $('.custom-select').change(function () {
-    const selectedValue = $(this).val(); // 선택된 값 가져오기
+    const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
     const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
     let specs;
 
