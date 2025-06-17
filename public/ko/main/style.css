@@ -13,7 +13,7 @@ body {
     overflow: hidden;
 }
 
-a:not(.deal-incetance-link) {
+a:not(.deal-incetance-link, .terms) {
     text-decoration: none;
     color: #fff;
 }
