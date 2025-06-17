@@ -13,7 +13,7 @@ body {
     overflow: hidden;
 }
 
-a:not(.deal-incetance-link) {
+a:not(.deal-incetance-link, .terms) {
     text-decoration: none;
     color: #fff;
 }
@@ -44,7 +44,7 @@ a:not(.deal-incetance-link) {
     background: #fff;
     padding: 2.5rem;
     border-radius: 1.5rem;
-    width: 400px;
+    width: 600px;
     text-align: center;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
     animation: scaleUp 0.3s ease-out;
@@ -53,25 +53,25 @@ a:not(.deal-incetance-link) {
 .login-modal p {
     font-size: 1.1rem;
     color: #555;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
 }
 
-.login-modal h2 {
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    color: #222;
+.login-modal .logo {
+    width: 200px;
+    margin-bottom: 1rem;
 }
 
-.login-modal h2 .highlight {
-    color: #3366ff;
-    font-weight: 700;
-    font-size: 2rem;
+.login-modal span {
+    font-size: 0.7rem;
 }
+
+
 
 .social-login {
     width: 100%;
     padding: 0.8rem;
     margin-top: 0.7rem;
+    margin-bottom: 1rem;
     border-radius: 0.6rem;
     display: flex;
     align-items: center;
