@@ -34,11 +34,11 @@ $.ajax({
 
 
 
-            $('#add-billing').click(function () {
+            $('.add-billing').click(function () {
                 requestBillingAuth()
             })
 
-            $('#add-sub-billing').click(function () {
+            $('.add-sub-billing').click(function () {
                 requestBillingAuth()
             })
 
