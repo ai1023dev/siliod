@@ -917,6 +917,12 @@ async function startServer() {
 
 
 
+        app.get('/get_card', async (req, res) => {
+            const id = get_user_id(req)
+            const card = await db.collection('card').find({ userId: id }).toArray();;
+
+            res.send(card);
+        });
 
         const { default: got } = await import('got');
 
@@ -938,6 +944,7 @@ async function startServer() {
 
             // DB에 저장
             await db.collection('card').insertOne({
+                userId: customerKey.split('-')[0],
                 customerKey: customerKey,
                 billingKey: response.body.billingKey,
                 cardCompany: response.body.cardCompany,
