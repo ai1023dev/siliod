@@ -350,7 +350,6 @@ a:not(.terms) {
 .payment-method {
     display: flex;
     align-items: center;
-    margin-bottom: 15px;
 }
 
 .payment-method img {
@@ -370,7 +369,7 @@ a:not(.terms) {
 }
 
 .register-button {
-    background-color: #1677ff;
+    background-color: #777;
     color: white;
     border: none;
     padding: 8px 14px;
@@ -381,7 +380,7 @@ a:not(.terms) {
 }
 
 .register-button:hover {
-    background-color: #125fd1;
+    background-color: #888;
 }
 
 
