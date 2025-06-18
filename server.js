@@ -936,7 +936,7 @@ async function startServer() {
             const { billingKey } = response.body;
 
             // DB에 저장
-            res.render('success', { data: response.body });
+            res.send({ data: response.body });
         });
 
 
