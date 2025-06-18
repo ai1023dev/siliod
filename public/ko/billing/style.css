@@ -351,12 +351,10 @@ a:not(.terms) {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    padding: 5px 0;
 }
 
-.payment-method>div {
+.payment-method > div {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -386,7 +384,7 @@ a:not(.terms) {
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
-    margin-left: 6px;
+    margin-left: -4px;
 }
 
 .register-button:hover {
