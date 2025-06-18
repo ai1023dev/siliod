@@ -391,6 +391,14 @@ a:not(.terms) {
     background-color: #777;
 }
 
+#add-billing {
+    background-color: #3b82f6;
+}
+
+#add-billing:hover {
+    background-color: #2563eb;
+}
+
 
 @font-face {
     font-family: 'Pretendard-Light';
