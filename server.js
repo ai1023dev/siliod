@@ -920,7 +920,7 @@ async function startServer() {
 
         const { default: got } = await import('got');
 
-        app.get('/billing_success', async (req, res) => {
+        app.get('/billing/success', async (req, res) => {
             const { authKey, customerKey } = req.query;
             const response = await got.post(
                 'https://api.tosspayments.com/v1/billing/authorizations/issue',
@@ -945,7 +945,7 @@ async function startServer() {
                 cardType: response.body.card.cardType,
             });
 
-            res.send({ data: response.body });
+            res.redirect('/billing')
         });
 
 

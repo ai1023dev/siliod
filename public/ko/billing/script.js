@@ -26,8 +26,8 @@ $.ajax({
             async function requestBillingAuth() {
                 await payment.requestBillingAuth({
                     method: "CARD", // 자동결제(빌링)는 카드만 지원합니다
-                    successUrl: window.location.origin + "/billing_success", // 요청이 성공하면 리다이렉트되는 URL
-                    failUrl: window.location.origin + "/billing_fail", // 요청이 실패하면 리다이렉트되는 URL
+                    successUrl: window.location.origin + "/billing/success", // 요청이 성공하면 리다이렉트되는 URL
+                    failUrl: window.location.origin + "/billing/fail", // 요청이 실패하면 리다이렉트되는 URL
                     customerEmail: data.email
                 });
             }
