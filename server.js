@@ -934,14 +934,14 @@ async function startServer() {
                 }
             );
 
-            requestPayment(response.body.billingKey, 10000, 'orderId0001', 'orderName')
+            requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
 
             // DB에 저장
             res.send({ data: response.body });
         });
 
 
-        async function requestPayment(billingKey, amount, orderId, orderName) {
+        async function requestPayment(billingKey, customerKey, amount, orderId) {
             const secretKey = process.env.TOSS_SECRET_KEY;
 
             const response = await got.post('https://api.tosspayments.com/v1/billing/charges', {
@@ -951,10 +951,10 @@ async function startServer() {
                 },
                 json: {
                     billingKey: billingKey,
-                    customerKey: '고객 고유키',         // billingKey와 매칭된 값
+                    customerKey: customerKey,         // billingKey와 매칭된 값
                     amount: amount,                    // 결제 금액 (정수)
                     orderId: orderId,                  // 고유 주문번호 (중복 불가)
-                    orderName: orderName              // 주문명 (ex: '정기 구독')
+                    orderName: 'siliod 정기 결제'              // 주문명 (ex: '정기 구독')
                 },
                 responseType: 'json'
             });
