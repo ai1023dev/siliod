@@ -918,6 +918,33 @@ async function startServer() {
 
 
 
+
+        app.get('/success', async (req, res) => {
+            const { default: got } = await import('got');
+            const { authKey, customerKey } = req.query;
+            const response = await got.post(
+                'https://api.tosspayments.com/v1/billing/authorizations/issue',
+                {
+                    headers: {
+                        Authorization: 'Basic ' + Buffer.from(secretKey + ':').toString('base64'),
+                        'Content-Type': 'application/json',
+                    },
+                    json: { authKey, customerKey },
+                    responseType: 'json'
+                }
+            );
+            const { billingKey } = response.body;
+
+            // DB에 저장
+            res.render('success', { data: response.body });
+        });
+
+
+
+
+
+
+
         app.get('/my_data', async (req, res) => {
             const id = get_user_id(req)
             const user = await db.collection('user').findOne({ id });
@@ -1111,108 +1138,6 @@ async function startServer() {
             });
             res.send(true)
         });
-
-
-
-
-
-        // 결제 페이지
-
-        // TODO: 개발자센터에 로그인해서 내 결제위젯 연동 키 > 시크릿 키를 입력하세요. 시크릿 키는 외부에 공개되면 안돼요.
-        // @docs https://docs.tosspayments.com/reference/using-api/api-keys
-
-        app.post("/confirm", async function (req, res) {
-            // 클라이언트에서 받은 JSON 요청 바디입니다.
-            const { paymentKey, orderId, amount } = req.body;
-
-            // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
-            // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
-            const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-            const encryptedSecretKey =
-                "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
-
-            const id = get_user_id(req)
-            const point = orderId.split("_")[1]
-            const currency = orderId.split("_")[2]
-            let check_amount;
-            switch (point) {
-                case "240":
-                    check_amount = currency === 'KRW' ? '4320' : '3.24';
-                    break;
-                case "7200":
-                    check_amount = currency === 'KRW' ? '108000' : '75.6';
-                    break;
-                case "1680":
-                    check_amount = currency === 'KRW' ? '25200' : '20.16';
-                    break;
-                case "1000":
-                    check_amount = currency === 'KRW' ? '17000' : '12.75';
-                    break;
-                case "500":
-                    check_amount = currency === 'KRW' ? '9000' : '6.75';
-                    break;
-                case "150":
-                    check_amount = currency === 'KRW' ? '3000' : '2.25';
-                    break;
-                case "100":
-                    check_amount = currency === 'KRW' ? '2000' : '1.5';
-                    break;
-                case "50":
-                    check_amount = currency === 'KRW' ? '1000' : '0.75';
-                    break;
-                default:
-                    check_amount = 'err'; // 기본값 또는 에러 처리
-                    break;
-            }
-
-
-            if (id === orderId.split("_")[0] && amount === check_amount) {
-                const { default: got } = await import('got');
-
-                // 결제를 승인하면 결제수단에서 금액이 차감돼요.
-                got.post("https://api.tosspayments.com/v1/payments/confirm", {
-                    headers: {
-                        Authorization: encryptedSecretKey,
-                        "Content-Type": "application/json",
-                    },
-                    json: {
-                        orderId: orderId,
-                        amount: amount,
-                        paymentKey: paymentKey,
-                    },
-                    responseType: "json",
-                })
-                    .then(async function (response) {
-                        // 결제 성공 비즈니스 로직을 구현하세요.
-                        const user_data = await db.collection('user').findOne({ id: id });
-
-                        await db.collection('user').updateOne(
-                            { id: id }, // 조건
-                            { $inc: { amount: Number(point) } } // 수정 내용
-                        );
-
-                        await db.collection('receipt').insertOne({ id, date: Date.now(), currency, point, amount: response.body.totalAmount, receipt: response.body.receipt.url });
-                        await sendEmail(user_data.email, "siliod 충전", point + 'p     ' + response.body.totalAmount + currency + " 충전됨여여.")
-
-                        console.log(response.body);
-                        res.status(response.statusCode).json(response.body)
-                    })
-                    .catch(function (error) {
-                        // 결제 실패 비즈니스 로직을 구현하세요.
-                        console.log(error.response.body);
-                        res.status(error.response.statusCode).json(error.response.body)
-                    });
-            } else {
-                res.status(401).json({ message: "인증되지 않은 요청입니다." });
-            }
-        });
-
-
-
-
-
-
-
 
 
 
