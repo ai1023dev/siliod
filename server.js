@@ -926,7 +926,7 @@ async function startServer() {
                 'https://api.tosspayments.com/v1/billing/authorizations/issue',
                 {
                     headers: {
-                        Authorization: 'Basic ' + Buffer.from(secretKey + ':').toString('base64'),
+                        Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
                         'Content-Type': 'application/json',
                     },
                     json: { authKey, customerKey },
