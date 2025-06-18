@@ -392,11 +392,11 @@ a:not(.terms) {
     background-color: #777;
 }
 
-#add-billing {
+.blue {
     background-color: #3393FF;
 }
 
-#add-billing:hover {
+.blue:hover {
     background-color: #2563eb;
 }
 

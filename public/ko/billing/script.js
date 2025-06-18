@@ -34,7 +34,11 @@ $.ajax({
 
 
 
-            $('#payment-button').click(function () {
+            $('#add-billing').click(function () {
+                requestBillingAuth()
+            })
+
+            $('#add-sub-billing').click(function () {
                 requestBillingAuth()
             })
 
