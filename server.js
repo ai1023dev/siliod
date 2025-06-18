@@ -921,6 +921,11 @@ async function startServer() {
             const id = get_user_id(req)
             const card = await db.collection('card').find({ userId: id }).toArray();;
 
+            card.forEach(item => {
+                delete item.billingKey;
+                delete item.customerKey;
+            });
+
             res.send(card);
         });
 
