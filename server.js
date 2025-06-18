@@ -934,9 +934,17 @@ async function startServer() {
                 }
             );
 
-            requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
+            // requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
 
             // DB에 저장
+            await db.collection('card').insertOne({
+                customerKey: customerKey,
+                billingKey: response.body.billingKey,
+                cardCompany: response.body.card.company,
+                cardNumber: response.body.card.number,
+                cardType: response.body.card.cardType,
+            });
+
             res.send({ data: response.body });
         });
 

@@ -38,10 +38,6 @@ $.ajax({
                 requestBillingAuth()
             })
 
-            $('.add-sub-billing').click(function () {
-                requestBillingAuth()
-            })
-
 
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
