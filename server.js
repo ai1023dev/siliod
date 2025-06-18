@@ -940,7 +940,7 @@ async function startServer() {
             await db.collection('card').insertOne({
                 customerKey: customerKey,
                 billingKey: response.body.billingKey,
-                cardCompany: response.body.card.company,
+                cardCompany: response.body.cardCompany,
                 cardNumber: response.body.card.number,
                 cardType: response.body.card.cardType,
             });
