@@ -918,9 +918,9 @@ async function startServer() {
 
 
 
+        const { default: got } = await import('got');
 
-        app.get('/success', async (req, res) => {
-            const { default: got } = await import('got');
+        app.get('/billing_success', async (req, res) => {
             const { authKey, customerKey } = req.query;
             const response = await got.post(
                 'https://api.tosspayments.com/v1/billing/authorizations/issue',
@@ -933,11 +933,34 @@ async function startServer() {
                     responseType: 'json'
                 }
             );
-            const { billingKey } = response.body;
+
+            requestPayment(response.body.billingKey, 10000, 'orderId0001', 'orderName')
 
             // DB에 저장
             res.send({ data: response.body });
         });
+
+
+        async function requestPayment(billingKey, amount, orderId, orderName) {
+            const secretKey = process.env.TOSS_SECRET_KEY;
+
+            const response = await got.post('https://api.tosspayments.com/v1/billing/charges', {
+                headers: {
+                    Authorization: 'Basic ' + Buffer.from(secretKey + ':').toString('base64'),
+                    'Content-Type': 'application/json',
+                },
+                json: {
+                    billingKey: billingKey,
+                    customerKey: '고객 고유키',         // billingKey와 매칭된 값
+                    amount: amount,                    // 결제 금액 (정수)
+                    orderId: orderId,                  // 고유 주문번호 (중복 불가)
+                    orderName: orderName              // 주문명 (ex: '정기 구독')
+                },
+                responseType: 'json'
+            });
+
+            return response.body;
+        }
 
 
 
