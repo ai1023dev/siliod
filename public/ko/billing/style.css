@@ -348,7 +348,7 @@ a:not(.terms) {
 }
 
 .payment-method {
-    /* display: flex; */
+    display: flex;
     align-items: center;
 }
 
