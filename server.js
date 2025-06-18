@@ -879,8 +879,8 @@ async function startServer() {
             check_country(req, res, 'guide')
         });
 
-        app.get('/point', (req, res) => {
-            check_country(req, res, 'point')
+        app.get('/billing', (req, res) => {
+            check_country(req, res, 'billing')
         });
 
         app.get('/pay', (req, res) => {
