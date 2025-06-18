@@ -327,13 +327,13 @@ a:not(.terms) {
 .label {
     font-size: 14px;
     color: #888;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .amount {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .subtext {
@@ -348,13 +348,23 @@ a:not(.terms) {
 }
 
 .payment-method {
-    display: flex;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.payment-method > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .payment-method img {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
     margin-right: 10px;
 }
 
@@ -369,18 +379,18 @@ a:not(.terms) {
 }
 
 .register-button {
-    background-color: #777;
-    color: white;
-    border: none;
-    padding: 8px 14px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    float: right;
+  background-color: #888;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 6px;
 }
 
 .register-button:hover {
-    background-color: #888;
+    background-color: #777;
 }
 
 
