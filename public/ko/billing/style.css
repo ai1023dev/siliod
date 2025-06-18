@@ -348,8 +348,18 @@ a:not(.terms) {
 }
 
 .payment-method {
-    display: flexbox;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    margin-bottom: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.payment-method>div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .payment-method img {
@@ -372,11 +382,11 @@ a:not(.terms) {
     background-color: #888;
     color: white;
     border: none;
-    padding: 8px 14px;
+    padding: 6px 12px;
     border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
-    float: right;
+    margin-left: 6px;
 }
 
 .register-button:hover {
