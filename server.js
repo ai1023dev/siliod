@@ -919,14 +919,17 @@ async function startServer() {
 
         app.get('/get_card', async (req, res) => {
             const id = get_user_id(req)
-            const card = await db.collection('card').find({ userId: id }).toArray();;
+            const card = await db.collection('card').find({ userId: id });
 
-            card.forEach(item => {
-                delete item.billingKey;
-                delete item.customerKey;
-            });
+            if (card) {
+                delete card.billingKey;
+                delete card.customerKey;
+    
+                res.send(card);
+            } else {
+                res.send(false);
+            }
 
-            res.send(card);
         });
 
         const { default: got } = await import('got');

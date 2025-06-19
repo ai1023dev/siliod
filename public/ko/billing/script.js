@@ -11,18 +11,6 @@ $.ajax({
             $(".username").text(data.name);
 
 
-            $.ajax({
-                method: 'GET',
-                url: '/get_card',
-                success: function (data) {
-                    console.log(data)
-                },
-                error: function (xhr, status, error) {
-                    alert('서버 측 에러')
-                }
-            });
-
-            
             // ------  SDK 초기화 ------
             // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
             const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
@@ -59,3 +47,54 @@ $.ajax({
         alert('서버 측 에러')
     }
 });
+
+
+$.ajax({
+    method: 'GET',
+    url: '/get_card',
+    success: function (data) {
+        if (data) {
+            ("#payment-method-container").html(
+                `<div class="payment-method">
+                    <div>
+                        <img src="image/card.svg" alt="신용카드 아이콘" />
+                        <div>
+                            <div class="method-info">결제 수단 · ${data.cardType}카드</div>
+                            <div class="method-sub">${data.cardCompany} · ${formatCardNumber(data.cardNumber)}</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="add-billing register-button">수정하기</button>
+                        <button class="add-billing register-button">삭제하기</button>
+                    </div>
+                </div>`
+            )
+        } else {
+            ("#payment-method-container").html(
+                `<div class="payment-method">
+                    <div>
+                        <img src="image/card.svg" alt="신용카드 아이콘" />
+                        <div>
+                            <div class="method-info">결제 수단 등록</div>
+                            <div class="method-sub">등록된 결제수단이 없습니다.</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="add-billing blue register-button">등록하기</button>
+                    </div>
+                </div>`
+            )
+        }
+    },
+    error: function (xhr, status, error) {
+        alert('서버 측 에러')
+    }
+});
+
+function formatCardNumber(rawNumber) {
+    // *를 X로 변환
+    const replaced = rawNumber.replace(/\*/g, 'X');
+
+    // 4자리씩 끊어서 하이픈 추가
+    return replaced.replace(/(.{4})(.{4})(.{4})(.{4}?)/, '$1-$2-$3-$4');
+}
