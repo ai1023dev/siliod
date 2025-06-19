@@ -919,7 +919,7 @@ async function startServer() {
 
         app.get('/get_card', async (req, res) => {
             const id = get_user_id(req)
-            const card = await db.collection('card').find({ userId: id });
+            const card = await db.collection('card').findOne({ userId: id });
 
             if (card) {
                 delete card.billingKey;
