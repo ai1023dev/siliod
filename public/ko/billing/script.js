@@ -34,7 +34,7 @@ $.ajax({
 
 
 
-            $('.add-billing').click(function () {
+            $(document).on('click', '.add-billing', function () {
                 requestBillingAuth()
             })
 
