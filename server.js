@@ -941,20 +941,20 @@ async function startServer() {
 
         app.get('/billing/success', async (req, res) => {
             const id = get_user_id(req)
-            if (id === customerKey.split('-')[0]) {
-                const { authKey, customerKey } = req.query;
-                const response = await got.post(
-                    'https://api.tosspayments.com/v1/billing/authorizations/issue',
-                    {
-                        headers: {
-                            Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
-                            'Content-Type': 'application/json',
-                        },
-                        json: { authKey, customerKey },
-                        responseType: 'json'
-                    }
-                );
+            const { authKey, customerKey } = req.query;
+            const response = await got.post(
+                'https://api.tosspayments.com/v1/billing/authorizations/issue',
+                {
+                    headers: {
+                        Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
+                        'Content-Type': 'application/json',
+                    },
+                    json: { authKey, customerKey },
+                    responseType: 'json'
+                }
+            );
 
+            if (id === customerKey.split('-')[0]) {
                 // requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
 
                 try {
