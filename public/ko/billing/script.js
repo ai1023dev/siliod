@@ -54,7 +54,7 @@ $.ajax({
     url: '/get_card',
     success: function (data) {
         if (data) {
-            ("#payment-method-container").html(
+            ("#payment-method-container").append(
                 `<div class="payment-method">
                     <div>
                         <img src="image/card.svg" alt="신용카드 아이콘" />
@@ -70,7 +70,7 @@ $.ajax({
                 </div>`
             )
         } else {
-            ("#payment-method-container").html(
+            ("#payment-method-container").append(
                 `<div class="payment-method">
                     <div>
                         <img src="image/card.svg" alt="신용카드 아이콘" />
