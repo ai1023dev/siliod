@@ -924,7 +924,7 @@ async function startServer() {
             if (card) {
                 card.billingKey = null;
                 card.customerKey = null;
-    
+
                 res.send(card);
             } else {
                 res.send(false);
@@ -935,32 +935,39 @@ async function startServer() {
         const { default: got } = await import('got');
 
         app.get('/billing/success', async (req, res) => {
-            const { authKey, customerKey } = req.query;
-            const response = await got.post(
-                'https://api.tosspayments.com/v1/billing/authorizations/issue',
-                {
-                    headers: {
-                        Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
-                        'Content-Type': 'application/json',
-                    },
-                    json: { authKey, customerKey },
-                    responseType: 'json'
-                }
-            );
+            const id = get_user_id(req)
+            if (id === customerKey.split('-')[0]) {
+                const { authKey, customerKey } = req.query;
+                const response = await got.post(
+                    'https://api.tosspayments.com/v1/billing/authorizations/issue',
+                    {
+                        headers: {
+                            Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
+                            'Content-Type': 'application/json',
+                        },
+                        json: { authKey, customerKey },
+                        responseType: 'json'
+                    }
+                );
 
-            // requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
+                // requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
 
-            // DB에 저장
-            await db.collection('card').insertOne({
-                userId: customerKey.split('-')[0],
-                customerKey: customerKey,
-                billingKey: response.body.billingKey,
-                cardCompany: response.body.cardCompany,
-                cardNumber: response.body.card.number,
-                cardType: response.body.card.cardType,
-            });
+                try {
+                    await db.collection('card').deleteOne({ userId: id });
+                } catch (error) {}
 
-            res.redirect('/billing')
+                // DB에 저장
+                await db.collection('card').insertOne({
+                    userId: id,
+                    customerKey: customerKey,
+                    billingKey: response.body.billingKey,
+                    cardCompany: response.body.cardCompany,
+                    cardNumber: response.body.card.number,
+                    cardType: response.body.card.cardType,
+                });
+
+                res.redirect('/billing')
+            }
         });
 
 
