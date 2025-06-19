@@ -49,7 +49,7 @@ $.ajax({
 });
 
 
-$('.del-billing').click(function () {
+$(document).on('click', '.del-billing', function () {
     $.ajax({
         method: 'GET',
         url: '/del_card',
