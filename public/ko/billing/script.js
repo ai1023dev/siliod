@@ -49,6 +49,32 @@ $.ajax({
 });
 
 
+$('.del-billing').click(function () {
+    $.ajax({
+        method: 'GET',
+        url: '/del_card',
+        success: function (data) {
+            $("#payment-method-container").html(
+                `<div class="payment-method">
+                    <div>
+                        <img src="image/card.svg" alt="신용카드 아이콘" />
+                        <div>
+                            <div class="method-info">결제 수단 등록</div>
+                            <div class="method-sub">등록된 결제수단이 없습니다.</div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="add-billing blue register-button">등록하기</button>
+                    </div>
+                </div>`
+            )
+        },
+        error: function (xhr, status, error) {
+            alert('서버 측 에러')
+        }
+    });
+})
+
 $.ajax({
     method: 'GET',
     url: '/get_card',
@@ -65,7 +91,7 @@ $.ajax({
                     </div>
                     <div>
                         <button class="add-billing register-button">수정하기</button>
-                        <button class="add-billing register-button">삭제하기</button>
+                        <button class="del-billing register-button">삭제하기</button>
                     </div>
                 </div>`
             )

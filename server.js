@@ -932,6 +932,11 @@ async function startServer() {
 
         });
 
+        app.get('/del_card', async (req, res) => {
+            const id = get_user_id(req)
+            await db.collection('card').deleteOne({ userId: id });
+        });
+
         const { default: got } = await import('got');
 
         app.get('/billing/success', async (req, res) => {
