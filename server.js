@@ -502,7 +502,7 @@ async function startServer() {
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
-                    "git clone https://github.com/tsl0922/ttyd.git /home/ubuntu/.ttyd",
+                    "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
                     "mkdir /home/ubuntu/.ttyd/build",
                     "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
                     "make -C /home/ubuntu/.ttyd/build",
