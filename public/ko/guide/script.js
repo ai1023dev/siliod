@@ -11,7 +11,6 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".balance-amount").text(data.amount + 'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
