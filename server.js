@@ -1374,8 +1374,7 @@ async function startServer() {
                         id: userData.id,
                         name: userData.name,
                         avatar_url: userData.picture,
-                        email: userData.email,
-                        amount: 50
+                        email: userData.email
                     });
 
                     // JWT 발급 후 로그인 처리
