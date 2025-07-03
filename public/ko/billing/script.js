@@ -13,7 +13,7 @@ $.ajax({
 
             // ------  SDK 초기화 ------
             // @docs https://docs.tosspayments.com/sdk/v2/js#토스페이먼츠-초기화
-            const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+            const clientKey = "test_ck_D5GePWvyJnrK0W0k6q8gLzN97Eoq";
             const customerKey = data.id + '-' + Date.now();
             const tossPayments = TossPayments(clientKey);
             // 회원 결제
