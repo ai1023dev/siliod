@@ -424,8 +424,8 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                { type: 'nano', count: 5 },
-                { type: 'micro', count: 5 },
+                { type: 'nano', count: 1 },
+                { type: 'micro', count: 1 },
                 { type: 'small', count: 5 },
                 { type: 'medium', count: 10 }, // 10
                 { type: 'large', count: 5 },
@@ -439,8 +439,9 @@ async function startServer() {
                 for (let i = 0; i < count; i++) {
                     allJobs.push(async () => {
                         const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
                         await ready_instance(instanceId, true, false, type);
-                        await new Promise(resolve => setTimeout(resolve, 100000));
+                        await new Promise(resolve => setTimeout(resolve, 10000));
                     });
                 }
             }
@@ -450,8 +451,9 @@ async function startServer() {
                 for (let i = 0; i < count; i++) {
                     allJobs.push(async () => {
                         const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
                         await ready_instance(instanceId, true, true, type);
-                        await new Promise(resolve => setTimeout(resolve, 150000));
+                        await new Promise(resolve => setTimeout(resolve, 10000));
                     });
                 }
             }
