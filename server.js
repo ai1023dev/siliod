@@ -426,8 +426,8 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                { type: 'nano', count: 1 },
-                { type: 'micro', count: 1 },
+                { type: 'nano', count: 5 },
+                { type: 'micro', count: 5 },
                 { type: 'small', count: 5 },
                 { type: 'medium', count: 10 }, // 10
                 { type: 'large', count: 5 },
@@ -1376,7 +1376,8 @@ async function startServer() {
                         id: userData.id,
                         name: userData.name,
                         avatar_url: userData.picture,
-                        email: userData.email
+                        email: userData.email,
+                        amount: 0
                     });
 
                     // JWT 발급 후 로그인 처리
