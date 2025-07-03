@@ -138,6 +138,8 @@ async function startServer() {
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
 
+                await new Promise(resolve => setTimeout(resolve, 5000));
+
                 await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
