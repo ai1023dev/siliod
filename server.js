@@ -504,8 +504,8 @@ async function startServer() {
                     "git clone https://github.com/ai1023dev/novnc.git ~/.novnc",
                     "sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1",
                 ];
-                
-                
+
+
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
@@ -692,17 +692,17 @@ async function startServer() {
                 command = cli_command
             }
 
+            // 순차적으로 SSH 명령 실행
+            for (const cmd of command) {
+                await runSSHCommand(publicIp, cmd);
+            }
+
             await new Promise(resolve => setTimeout(resolve, 3000));
             if (size !== 8) {
                 await modifyAttachedVolume(instanceId, size);
                 for (const cmd of ebs_command) {
                     await runSSHCommand(publicIp, cmd);
                 }
-            }
-
-            // 순차적으로 SSH 명령 실행
-            for (const cmd of command) {
-                await runSSHCommand(publicIp, cmd);
             }
 
 
