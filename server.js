@@ -140,7 +140,7 @@ async function startServer() {
 
                 await new Promise(resolve => setTimeout(resolve, 5000));
 
-                await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+                await addIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32')
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
                 return instanceId;
@@ -697,13 +697,13 @@ async function startServer() {
                 await runSSHCommand(publicIp, cmd);
             }
 
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            if (size !== 8) {
-                await modifyAttachedVolume(instanceId, size);
-                for (const cmd of ebs_command) {
-                    await runSSHCommand(publicIp, cmd);
-                }
-            }
+            // await new Promise(resolve => setTimeout(resolve, 3000));
+            // if (size !== 8) {
+            //     await modifyAttachedVolume(instanceId, size);
+            //     for (const cmd of ebs_command) {
+            //         await runSSHCommand(publicIp, cmd);
+            //     }
+            // }
 
 
             await removeIngressRule(instanceId, 'tcp', 22, 22, '3.13.249.249/32') // 서버의 아이피로 변경
