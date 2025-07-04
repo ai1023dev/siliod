@@ -510,15 +510,15 @@ async function startServer() {
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
-                    "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
-                    "mkdir /home/ubuntu/.ttyd/build",
-                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
-                    "make -C /home/ubuntu/.ttyd/build",
-                    "sudo make -C /home/ubuntu/.ttyd/build install",
+                    // "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
+                    // "mkdir /home/ubuntu/.ttyd/build",
+                    // "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
+                    // "make -C /home/ubuntu/.ttyd/build",
+                    // "sudo make -C /home/ubuntu/.ttyd/build install",
                     "curl https://get.acme.sh | sh",
                     "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
                     `sudo ~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
-                    `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
+                    // `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
                 ];
 
 
