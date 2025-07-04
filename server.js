@@ -518,7 +518,7 @@ async function startServer() {
                     "curl https://get.acme.sh | sh",
                     "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
                     `sudo ~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
-                    `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
+                    `sudo ~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
                 ];
 
 
