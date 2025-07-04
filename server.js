@@ -692,6 +692,7 @@ async function startServer() {
                 command = cli_command
             }
 
+            await new Promise(resolve => setTimeout(resolve, 3000));
             if (size !== 8) {
                 await modifyAttachedVolume(instanceId, size);
                 for (const cmd of ebs_command) {
