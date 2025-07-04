@@ -483,7 +483,7 @@ async function startServer() {
 
                 await check_command(publicIp)
 
-                // const domain = `${instanceId.substring(2)}.siliod.com`;
+                const domain = `${instanceId.substring(2)}.siliod.com`;
 
                 let commands = []
 
@@ -493,26 +493,35 @@ async function startServer() {
                     "sudo apt-get upgrade -y",
                     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
                     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot python3-certbot-dns-route53 -y dbus-x11",
-                    `mkdir -p ~/.vnc`,
-                    `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
-                    `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
-                    `sudo certbot certonly --dns-route53 -d '*.siliod.com' -d 'siliod.com' --non-interactive --agree-tos --email siliod.official@gmail.com`,
-                    `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
-                    `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
+                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar dbus-x11",
+                    "mkdir -p ~/.vnc",
+                    "echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup",
+                    "echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved",
+                    "curl https://get.acme.sh | sh",
+                    "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
+                    `~/.acme.sh/acme.sh --issue --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
+                    `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`,
+                    "git clone https://github.com/ai1023dev/novnc.git ~/.novnc",
+                    "sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1",
                 ];
+
 
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
-                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot python3-certbot-dns-route53 -y",
+                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev",
                     "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
                     "mkdir /home/ubuntu/.ttyd/build",
                     "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
                     "make -C /home/ubuntu/.ttyd/build",
                     "sudo make -C /home/ubuntu/.ttyd/build install",
-                    `sudo certbot certonly --dns-route53 -d '*.siliod.com' -d 'siliod.com' --non-interactive --agree-tos --email siliod.official@gmail.com`
+                    "curl https://get.acme.sh | sh",
+                    "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
+                    `~/.acme.sh/acme.sh --issue --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
+                    `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`,
                 ];
+
+
 
                 if (type) {
                     commands = gui_ready_commands
@@ -660,14 +669,16 @@ async function startServer() {
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
                 `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
                 `vncserver :1`,
-                `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
+                `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/ssl/certs/${domain}.crt --key /etc/ssl/private/${domain}.key --listen 443 > /dev/null 2>&1 & disown`
             ];
+
 
             const cli_command = [
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
-                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
-                `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/ssl/certs/${domain}.crt --ssl-key /etc/ssl/private/${domain}.key --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
+                `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/ssl/certs/${domain}.crt --ssl-key /etc/ssl/private/${domain}.key --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
             ];
+
 
             const ebs_command = [
                 `sudo growpart /dev/nvme0n1 1`,
@@ -961,7 +972,7 @@ async function startServer() {
 
                 try {
                     await db.collection('card').deleteOne({ userId: id });
-                } catch (error) {}
+                } catch (error) { }
 
                 // DB에 저장
                 await db.collection('card').insertOne({
