@@ -261,7 +261,7 @@ async function startServer() {
 
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "/home/ubuntu/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=1800 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "/home/ubuntu/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
@@ -510,15 +510,15 @@ async function startServer() {
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
-                    "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
-                    "mkdir /home/ubuntu/.ttyd/build",
-                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
-                    "make -C /home/ubuntu/.ttyd/build",
-                    "sudo make -C /home/ubuntu/.ttyd/build install",
                     "curl https://get.acme.sh | sh",
                     "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
                     `~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
                     `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`,
+                    "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
+                    "mkdir /home/ubuntu/.ttyd/build",
+                    "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
+                    "make -C /home/ubuntu/.ttyd/build",
+                    "sudo make -C /home/ubuntu/.ttyd/build install"
                 ];
 
 
