@@ -483,7 +483,7 @@ async function startServer() {
 
                 await check_command(publicIp)
 
-                const domain = `${instanceId.substring(2)}.siliod.com`;
+                // const domain = `${instanceId.substring(2)}.siliod.com`;
 
                 let commands = []
 
@@ -493,11 +493,11 @@ async function startServer() {
                     "sudo apt-get upgrade -y",
                     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
                     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11",
+                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot python3-certbot-dns-route53 -y dbus-x11",
                     `mkdir -p ~/.vnc`,
                     `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
                     `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
+                    `sudo certbot certonly --dns-route53 -d '*.siliod.com' -d 'siliod.com' --non-interactive --agree-tos --email siliod.official@gmail.com`,
                     `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
                     `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
                 ];
@@ -505,13 +505,13 @@ async function startServer() {
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
-                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
+                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot python3-certbot-dns-route53 -y",
                     "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
                     "mkdir /home/ubuntu/.ttyd/build",
                     "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
                     "make -C /home/ubuntu/.ttyd/build",
                     "sudo make -C /home/ubuntu/.ttyd/build install",
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`
+                    `sudo certbot certonly --dns-route53 -d '*.siliod.com' -d 'siliod.com' --non-interactive --agree-tos --email siliod.official@gmail.com`
                 ];
 
                 if (type) {
