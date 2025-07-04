@@ -499,20 +499,20 @@ async function startServer() {
                     "echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved",
                     "curl https://get.acme.sh | sh",
                     "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
-                    "cat ~/.acme.sh/account.conf | grep DEFAULT_CA",
                     `~/.acme.sh/acme.sh --issue --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
                     `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`,
                     "git clone https://github.com/ai1023dev/novnc.git ~/.novnc",
                     "sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1",
                 ];
-
-
+                
+                
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
                     "curl https://get.acme.sh | sh",
                     "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
+                    "cat ~/.acme.sh/account.conf | grep DEFAULT_CA",
                     `~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
                     `~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`,
                     "git clone https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
