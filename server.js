@@ -26,6 +26,7 @@ const dotenv = require("dotenv");
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
+const cron = require('node-cron');
 const compression = require('compression')
 const requestIp = require('request-ip');
 app.use(requestIp.mw());
@@ -601,11 +602,6 @@ async function startServer() {
                         private_ip: privateIP
                     });
 
-                    await db.collection('user').updateOne(
-                        { id: id }, // 조건
-                        { $inc: { amount: (size - 8) * 120 } } // 수정 내용
-                    );
-
 
                     await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
@@ -830,8 +826,19 @@ async function startServer() {
                     console.log(status)
                 }
             }
-            // }, 30000);
         }, 15 * 60 * 1000);
+
+        cron.schedule('*/10 * * * * *', async () => {
+            console.log('✅ 매주 월요일 00:00에 실행되는 작업입니다!');
+
+            const instance = await db.collection('instance').find({}).toArray();
+            for (let i = 0; i < instance.length; i++) {
+                await db.collection('user').updateOne(
+                    { id: instance[i].user }, // 조건
+                    { $inc: { amount: (instance[i].size - 8) * 30 } } // 수정 내용
+                );
+            }
+        });
 
 
 
