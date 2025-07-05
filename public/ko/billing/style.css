@@ -299,13 +299,16 @@ a:not(.terms) {
 
 /********************** 메인 **********************/
 
-.container {
-    width: 60%;
-    height: calc(100vh - 154px);
-    margin-left: 20%;
+.form-section {
     display: flex;
     flex-direction: column;
     overflow-y: auto !important;
+    height: calc(100vh - 154px);
+}
+
+.container {
+    width: 60%;
+    margin-left: 20%;
 }
 
 .card {
