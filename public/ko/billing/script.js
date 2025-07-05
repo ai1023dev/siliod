@@ -141,3 +141,23 @@ function formatCardNumber(rawNumber) {
     // 4자리씩 끊어서 하이픈 추가
     return replaced.replace(/(.{4})(.{4})(.{4})(.{4}?)/, '$1-$2-$3-$4');
 }
+
+
+
+function calculateMonthlyFee() {
+        const hourlyRate = parseInt($('#instance-price').val()) || 0;
+        const hours = parseInt($('#planned-hours').val()) || 0;
+        const storage = parseInt($('#storage-size').val()) || 0;
+
+        const baseFee = hourlyRate * hours;
+
+        const extraStorageGiB = Math.max(0, storage - 8);
+        const weeklyExtraFee = extraStorageGiB * 30;  // 매주 월요일마다 30원
+        const monthlyExtraFee = weeklyExtraFee * 4;    // 월 기준: 4주
+
+        const total = baseFee + monthlyExtraFee;
+
+        $('#monthly-fee').text(total.toLocaleString() + " 원");
+    }
+
+    $('#instance-price, #planned-hours, #storage-size').on('input', calculateMonthlyFee);
