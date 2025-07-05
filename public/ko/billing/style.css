@@ -128,7 +128,6 @@ a:not(.terms) {
 
 /* ===== 왼쪽 사이드바 ===== */
 .sidebar {
-    position: fixed;
     width: 260px;
     min-width: 260px;
     height: 100vh;
@@ -302,7 +301,11 @@ a:not(.terms) {
 
 .container {
     width: 60%;
+    height: calc(100vh - 154px);
     margin-left: 20%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto !important;
 }
 
 .card {
