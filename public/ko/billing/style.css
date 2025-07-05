@@ -336,7 +336,7 @@ a:not(.terms) {
     margin-bottom: 5px;
 }
 
-.subtext {
+.date {
     font-size: 13px;
     color: #999;
 }
@@ -399,6 +399,69 @@ a:not(.terms) {
 .blue:hover {
     background-color: #2563eb;
 }
+
+
+
+/* 예상 금액 계산기 카드 내부 스타일 보완 */
+.card.box {
+    padding: 2rem 2.5rem;
+}
+
+/* 레이블과 입력부를 한 줄에 배치 */
+.card.box label {
+    display: inline-block;
+    width: 120px;
+    font-weight: 600;
+    color: #555;
+    vertical-align: middle;
+    margin-bottom: 1rem;
+}
+
+/* 인풋, 셀렉트박스 공통 스타일 */
+.card.box input[type="number"],
+.card.box select {
+    width: calc(100% - 130px);
+    padding: 0.5rem 1rem;
+    border: 1.5px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Pretendard-Light', sans-serif;
+    vertical-align: middle;
+    transition: border-color 0.3s ease;
+}
+
+/* 포커스 시 테두리 색 강조 */
+.card.box input[type="number"]:focus,
+.card.box select:focus {
+    outline: none;
+    border-color: #3393FF;
+    box-shadow: 0 0 5px rgba(51, 147, 255, 0.5);
+}
+
+/* 월 납입료 텍스트 강조 */
+#monthly-fee {
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: #3366cc;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* 설명 텍스트 여백과 글자 색 조절 */
+.fee-info {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #666;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* 레이블과 입력부 사이 적당한 간격 유지 */
+.card.box label + input,
+.card.box label + select {
+    margin-bottom: 1.5rem;
+}
+
 
 
 @font-face {
