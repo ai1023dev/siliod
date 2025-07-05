@@ -601,6 +601,11 @@ async function startServer() {
                         private_ip: privateIP
                     });
 
+                    await db.collection('user').updateOne(
+                        { id: id }, // 조건
+                        { $inc: { amount: (size - 8) * 120 } } // 수정 내용
+                    );
+
 
                     await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
@@ -788,45 +793,45 @@ async function startServer() {
 
 
 
-        // setInterval(async () => {
-        //     const instance = await db.collection('instance').find({}).toArray();
-        //     for (let i = 0; i < instance.length; i++) {
-        //         const status = await getInstanceStatus('i-' + instance[i].instance_id)
+        setInterval(async () => {
+            const instance = await db.collection('instance').find({}).toArray();
+            for (let i = 0; i < instance.length; i++) {
+                const status = await getInstanceStatus('i-' + instance[i].instance_id)
 
-        //         if (status.instanceState === 'running') {
-        //             let amount
-        //             switch (instance[i].grade) {
-        //                 case 'nano':
-        //                     amount = 0.75;
-        //                     break;
-        //                 case 'micro':
-        //                     amount = 1.25;
-        //                     break;
-        //                 case 'small':
-        //                     amount = 1.75;
-        //                     break;
-        //                 case 'medium':
-        //                     amount = 2.5;
-        //                     break;
-        //                 case 'large':
-        //                     amount = 5;
-        //                     break;
-        //                 case 'xlarge':
-        //                     amount = 10;
-        //                     break;
-        //             }
+                if (status.instanceState === 'running') {
+                    let amount
+                    switch (instance[i].grade) {
+                        case 'nano':
+                            amount = 7.5;
+                            break;
+                        case 'micro':
+                            amount = 12.5;
+                            break;
+                        case 'small':
+                            amount = 17.5;
+                            break;
+                        case 'medium':
+                            amount = 25;
+                            break;
+                        case 'large':
+                            amount = 50;
+                            break;
+                        case 'xlarge':
+                            amount = 100;
+                            break;
+                    }
 
-        //         await db.collection('user').updateOne(
-        //             { id: instance[i].user }, // 조건
-        //             { $inc: { amount: amount } } // 수정 내용
-        //         );
+                    await db.collection('user').updateOne(
+                        { id: instance[i].user }, // 조건
+                        { $inc: { amount: amount } } // 수정 내용
+                    );
 
-        //         console.log(instance[i].instance_id)
-        //         console.log(status)
-        //     }
-        // }
-        // }, 30000);
-        // }, 15 * 60 * 1000);
+                    console.log(instance[i].instance_id)
+                    console.log(status)
+                }
+            }
+            // }, 30000);
+        }, 15 * 60 * 1000);
 
 
 
