@@ -350,9 +350,8 @@ iframe {
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: 3rem;
     overflow-y: auto !important;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 125px);
 }
 
 .form-group {

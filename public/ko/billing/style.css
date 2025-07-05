@@ -303,7 +303,7 @@ a:not(.terms) {
     display: flex;
     flex-direction: column;
     overflow-y: auto !important;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 125px);
 }
 
 .container {
