@@ -439,6 +439,30 @@ input[type="password"]:focus {
     /* 부드러운 그림자 추가 */
 }
 
+select {
+    appearance: none; /* 기본 브라우저 스타일 제거 */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #fff;
+    border: 1px solid #c2d4ff;
+    border-radius: 0.5rem;
+    padding: 0.6rem 2.5rem 0.6rem 0.8rem;
+    font-size: 1rem;
+    width: 250px;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="none" stroke="%237aa5ff" stroke-width="2" d="M1 1l5 5 5-5"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 0.8rem center;
+    background-size: 12px 8px;
+    transition: border-color 0.2s ease;
+}
+
+select:focus {
+    border-color: #7aa5ff;
+    box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
+    outline: none;
+}
+
 /* 월 납입료 텍스트 강조 */
 #monthly-fee {
     font-size: 2rem;
