@@ -128,6 +128,7 @@ a:not(.terms) {
 
 /* ===== 왼쪽 사이드바 ===== */
 .sidebar {
+    position: fixed;
     width: 260px;
     min-width: 260px;
     height: 100vh;
