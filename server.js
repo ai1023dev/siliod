@@ -426,10 +426,10 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                { type: 'nano', count: 1 },
+                // { type: 'nano', count: 1 },
                 // { type: 'micro', count: 5 },
                 // { type: 'small', count: 5 },
-                // { type: 'medium', count: 10 }, // 10
+                { type: 'medium', count: 1 },
                 // { type: 'large', count: 5 },
                 // { type: 'xlarge', count: 5 },
             ];
