@@ -315,7 +315,7 @@ a:not(.terms) {
 
 .flex-box {
     display: flex;
-    gap: 20px;
+    gap: 25px;
     flex-wrap: wrap;
 }
 
@@ -410,7 +410,7 @@ a:not(.terms) {
 /* 레이블과 입력부를 한 줄에 배치 */
 .card.box label {
     display: inline-block;
-    width: 120px;
+    width: 150px;
     font-weight: 600;
     color: #555;
     vertical-align: middle;
@@ -420,7 +420,7 @@ a:not(.terms) {
 /* 인풋, 셀렉트박스 공통 스타일 */
 .card.box input[type="number"],
 .card.box select {
-    width: calc(100% - 130px);
+    width: calc(100% - 160px);
     padding: 0.5rem 1rem;
     border: 1.5px solid #ccc;
     border-radius: 8px;
