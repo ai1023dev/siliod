@@ -24,7 +24,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".username").text(data.amount + ' 원');
+            $(".amaount").text(data.amount + ' 원');
 
 
             // ------  SDK 초기화 ------
