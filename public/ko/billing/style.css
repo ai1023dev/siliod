@@ -473,6 +473,7 @@ select:focus {
 /* 월 납입료 텍스트 강조 */
 #monthly-fee-label {
     text-align: center;
+    width: 100%;
 }
 
 #monthly-fee {
