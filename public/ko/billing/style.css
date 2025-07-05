@@ -424,7 +424,7 @@ a:not(.terms) {
     color: #555;
     vertical-align: middle;
     margin-bottom: 1rem;
-    transform: translateY(-10px);
+    transform: translateY(-0px);
 }
 
 /* 인풋, 셀렉트박스 공통 스타일 */
