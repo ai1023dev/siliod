@@ -69,20 +69,21 @@
                 </div>
             </header>
 
-            <div class="container">
-                <!-- 상단 결제 정보 -->
-                <div class="flex-box">
-                    <div class="card box">
-                        <div class="label">다음 결제 예정 금액</div>
-                        <div class="amount">0 원</div>
-                        <div class="date"></div>
+            <div class="form-section">
+                <div class="container">
+                    <!-- 상단 결제 정보 -->
+                    <div class="flex-box">
+                        <div class="card box">
+                            <div class="label">다음 결제 예정 금액</div>
+                            <div class="amount">0 원</div>
+                            <div class="date"></div>
+                        </div>
                     </div>
-                </div>
 
-                <br><!-- 결제수단 -->
-                <div class="section-title">결제수단</div>
-                <div id="payment-method-container" class="card">
-                    <!-- <div class="payment-method">
+                    <br><!-- 결제수단 -->
+                    <div class="section-title">결제수단</div>
+                    <div id="payment-method-container" class="card">
+                        <!-- <div class="payment-method">
                         <div>
                             <img src="image/card.svg" alt="신용카드 아이콘" />
                             <div>
@@ -95,44 +96,44 @@
                             <button class="add-billing register-button">삭제하기</button>
                         </div>
                     </div> -->
-                </div><br>
+                    </div><br>
 
-                <div class="section-title">예상 금액 계산기</div>
-                <div class="card box">
-                    <label>예상 월 납입료</label>
-                    <h2 id="monthly-fee">1240 원</h2>
+                    <div class="section-title">예상 금액 계산기</div>
+                    <div class="card box">
+                        <label>예상 월 납입료</label>
+                        <h2 id="monthly-fee">1240 원</h2>
 
-                    <br>
-                    <div class="fee-info">
-                        월 결제 금액은 '월별 예정 실행 시간'에 '인스턴스 시간당 요금'을 곱한 후<br>
-                        8GiB를 초과한 스토리지 1GiB당 매주 월요일마다 30원을 더해 산정됩니다.<br>
-                        (실제 결제금액과 소액의 차이가 날 수 있음.)
+                        <br>
+                        <div class="fee-info">
+                            월 결제 금액은 '월별 예정 실행 시간'에 '인스턴스 시간당 요금'을 곱한 후<br>
+                            8GiB를 초과한 스토리지 1GiB당 매주 월요일마다 30원을 더해 산정됩니다.<br>
+                            (실제 결제금액과 소액의 차이가 날 수 있음.)
+                        </div>
+
+                        <br>
+
+                        <label>인스턴스 등급</label>
+                        <select id="instance-price">
+                            <option value="30">nano (시간당 요금 30원)</option>
+                            <option value="50">micro (시간당 요금 50원)</option>
+                            <option value="70">small (시간당 요금 70원)</option>
+                            <option value="100" selected>medium (시간당 요금 100원)</option>
+                            <option value="200">large (시간당 요금 200원)</option>
+                            <option value="400">xlarge (시간당 요금 400원)</option>
+                        </select>
+
+                        <br>
+
+                        <label>월별 예정 실행 시간</label>
+                        <input type="number" id="planned-hours" value="10">
+
+                        <br>
+
+                        <label>스토리지 크기 (GiB)</label>
+                        <input type="number" id="storage-size" value="10" min="8">
+
                     </div>
-
-                    <br>
-
-                    <label>인스턴스 등급</label>
-                    <select id="instance-price">
-                        <option value="30">nano (시간당 요금 30원)</option>
-                        <option value="50">micro (시간당 요금 50원)</option>
-                        <option value="70">small (시간당 요금 70원)</option>
-                        <option value="100" selected>medium (시간당 요금 100원)</option>
-                        <option value="200">large (시간당 요금 200원)</option>
-                        <option value="400">xlarge (시간당 요금 400원)</option>
-                    </select>
-
-                    <br>
-
-                    <label>월별 예정 실행 시간</label>
-                    <input type="number" id="planned-hours" value="10">
-
-                    <br>
-
-                    <label>스토리지 크기 (GiB)</label>
-                    <input type="number" id="storage-size" value="10" min="8">
-
                 </div>
-                <br><br>
             </div>
         </div>
     </div>
