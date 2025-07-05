@@ -577,7 +577,7 @@ async function startServer() {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
-                    const ready_instanceId = await createEC2Instance();
+                    const ready_instanceId = await createEC2Instance(grade);
                     ready_instance(ready_instanceId, true, type, grade)
 
                     const instanceId = 'i-' + short_instanceId.instance_id
