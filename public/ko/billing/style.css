@@ -334,7 +334,7 @@ a:not(.terms) {
 .label {
     font-size: 14px;
     color: #888;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
 }
 
 .amount {
@@ -471,6 +471,10 @@ select:focus {
 }
 
 /* 월 납입료 텍스트 강조 */
+#monthly-fee-label {
+    text-align: center;
+}
+
 #monthly-fee {
     font-size: 2rem;
     font-weight: 700;
