@@ -10,7 +10,6 @@ body {
     background-color: #fff;
     height: 100vh;
     display: flex;
-    overflow: hidden;
 }
 
 a:not(.terms) {
@@ -418,24 +417,25 @@ a:not(.terms) {
 }
 
 /* 인풋, 셀렉트박스 공통 스타일 */
-.card.box input[type="number"],
-.card.box select {
-    width: calc(100% - 160px);
-    padding: 0.5rem 1rem;
-    border: 1.5px solid #ccc;
-    border-radius: 8px;
+.form-group input[type="number"],
+.form-group input[type="password"] {
+    padding: 0.6rem;
+    border: 1px solid #c2d4ff;
+    border-radius: 0.5rem;
     font-size: 1rem;
-    font-family: 'Pretendard-Light', sans-serif;
-    vertical-align: middle;
-    transition: border-color 0.3s ease;
+    width: calc(100% - 160px);
+    outline: none;
+    /* 기본 아웃라인 제거 */
+    transition: all 0.2s ease;
+    /* 부드럽게 변하게 */
 }
 
-/* 포커스 시 테두리 색 강조 */
-.card.box input[type="number"]:focus,
-.card.box select:focus {
-    outline: none;
-    border-color: #3393FF;
-    box-shadow: 0 0 5px rgba(51, 147, 255, 0.5);
+.form-group input[type="number"]:focus,
+.form-group input[type="password"]:focus {
+    border-color: #7aa5ff;
+    /* 포커스 시 테두리 색 변경 */
+    box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
+    /* 부드러운 그림자 추가 */
 }
 
 /* 월 납입료 텍스트 강조 */
