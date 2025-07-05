@@ -353,7 +353,7 @@ a:not(.terms) {
     color: #555;
     font-size: 16px;
     font-weight: 600;
-    margin: 20px 0 10px;
+    margin: 20px 0;
 }
 
 .payment-method {
