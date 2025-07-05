@@ -789,7 +789,7 @@ async function startServer() {
 
 
 
-        setInterval(async () => {
+        cron.schedule('*/15 * * * *', async () => {
             const instance = await db.collection('instance').find({}).toArray();
             for (let i = 0; i < instance.length; i++) {
                 const status = await getInstanceStatus('i-' + instance[i].instance_id)
@@ -826,9 +826,9 @@ async function startServer() {
                     console.log(status)
                 }
             }
-        }, 15 * 60 * 1000);
+        });
 
-        cron.schedule('*/10 * * * * *', async () => {
+        cron.schedule('0 0 * * 1', async () => {
             console.log('✅ 매주 월요일 00:00에 실행되는 작업입니다!');
 
             const instance = await db.collection('instance').find({}).toArray();
