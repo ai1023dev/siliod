@@ -418,8 +418,7 @@ a:not(.terms) {
 }
 
 /* 인풋, 셀렉트박스 공통 스타일 */
-input[type="number"],
-input[type="password"] {
+input {
     padding: 0.6rem;
     border: 1px solid #c2d4ff;
     border-radius: 0.5rem;
@@ -431,8 +430,7 @@ input[type="password"] {
     /* 부드럽게 변하게 */
 }
 
-input[type="number"]:focus,
-input[type="password"]:focus {
+input:focus {
     border-color: #7aa5ff;
     /* 포커스 시 테두리 색 변경 */
     box-shadow: 0 0 5px rgba(122, 165, 255, 0.6);
