@@ -540,7 +540,7 @@ label {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .form-actions button:hover {
