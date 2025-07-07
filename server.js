@@ -535,6 +535,9 @@ async function startServer() {
                     await runSSHCommand(publicIp, cmd);
                 }
 
+                await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+                await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
+
                 console.log('✅ 시스템 준비 완료');
 
                 if (ready) {
@@ -603,10 +606,11 @@ async function startServer() {
                     });
 
 
+                    await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+                    await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
                     await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
                     const publicIp = await start_instance(instanceId)
-                    await updateRoute53Record(instanceId, publicIp);
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
@@ -626,7 +630,6 @@ async function startServer() {
                         private_ip: privateIP
                     });
 
-                    await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
                     const publicIp = await ready_instance(instanceId, false, type, grade)
 
@@ -708,7 +711,6 @@ async function startServer() {
 
 
             await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0') // 서버의 아이피로 변경
-            await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
             // 인스턴스 DB에 등록
             await db.collection('instance').updateOne(
