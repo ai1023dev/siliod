@@ -425,53 +425,53 @@ async function startServer() {
 
 
 
-        // async function launchInstances() {
-        //     const types = [
-        //         { type: 'nano', count: 5 },
-        //         { type: 'micro', count: 5 },
-        //         { type: 'small', count: 5 },
-        //         { type: 'medium', count: 10 }, // 10
-        //         { type: 'large', count: 5 },
-        //         { type: 'xlarge', count: 5 },
-        //     ];
+        async function launchInstances() {
+            const types = [
+                { type: 'nano', count: 1 },
+                // { type: 'micro', count: 5 },
+                // { type: 'small', count: 5 },
+                // { type: 'medium', count: 10 }, // 10
+                // { type: 'large', count: 5 },
+                // { type: 'xlarge', count: 5 },
+            ];
 
-        //     const allJobs = [];
+            const allJobs = [];
 
-        //     // 첫 번째 그룹: ready_instance(..., true, false, type)
-        //     for (const { type, count } of types) {
-        //         for (let i = 0; i < count; i++) {
-        //             allJobs.push(async () => {
-        //                 const instanceId = await createEC2Instance(type);
-        //                 await new Promise(resolve => setTimeout(resolve, 10000));
-        //                 await ready_instance(instanceId, true, false, type);
-        //                 await new Promise(resolve => setTimeout(resolve, 10000));
-        //             });
-        //         }
-        //     }
+            // 첫 번째 그룹: ready_instance(..., true, false, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
+                        const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(instanceId, true, false, type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                    });
+                }
+            }
 
-        //     // 두 번째 그룹: ready_instance(..., true, true, type)
-        //     for (const { type, count } of types) {
-        //         for (let i = 0; i < count; i++) {
-        //             allJobs.push(async () => {
-        //                 const instanceId = await createEC2Instance(type);
-        //                 await new Promise(resolve => setTimeout(resolve, 10000));
-        //                 await ready_instance(instanceId, true, true, type);
-        //                 await new Promise(resolve => setTimeout(resolve, 10000));
-        //             });
-        //         }
-        //     }
+            // 두 번째 그룹: ready_instance(..., true, true, type)
+            // for (const { type, count } of types) {
+            //     for (let i = 0; i < count; i++) {
+            //         allJobs.push(async () => {
+            //             const instanceId = await createEC2Instance(type);
+            //             await new Promise(resolve => setTimeout(resolve, 10000));
+            //             await ready_instance(instanceId, true, true, type);
+            //             await new Promise(resolve => setTimeout(resolve, 10000));
+            //         });
+            //     }
+            // }
 
-        //     // 순차 실행
-        //     for (const job of allJobs) {
-        //         await job(); // 한 작업이 끝날 때까지 기다림
-        //     }
-        // }
+            // 순차 실행
+            for (const job of allJobs) {
+                await job(); // 한 작업이 끝날 때까지 기다림
+            }
+        }
 
-        // launchInstances()
-        //     .then(() => {
-        //         console.log('모든 인스턴스 생성 및 준비 완료 (순차 실행)');
-        //     })
-        //     .catch(console.error);
+        launchInstances()
+            .then(() => {
+                console.log('모든 인스턴스 생성 및 준비 완료 (순차 실행)');
+            })
+            .catch(console.error);
 
 
 
@@ -538,6 +538,10 @@ async function startServer() {
                 console.log('✅ 시스템 준비 완료');
 
                 if (ready) {
+
+                    await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+
                     // DB에 준비된 인스턴스 등록
                     await db.collection('ready_instance').insertOne({
                         instance_id: instanceId.substring(2), type, grade
@@ -603,10 +607,11 @@ async function startServer() {
                     });
 
 
+                    await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+                    await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
                     await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
                     const publicIp = await start_instance(instanceId)
-                    await updateRoute53Record(instanceId, publicIp);
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
