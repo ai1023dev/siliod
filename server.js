@@ -615,6 +615,8 @@ async function startServer() {
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
+                    
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 } else {
                     const instanceId = await createEC2Instance(grade);
                     res.send({ instanceId, ready: false }) // 길게 기다림
@@ -637,6 +639,8 @@ async function startServer() {
 
                     console.log(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
+                    
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 }
             } catch (error) {
                 console.error("❌ 전체 실행 중 에러 발생:", error);
@@ -710,10 +714,6 @@ async function startServer() {
                     await runSSHCommand(publicIp, cmd);
                 }
             }
-
-
-            await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0') // 서버의 아이피로 변경
-            await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
             // 인스턴스 DB에 등록
             await db.collection('instance').updateOne(
