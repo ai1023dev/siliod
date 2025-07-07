@@ -427,12 +427,12 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                // { type: 'nano', count: 5 },
-                // { type: 'micro', count: 5 },
-                // { type: 'small', count: 5 },
-                { type: 'medium', count: 1 },
-                // { type: 'large', count: 5 },
-                // { type: 'xlarge', count: 5 },
+                { type: 'nano', count: 5 },
+                { type: 'micro', count: 5 },
+                { type: 'small', count: 5 },
+                { type: 'medium', count: 10 },
+                { type: 'large', count: 5 },
+                { type: 'xlarge', count: 5 },
             ];
 
             const allJobs = [];
@@ -582,8 +582,8 @@ async function startServer() {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
-                    // const ready_instanceId = await createEC2Instance(grade);
-                    // ready_instance(ready_instanceId, true, type, grade)
+                    const ready_instanceId = await createEC2Instance(grade);
+                    ready_instance(ready_instanceId, true, type, grade)
 
                     const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
