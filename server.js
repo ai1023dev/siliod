@@ -934,6 +934,10 @@ async function startServer() {
             res.sendFile(path.join(__dirname, 'public/terms.html'));
         });
 
+        app.get('/zohoverify/verifyforzoho.html', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/verifyforzoho.html'));
+        });
+
 
 
 
