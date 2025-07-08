@@ -15,7 +15,11 @@
     "@aws-sdk/client-ssm": "^3.759.0",
     "@portone/server-sdk": "^0.15.0",
     "axios": "^1.7.9",
+<<<<<<< HEAD
     "body-parser": "^2.2.0",
+=======
+    "compression": "^1.8.0",
+>>>>>>> 239e58cab503fae7a1aa6e19e4dae140c16bb074
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -25,8 +29,11 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.13.0",
+    "node-cron": "^4.2.0",
     "nodemailer": "^6.10.0",
+    "posthog-js": "^1.249.0",
     "request-ip": "^3.3.0",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "ws": "^8.18.2"
   }
 }

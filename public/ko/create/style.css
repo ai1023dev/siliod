@@ -13,7 +13,11 @@ body {
     overflow: hidden;
 }
 
+<<<<<<< HEAD
 a:not(.terms)  {
+=======
+a:not(.terms) {
+>>>>>>> 239e58cab503fae7a1aa6e19e4dae140c16bb074
     text-decoration: none;
     color: #fff;
 }
@@ -352,7 +356,7 @@ iframe {
     flex-direction: column;
     gap: 3rem;
     overflow-y: auto !important;
-    height: calc(100vh - 154px);
+    height: calc(100vh - 120px);
 }
 
 .form-group {
@@ -540,6 +544,7 @@ label {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin-bottom: 2rem;
 }
 
 .form-actions button:hover {

@@ -7,12 +7,17 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 require('express-async-errors');
+
+
 const express = require('express');
 const path = require('path');
-const app = express();
-const port = 8080;
+const app = express(); // HTTPS 용 앱
+const redirectApp = express(); // HTTP 리다이렉션 용 앱
+const port = 443;
+const httpPort = 80;
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+<<<<<<< HEAD
 const bodyParser = require('body-parser');
 const { PortOneClient } = require('@portone/server-sdk');
 const nodemailer = require('nodemailer');
@@ -20,11 +25,65 @@ const { EC2Client, DescribeInstanceStatusCommand, StartInstancesCommand, Describ
 const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
 const { exec, spawn } = require("child_process");
 const WebSocket = require('ws');
+=======
+const nodemailer = require("nodemailer");
+const { EC2Client, DescribeInstanceStatusCommand, DescribeVolumesCommand, ModifyVolumeCommand, StartInstancesCommand, DescribeInstancesCommand, DescribeSecurityGroupsCommand, RunInstancesCommand, RebootInstancesCommand, StopInstancesCommand, TerminateInstancesCommand, CreateVolumeCommand, AttachVolumeCommand, waitUntilVolumeAvailable, CreateSecurityGroupCommand, AuthorizeSecurityGroupIngressCommand, RevokeSecurityGroupIngressCommand } = require("@aws-sdk/client-ec2");
+const { Route53Client, ChangeResourceRecordSetsCommand } = require("@aws-sdk/client-route-53");
+const { exec, spawn } = require("child_process");
+const WebSocket = require('ws');
+const dotenv = require("dotenv");
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+const cron = require('node-cron');
+const compression = require('compression')
+>>>>>>> 239e58cab503fae7a1aa6e19e4dae140c16bb074
 const requestIp = require('request-ip');
 app.use(requestIp.mw());
 const geoip = require('geoip-lite');
-const dotenv = require("dotenv");
-// const helmet = require('helmet');
+app.use(compression())
+const helmet = require('helmet');
+app.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "script-src": [
+                "'self'",
+                "https://code.jquery.com",
+                "https://js.tosspayments.com",
+                "https://cdnjs.cloudflare.com",
+                "https://us.i.posthog.com",
+                "https://us-assets.i.posthog.com"
+            ],
+            "connect-src": [
+                "'self'",
+                "https://api.ipify.org",
+                "https://us.i.posthog.com",
+                "https://log.tosspayments.com",
+                "https://js.tosspayments.com",
+                "https://apigw-sandbox.tosspayments.com",
+                "https://event.tosspayments.com",
+                "https://api.tosspayments.com",
+                "wss://siliod.com:8443"
+            ],
+            "frame-src": ["*"],
+            "style-src": ["'self'", "'unsafe-inline'"],
+            "img-src": [
+                "'self'",
+                "data:",
+                "https://lh3.googleusercontent.com"  // ✅ 이미지 허용 도메인 추가
+            ]
+        }
+    },
+    frameguard: false
+}));
+
+
+// 인증서 로드
+const https_options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/siliod.com/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/siliod.com/fullchain.pem')
+};
 
 dotenv.config();
 
@@ -90,7 +149,9 @@ async function startServer() {
                 const instanceId = response.Instances[0].InstanceId;
                 console.log(`✅ EC2 인스턴스 생성 완료: ${instanceId}`);
 
-                await addIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
+                await new Promise(resolve => setTimeout(resolve, 5000));
+
+                await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
 
                 return instanceId;
@@ -101,7 +162,7 @@ async function startServer() {
 
         async function createSecurityGroup() {
             const params = {
-                GroupName: "SecurityGroup" + Date.now(),  // 고유한 이름 생성
+                GroupName: "SecurityGroup" + Date.now() + Math.random(),  // 고유한 이름 생성
                 VpcId: "vpc-0899762b3597175ba",          // VPC ID
                 Description: "temporary"
             };
@@ -211,7 +272,7 @@ async function startServer() {
 
 
         async function runSSHCommand(ip, command) {
-            const ssh_command = `ssh -i "C:/Users/포토박스반짝/Desktop/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
+            const ssh_command = `ssh -i "/home/ubuntu/siliod/keypair.pem" -o StrictHostKeyChecking=no -o ConnectTimeout=180 ubuntu@ec2-${ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com "${command}"`
             console.log(command)
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
@@ -223,7 +284,7 @@ async function startServer() {
                     if (stderr) {
                         console.error(`⚠️ SSH stderr: ${stderr}`);
                     }
-                    console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
+                    // console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
                     resolve(stdout);
                 });
             });
@@ -374,19 +435,55 @@ async function startServer() {
 
 
 
+        async function launchInstances() {
+            const types = [
+                { type: 'nano', count: 5 },
+                { type: 'micro', count: 5 },
+                { type: 'small', count: 5 },
+                { type: 'medium', count: 10 },
+                { type: 'large', count: 5 },
+                { type: 'xlarge', count: 5 },
+            ];
 
-        // const instanceId1 = await createEC2Instance('medium');
-        // ready_instance(instanceId1, true, false, 'medium')
-        // const instanceId2 = await createEC2Instance('medium');
-        // ready_instance(instanceId2, true, false, 'medium')
-        // const instanceId3 = await createEC2Instance('medium');
-        // ready_instance(instanceId3, true, false, 'medium')
-        // const instanceId4 = await createEC2Instance('medium');
-        // ready_instance(instanceId4, true, true, 'medium')
-        // const instanceId5 = await createEC2Instance('medium');
-        // ready_instance(instanceId5, true, true, 'medium')
-        // const instanceId6 = await createEC2Instance('large');
-        // ready_instance(instanceId6, true, true, 'large')
+            const allJobs = [];
+
+            // 첫 번째 그룹: ready_instance(..., true, false, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
+                        const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(instanceId, true, false, type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                    });
+                }
+            }
+
+            // 두 번째 그룹: ready_instance(..., true, true, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
+                        const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(instanceId, true, true, type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                    });
+                }
+            }
+
+            // 순차 실행
+            for (const job of allJobs) {
+                await job(); // 한 작업이 끝날 때까지 기다림
+            }
+        }
+
+        launchInstances()
+            .then(() => {
+                console.log('모든 인스턴스 생성 및 준비 완료 (순차 실행)');
+            })
+            .catch(console.error);
+
+
 
 
         async function ready_instance(instanceId, ready, type, grade) {
@@ -407,35 +504,35 @@ async function startServer() {
                     "sudo apt-get upgrade -y",
                     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
                     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11",
-                    `mkdir -p ~/.vnc`,
-                    `echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup`,
-                    `echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved`,
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`,
-                    `git clone https://github.com/ai1023dev/novnc.git ~/.novnc`,
-                    `sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1`,
+                    "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar dbus-x11 socat",
+                    "mkdir -p ~/.vnc",
+                    "echo '#!/bin/bash' > ~/.vnc/xstartup && echo 'xrdb $HOME/.Xresources' >> ~/.vnc/xstartup && echo 'export $(dbus-launch)' >> ~/.vnc/xstartup && echo 'startxfce4' >> ~/.vnc/xstartup && sudo chmod +x ~/.vnc/xstartup",
+                    "echo '[Resolve]' | sudo tee /etc/systemd/resolved.conf > /dev/null && echo 'DNS=8.8.8.8 8.8.4.4' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && echo 'FallbackDNS=1.1.1.1 1.0.0.1' | sudo tee -a /etc/systemd/resolved.conf > /dev/null && sudo systemctl restart systemd-resolved",
+                    "git clone https://github.com/ai1023dev/novnc.git ~/.novnc",
+                    "sudo chmod +x ~/.novnc/start.sh > /dev/null 2>&1",
+                    "curl https://get.acme.sh | sh",
+                    "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
+                    `sudo ~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
+                    `sudo ~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
                 ];
-                // const gui_ready_commands = [
-                //     "sudo apt-get update -y",
-                //     "sudo apt-get upgrade -y",
-                //     'echo "debconf debconf/frontend select Noninteractive" | sudo debconf-set-selections',
-                //     'echo "lightdm shared/default-x-display-manager select lightdm" | sudo debconf-set-selections',
-                //     "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ubuntu-desktop tigervnc-standalone-server tigervnc-xorg-extension tigervnc-viewer xfce4 xfce4-goodies lightdm thunar certbot dbus-x11"
-                // ];
+
 
                 const cli_ready_commands = [
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
-                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev certbot",
-                    "git clone https://github.com/tsl0922/ttyd.git /home/ubuntu/.ttyd",
+                    "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
+                    "git clone -b siliod-ttyd https://github.com/ai1023dev/ttyd.git /home/ubuntu/.ttyd",
                     "mkdir /home/ubuntu/.ttyd/build",
                     "cmake /home/ubuntu/.ttyd -B /home/ubuntu/.ttyd/build",
                     "make -C /home/ubuntu/.ttyd/build",
                     "sudo make -C /home/ubuntu/.ttyd/build install",
-                    `sudo certbot certonly --standalone -d ${domain} --non-interactive --agree-tos --email siliod.official@gmail.com`
-                    // `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash") | crontab -`,
-                    // `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential ubuntu:password sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+                    "curl https://get.acme.sh | sh",
+                    "~/.acme.sh/acme.sh --set-default-ca --server https://api.buypass.com/acme/directory",
+                    `sudo ~/.acme.sh/acme.sh --issue --debug --standalone -d ${domain} --accountemail siliod.official@gmail.com`,
+                    `sudo ~/.acme.sh/acme.sh --install-cert -d ${domain} --key-file /etc/ssl/private/${domain}.key --fullchain-file /etc/ssl/certs/${domain}.crt`
                 ];
+
+
 
                 if (type) {
                     commands = gui_ready_commands
@@ -451,6 +548,10 @@ async function startServer() {
                 console.log('✅ 시스템 준비 완료');
 
                 if (ready) {
+
+                    await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+
                     // DB에 준비된 인스턴스 등록
                     await db.collection('ready_instance').insertOne({
                         instance_id: instanceId.substring(2), type, grade
@@ -491,8 +592,8 @@ async function startServer() {
             try {
                 if (short_instanceId) {
                     // 준비 인스턴트 다시 생성성
-                    // const ready_instanceId = await createEC2Instance();
-                    // ready_instance(ready_instan true,ceId, true)
+                    const ready_instanceId = await createEC2Instance(grade);
+                    ready_instance(ready_instanceId, true, type, grade)
 
                     const instanceId = 'i-' + short_instanceId.instance_id
                     res.send({ instanceId, ready: true }) // 짧게 기다림
@@ -516,13 +617,16 @@ async function startServer() {
                     });
 
 
+                    await addIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
+                    await addIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
                     await addIngressRule(instanceId, 'tcp', 443, 443, source)
 
                     const publicIp = await start_instance(instanceId)
-                    await updateRoute53Record(instanceId, publicIp);
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
+                    
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 } else {
                     const instanceId = await createEC2Instance(grade);
                     res.send({ instanceId, ready: false }) // 길게 기다림
@@ -545,6 +649,8 @@ async function startServer() {
 
                     console.log(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
+
+                    await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 }
             } catch (error) {
                 console.error("❌ 전체 실행 중 에러 발생:", error);
@@ -583,14 +689,16 @@ async function startServer() {
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
                 `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
                 `vncserver :1`,
-                `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/letsencrypt/live/${domain}/fullchain.pem --key /etc/letsencrypt/live/${domain}/privkey.pem --listen 443 > /dev/null 2>&1 & disown`
+                `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/ssl/certs/${domain}.crt --key /etc/ssl/private/${domain}.key --listen 443 > /dev/null 2>&1 & disown`
             ];
+
 
             const cli_command = [
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
-                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
-                `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/letsencrypt/live/${domain}/fullchain.pem --ssl-key /etc/letsencrypt/live/${domain}/privkey.pem --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
+                `(crontab -l 2>/dev/null; echo "@reboot sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/ssl/certs/${domain}.crt --ssl-key /etc/ssl/private/${domain}.key --writable --credential admin:${connect_password} sudo -u ubuntu bash") | crontab -`,
+                `nohup sudo /home/ubuntu/.ttyd/build/ttyd --port 443 --ssl --ssl-cert /etc/ssl/certs/${domain}.crt --ssl-key /etc/ssl/private/${domain}.key --writable --credential admin:${connect_password} sudo -u ubuntu bash > /dev/null 2>&1 & disown`
             ];
+
 
             const ebs_command = [
                 `sudo growpart /dev/nvme0n1 1`,
@@ -604,21 +712,18 @@ async function startServer() {
                 command = cli_command
             }
 
-            if (size !== 8) {
-                await modifyAttachedVolume(instanceId, size);
-                for (const cmd of ebs_command) {
-                    await runSSHCommand(publicIp, cmd);
-                }
-            }
-
             // 순차적으로 SSH 명령 실행
             for (const cmd of command) {
                 await runSSHCommand(publicIp, cmd);
             }
 
-
-            await removeIngressRule(instanceId, 'tcp', 22, 22, '116.47.133.210/32') // 서버의 아이피로 변경
-            await removeIngressRule(instanceId, 'tcp', 80, 80, '0.0.0.0/0')
+            if (size !== 8) {
+                await modifyAttachedVolume(instanceId, size);
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                for (const cmd of ebs_command) {
+                    await runSSHCommand(publicIp, cmd);
+                }
+            }
 
             // 인스턴스 DB에 등록
             await db.collection('instance').updateOne(
@@ -699,45 +804,56 @@ async function startServer() {
 
 
 
-        // setInterval(async () => {
-        //     const instance = await db.collection('instance').find({}).toArray();
-        //     for (let i = 0; i < instance.length; i++) {
-        //         const status = await getInstanceStatus('i-' + instance[i].instance_id)
+        cron.schedule('*/15 * * * *', async () => {
+            const instance = await db.collection('instance').find({}).toArray();
+            for (let i = 0; i < instance.length; i++) {
+                const status = await getInstanceStatus('i-' + instance[i].instance_id)
 
-        //         if (status.instanceState === 'running') {
-        //             let amount
-        //             switch (instance[i].grade) {
-        //                 case 'nano':
-        //                     amount = 0.75;
-        //                     break;
-        //                 case 'micro':
-        //                     amount = 1.25;
-        //                     break;
-        //                 case 'small':
-        //                     amount = 1.75;
-        //                     break;
-        //                 case 'medium':
-        //                     amount = 2.5;
-        //                     break;
-        //                 case 'large':
-        //                     amount = 5;
-        //                     break;
-        //                 case 'xlarge':
-        //                     amount = 10;
-        //                     break;
-        //             }
+                if (status.instanceState === 'running') {
+                    let amount
+                    switch (instance[i].grade) {
+                        case 'nano':
+                            amount = 7.5;
+                            break;
+                        case 'micro':
+                            amount = 12.5;
+                            break;
+                        case 'small':
+                            amount = 17.5;
+                            break;
+                        case 'medium':
+                            amount = 25;
+                            break;
+                        case 'large':
+                            amount = 50;
+                            break;
+                        case 'xlarge':
+                            amount = 100;
+                            break;
+                    }
 
-        //         await db.collection('user').updateOne(
-        //             { id: instance[i].user }, // 조건
-        //             { $inc: { amount: amount } } // 수정 내용
-        //         );
+                    await db.collection('user').updateOne(
+                        { id: instance[i].user }, // 조건
+                        { $inc: { amount: amount } } // 수정 내용
+                    );
 
-        //         console.log(instance[i].instance_id)
-        //         console.log(status)
-        //     }
-        // }
-        // }, 30000);
-        // }, 15 * 60 * 1000);
+                    console.log(instance[i].instance_id)
+                    console.log(status)
+                }
+            }
+        });
+
+        cron.schedule('0 0 * * 1', async () => {
+            console.log('✅ 매주 월요일 00:00에 실행되는 작업입니다!');
+
+            const instance = await db.collection('instance').find({}).toArray();
+            for (let i = 0; i < instance.length; i++) {
+                await db.collection('user').updateOne(
+                    { id: instance[i].user }, // 조건
+                    { $inc: { amount: (instance[i].size - 8) * 30 } } // 수정 내용
+                );
+            }
+        });
 
 
 
@@ -804,8 +920,8 @@ async function startServer() {
             check_country(req, res, 'guide')
         });
 
-        app.get('/point', (req, res) => {
-            check_country(req, res, 'point')
+        app.get('/billing', (req, res) => {
+            check_country(req, res, 'billing')
         });
 
         app.get('/pay', (req, res) => {
@@ -823,6 +939,105 @@ async function startServer() {
         app.get('/dino', (req, res) => {
             res.sendFile(path.join(__dirname, 'public/dino/index.html'));
         });
+
+        app.get('/terms', (req, res) => {
+            res.sendFile(path.join(__dirname, 'public/terms.html'));
+        });
+
+
+
+
+
+
+        app.get('/test_login', async (req, res) => {
+            give_jwt('test_login', res);
+            res.send(true);
+        });
+
+
+
+
+
+        app.get('/get_card', async (req, res) => {
+            const id = get_user_id(req)
+            let card = await db.collection('card').findOne({ userId: id });
+
+            if (card) {
+                card.billingKey = null;
+                card.customerKey = null;
+
+                res.send(card);
+            } else {
+                res.send(false);
+            }
+
+        });
+
+        app.get('/del_card', async (req, res) => {
+            const id = get_user_id(req)
+            await db.collection('card').deleteOne({ userId: id });
+        });
+
+        const { default: got } = await import('got');
+
+        app.get('/billing/success', async (req, res) => {
+            const id = get_user_id(req)
+            const { authKey, customerKey } = req.query;
+            const response = await got.post(
+                'https://api.tosspayments.com/v1/billing/authorizations/issue',
+                {
+                    headers: {
+                        Authorization: 'Basic ' + Buffer.from(process.env.TOSS_SECRET_KEY + ':').toString('base64'),
+                        'Content-Type': 'application/json',
+                    },
+                    json: { authKey, customerKey },
+                    responseType: 'json'
+                }
+            );
+
+            if (id === customerKey.split('-')[0]) {
+                // requestPayment(response.body.billingKey, customerKey, 10000, 'orderId0001'+Math.random())
+
+                try {
+                    await db.collection('card').deleteOne({ userId: id });
+                } catch (error) { }
+
+                // DB에 저장
+                await db.collection('card').insertOne({
+                    userId: id,
+                    customerKey: customerKey,
+                    billingKey: response.body.billingKey,
+                    cardCompany: response.body.cardCompany,
+                    cardNumber: response.body.card.number,
+                    cardType: response.body.card.cardType,
+                });
+
+                res.redirect('/billing')
+            }
+        });
+
+
+        async function requestPayment(billingKey, customerKey, amount, orderId) {
+            const secretKey = process.env.TOSS_SECRET_KEY;
+
+            const response = await got.post('https://api.tosspayments.com/v1/billing/charges', {
+                headers: {
+                    Authorization: 'Basic ' + Buffer.from(secretKey + ':').toString('base64'),
+                    'Content-Type': 'application/json',
+                },
+                json: {
+                    billingKey: billingKey,
+                    customerKey: customerKey,         // billingKey와 매칭된 값
+                    amount: amount,                    // 결제 금액 (정수)
+                    orderId: orderId,                  // 고유 주문번호 (중복 불가)
+                    orderName: 'siliod 정기 결제'              // 주문명 (ex: '정기 구독')
+                },
+                responseType: 'json'
+            });
+
+            return response.body;
+        }
+
 
 
 
@@ -1093,6 +1308,7 @@ async function startServer() {
 
 
 
+<<<<<<< HEAD
 
         // 결제 페이지
 
@@ -1205,6 +1421,8 @@ async function startServer() {
 
 
 
+=======
+>>>>>>> 239e58cab503fae7a1aa6e19e4dae140c16bb074
         // sendEmail("ai1023dev@gmail.com", "테스트 이메일", "이메일 전송이 정상적으로 이루어졌습니다.");
 
 
@@ -1307,7 +1525,7 @@ async function startServer() {
 
             url += `?client_id=612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com`;
 
-            let redirectUri = 'http://localhost:8080/login/google/redirect'
+            let redirectUri = 'https://siliod.com/login/google/redirect'
 
             url += `&redirect_uri=${encodeURIComponent(redirectUri)}`;
             url += '&response_type=code';
@@ -1339,7 +1557,7 @@ async function startServer() {
                         code,
                         client_id: '612283661754-r0ffeqvtuptro27vsebaiojd9cqv7lmf.apps.googleusercontent.com',
                         client_secret: process.env.GOOGLE_SECRET,
-                        redirect_uri: `http://localhost:8080/login/google/redirect`,
+                        redirect_uri: `https://siliod.com/login/google/redirect`,
                         grant_type: 'authorization_code',
                     }),
                 });
@@ -1379,7 +1597,7 @@ async function startServer() {
                         name: userData.name,
                         avatar_url: userData.picture,
                         email: userData.email,
-                        amount: 50
+                        amount: 0
                     });
 
                     // JWT 발급 후 로그인 처리
@@ -1401,8 +1619,81 @@ async function startServer() {
             res.status(500).json({ message: 'Internal Server Error' }); // 사용자에게는 노출 X
         });
 
-        app.listen(port, function () {
-            console.log(`Server is listening on port ${port}`);
+        // HTTPS 서버 실행
+        const server = https.createServer(https_options, app).listen(port, () => {
+            console.log(`Server is listening on https://localhost:${port}`);
+        });
+
+        const wss = new WebSocket.Server({ server });
+
+        wss.on('connection', (ws) => {
+            console.log('클라이언트 연결됨');
+            let sshProcess = null;
+
+            ws.on('message', (message) => {
+                const msg = JSON.parse(message);
+
+                if (msg.type === 'run') {
+                    const command = msg.command.trim();
+                    if (!command) return;
+
+                    if (sshProcess) {
+                        ws.send('[⚠️ A command is already running. Please stop it before starting a new one.]');
+                        return;
+                    }
+
+                    const sshArgs = [
+                        '-i', '/home/ubuntu/siliod/keypair.pem',
+                        '-o', 'StrictHostKeyChecking=no',
+                        '-o', 'ConnectTimeout=180',
+                        `ubuntu@ec2-${msg.ip.replace(/\./g, '-')}.us-east-2.compute.amazonaws.com`,
+                        command
+                    ];
+
+                    sshProcess = spawn('ssh', sshArgs);
+
+                    sshProcess.stdout.on('data', (data) => {
+                        ws.send(data.toString());
+                    });
+
+                    sshProcess.stderr.on('data', (data) => {
+                        ws.send('[stderr] ' + data.toString());
+                    });
+
+                    sshProcess.on('close', (code) => {
+                        ws.send(`\n`);
+                        sshProcess = null;
+                    });
+
+                    sshProcess.on('error', (err) => {
+                        ws.send(`[❌ SSH error] ${err.message}`);
+                        sshProcess = null;
+                    });
+                }
+
+                if (msg.type === 'stop') {
+                    if (sshProcess) {
+                        sshProcess.kill('SIGTERM'); // 또는 SIGKILL
+                        ws.send(`\n`);
+                    } else {
+                        ws.send('[ℹ️ No process is currently running.]');
+                    }
+                }
+            });
+
+            ws.on('close', () => {
+                if (sshProcess) sshProcess.kill('SIGTERM');
+                console.log('클라이언트 연결 종료');
+            });
+        });
+
+        // HTTP → HTTPS 리다이렉션
+        redirectApp.all('*', (req, res) => {
+            res.redirect(301, `https://siliod.com${req.url}`);
+        });
+
+        http.createServer(redirectApp).listen(httpPort, () => {
+            console.log(`HTTP 리다이렉션 서버가 http://siliod.com:${httpPort}에서 실행 중입니다.`);
         });
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);

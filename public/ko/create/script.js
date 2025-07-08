@@ -1,3 +1,6 @@
+!function (t, e) { var o, n, p, r; e.__SV || (window.posthog = e, e._i = [], e.init = function (i, s, a) { function g(t, e) { var o = e.split("."); 2 == o.length && (t = t[o[0]], e = o[1]), t[e] = function () { t.push([e].concat(Array.prototype.slice.call(arguments, 0))) } } (p = t.createElement("script")).type = "text/javascript", p.crossOrigin = "anonymous", p.async = !0, p.src = s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") + "/static/array.js", (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(p, r); var u = e; for (void 0 !== a ? u = e[a] = [] : a = "posthog", u.people = u.people || [], u.toString = function (t) { var e = "posthog"; return "posthog" !== a && (e += "." + a), t || (e += " (stub)"), e }, u.people.toString = function () { return u.toString(1) + ".people (stub)" }, o = "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "), n = 0; n < o.length; n++)g(u, o[n]); e._i.push([i, s, a]) }, e.__SV = 1) }(document, window.posthog || []);
+posthog.init('phc_8aLLOQWlOi8AVhgzgoWvZP7NiAwMYqVvPMimyxxprjS', { api_host: 'https://us.i.posthog.com' })
+
 $.ajax({
     method: 'GET',
     url: '/login_check',
@@ -6,7 +9,6 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".balance-amount").text(data.amount+'p');
         } else {
             $(".login-modal-backdrop").removeClass("hidden");
         }
@@ -73,28 +75,39 @@ updateStrengthIndicator("#ubuntu-password", "#ubuntu-strength");
 updateStrengthIndicator("#connect-password", "#connect-strength");
 
 
-$('.custom-select').change(function () {
-    const selectedValue = $(this).val(); // 선택된 값 가져오기
+$('#time-select').change(function () {
+    const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
+    const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
+    const storage = $('#storage-input').val(); // 선택된 값 가져오기
+
+    // 선택된 값에 맞는 사양 표시
+    $('#amount').text(Number(selectedValue) * Number(time_selectValue) + ((Number(storage) - 8) * 120) + '원');
+});
+
+$('#instance-grade').change(function () {
+    const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
+    const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
+    const storage = $('#storage-input').val(); // 선택된 값 가져오기
     let specs;
 
     switch (selectedValue) {
         case 'nano':
-            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 3p';
+            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 30원';
             break;
         case 'micro':
-            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 5p';
+            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 50원';
             break;
         case 'small':
-            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 7p';
+            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 70원';
             break;
         case 'medium':
-            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 10p';
+            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 100원';
             break;
         case 'large':
-            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 20p';
+            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 200원';
             break;
         case 'xlarge':
-            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 40p';
+            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 400원';
             break;
         default:
             specs = '';
@@ -102,12 +115,17 @@ $('.custom-select').change(function () {
 
     // 선택된 값에 맞는 사양 표시
     $('#speac-strength').text(specs);
+    $('#amount').text(Number(selectedValue) * Number(time_selectValue) + ((Number(storage) - 8) * 120) + '원');
 });
 
 $('#storage-input').on('input', function () {
-    const selectedValue = $(this).val();
-    if (selectedValue >= 8) {
+    const storage = $('#storage-input').val(); // 선택된 값 가져오기
+    if (storage >= 8) {
         $('#storage-strength').text('GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.').removeClass("weak medium strong");
+
+        const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
+        const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
+        $('#amount').text(Number(selectedValue) * Number(time_selectValue) + ((Number(storage) - 8) * 120) + '원');
     } else {
         $('#storage-strength').text('최소 스토리지 용량은 8GiB입니다.').removeClass("weak medium strong").addClass('weak');
     }
@@ -227,7 +245,7 @@ $("#create-instance-btn").click(function () {
         data: JSON.stringify({
             name: instanceName,
             type,
-            grade: $(".custom-select").val(),
+            grade: $("#instance-grade").val(),
             source: $("#ip").val(),
             storage,
             ubuntu_password: ubuntuPassword,
@@ -240,7 +258,7 @@ $("#create-instance-btn").click(function () {
                     $("#dino-time").text('예상 소요시간 10분')
                 }
                 $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
-    
+
                 setInterval(() => {
                     $.ajax({
                         method: 'POST',
@@ -248,7 +266,7 @@ $("#create-instance-btn").click(function () {
                         data: { instance_id: data.instanceId.substring(2) },
                         success: function (build) {
                             if (build) {
-                                window.location.href = '/?instance=' + data.instanceId.substring(2)
+                                window.location.href = '/'
                             }
                         },
                     });
@@ -262,6 +280,14 @@ $("#create-instance-btn").click(function () {
         }
     });
 });
+
+
+$('#create-instance-btn').on('keydown keyup', function (e) {
+    if (e.code === 'Space' || e.keyCode === 32) {
+        e.preventDefault();
+    }
+});
+
 
 $.ajax({
     method: 'GET',
