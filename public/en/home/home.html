@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siliod</title>
+  <!-- 기본 파비콘 -->
+  <link rel="icon" href="icon/favicon.ico" type="image/x-icon" />
+  
+  <!-- PNG 포맷 (브라우저 호환용) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+  
+  <!-- 애플, 안드로이드 등 지원 -->
+  <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
+  <link rel="manifest" href="icon/site.webmanifest">
+  
+  <link rel="stylesheet" href="ko/home/style.css">
+</head>
+
+<body>
+  <div class="language-selector">
+    <select id="language-select">
+      <option value="KR">한국어 (ko)</option>
+      <option value="US">English</option>
+    </select>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <p class="subtitle">가장 쉬운 클라우드 컴퓨팅</p>
+      <div class="logo-container">
+        <img src="/image/siliod_logo_white.png" alt="Siliod 로고" class="logo-full">
+      </div>
+      <a href="/" class="cta-button">바로 시작하기</a>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="content-section">
+    <h2 class="section-title">1분 만에 <br>나만의 클라우드 데스크탑 만들기</h2>
+    <p class="section-description">Google 계정으로 로그인하고, <br>GUI 환경을 바로 실행하세요.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <img src="/image/create-form-ko.webp" alt="구글로 로그인 후 간단한 폼 입력 화면" class="feature-image border">
+        <h3 class="feature-title">구글로 로그인 후 간단한 폼 입력</h3>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div class="feature-card">
+        <img src="/image/novnc.webp" alt="웹 브라우저에서 접속 가능한 GUI 또는 CLI 환경 제공 화면" class="feature-image">
+        <h3 class="feature-title">웹 브라우저에서 접속 가능한 GUI 또는 CLI 환경 제공</h3>
+        <p class="feature-description">드라이버, HTTPS (TLS) 인증서 자동 설정</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compatibility Section -->
+  <section class="compatibility-section">
+    <div class="compatibility-content">
+      <h2 class="compatibility-title">무궁무진한 가능성</h2>
+      <p class="compatibility-description">
+        서버는 물론, 공유 PC로 활용하거나 로컬에서 실행하기 어려운 AI, 게임 자동사냥 등을 자유롭게 실행할 수 있습니다.
+      </p>
+      <img src="/image/devices.webp" alt="다양한 디바이스 호환성을 보여주는 이미지" class="devices-image">
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <section class="footer-section">
+    <p class="footer-subtitle">가장 쉬운 클라우드 컴퓨팅</p>
+    <div class="footer-logo-container">
+      <img src="/image/siliod_logo_white.png" alt="Siliod 로고" class="footer-logo-full">
+    </div>
+    <a href="/" class="cta-button">바로 시작하기</a>
+
+    <p class="footer-text">
+      사업자등록번호 : 368-09-02983 | 상호 : 실리오드(siliod) | 대표 : 박아람 | 사업장주소 : 세종특별자치시 갈매로 353, A동 1층 1012호 | 전화 번호 : 010-8414-3108<br class="footer-br">
+      Copyright ⓒ Siliod. All Rights Reserved | <a target="_blank" href="https://siliod.com/terms">이용약관</a> | 오픈 소스 : <a target="_blank" href="https://github.com/ai1023dev/novnc">novnc</a>,
+      <a target="_blank" href="http://">ttyd</a>, <a target="_blank" href="https://github.com/chromium/chromium/tree/main/components/neterror/resources">dino game</a>
+    </p>
+  </section>
+
+
+  <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="ko/home/script.js"></script>
+</body>
+
+</html>

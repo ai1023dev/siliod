@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siliod</title>
+    <!-- 기본 파비콘 -->
+    <link rel="icon" href="icon/favicon.ico" type="image/x-icon" />
+
+    <!-- PNG 포맷 (브라우저 호환용) -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+
+    <!-- 애플, 안드로이드 등 지원 -->
+    <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
+    <link rel="manifest" href="icon/site.webmanifest">
+</head>
+
+<body>
+    <h3>백업용 쉘 - </h3>
+
+    <input id="cmd" type="text" placeholder="명령어 입력" style="width: 400px;">
+    <button id="run">실행</button>
+    <button id="stop">실행 중단</button> <span> ※cd /path/path && command 혹은 /path/path/run.sh 이렇게 사용하세요 일반적인 cd 명령어는 지원하지
+        않습니다.</span>
+    <pre id="output" style="white-space: pre-wrap; background:#eee; padding:10px;"></pre>
+
+    <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="ko/backup/script.js"></script>
+</body>
+
+</html>
