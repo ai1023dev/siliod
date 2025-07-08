@@ -54,7 +54,7 @@ app.use(helmet({
                 "https://apigw-sandbox.tosspayments.com",
                 "https://event.tosspayments.com",
                 "https://api.tosspayments.com",
-                "https://cdn.smartcat-proxy.com/f02f2d27fbe24b0eb34caa882a00fc21/script-v1/__translator.js?hash=6c62986ba987ec6edf195474bbc13c0a",
+                "https://cdn.smartcat-proxy.com",
                 "wss://siliod.com:8443"
             ],
             "frame-src": ["*"],
