@@ -56,6 +56,7 @@ app.use(helmet({
                 "https://event.tosspayments.com",
                 "https://api.tosspayments.com",
                 "https://cdn.smartcat-proxy.com",
+                "https://translator-ea.smartcat.com",
                 "wss://siliod.com:8443"
             ],
             "frame-src": ["*"],
