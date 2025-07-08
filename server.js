@@ -1501,9 +1501,9 @@ async function startServer() {
         });
 
         // HTTP → HTTPS 리다이렉션
-        redirectApp.all('*', (req, res) => {
-            res.redirect(301, `https://siliod.com${req.url}`);
-        });
+        // redirectApp.all('*', (req, res) => {
+        //     res.redirect(301, `https://siliod.com${req.url}`);
+        // });
 
         http.createServer(redirectApp).listen(httpPort, () => {
             console.log(`HTTP 리다이렉션 서버가 http://siliod.com:${httpPort}에서 실행 중입니다.`);
