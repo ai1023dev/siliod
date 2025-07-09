@@ -267,12 +267,12 @@ async function startServer() {
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
                     if (error) {
-                        console.error(`❌ SSH 명령 실행 오류: ${error.message}`);
+                        console.log(`❌ SSH 명령 실행 오류: ${error.message}`);
                         reject(error);
                         return;
                     }
                     if (stderr) {
-                        console.error(`⚠️ SSH stderr: ${stderr}`);
+                        console.log(`⚠️ SSH stderr: ${stderr}`);
                     }
                     // console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
                     resolve(stdout);
