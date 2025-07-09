@@ -538,7 +538,7 @@ async function startServer() {
                         await runSSHCommand(publicIp, cmd);
                     } catch (error) {
                         await terminate_instance(instanceId);
-                        const re_instanceId = await createEC2Instance(type);
+                        const re_instanceId = await createEC2Instance(grade);
                         await new Promise(resolve => setTimeout(resolve, 10000));
                         await ready_instance(re_instanceId, ready, type, grade)
                         return
@@ -576,7 +576,7 @@ async function startServer() {
                     if (!success && !used_success) {
                         console.log('❌ 인스턴스 준비 실패. 종료 처리');
                         await terminate_instance(instanceId);
-                        const re_instanceId = await createEC2Instance(type);
+                        const re_instanceId = await createEC2Instance(grade);
                         await new Promise(resolve => setTimeout(resolve, 10000));
                         await ready_instance(re_instanceId, ready, type, grade)
 
