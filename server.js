@@ -509,7 +509,6 @@ async function startServer() {
 
 
                 const cli_ready_commands = [
-                    "sdfgsadfgsdfg",
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
