@@ -267,12 +267,12 @@ async function startServer() {
             return new Promise((resolve, reject) => {
                 exec(ssh_command, (error, stdout, stderr) => {
                     if (error) {
-                        console.log(`❌ SSH 명령 실행 오류: ${error.message}`);
+                        console.error(`❌ SSH 명령 실행 오류: ${error.message}`);
                         reject(error);
                         return;
                     }
                     if (stderr) {
-                        console.log(`⚠️ SSH stderr: ${stderr}`);
+                        console.error(`⚠️ SSH stderr: ${stderr}`);
                     }
                     // console.log(`✅ SSH 명령 실행 결과: ${stdout}`);
                     resolve(stdout);
@@ -534,7 +534,15 @@ async function startServer() {
 
                 // 명령어 순차 실행
                 for (const cmd of commands) {
-                    await runSSHCommand(publicIp, cmd);
+                    try {
+                        await runSSHCommand(publicIp, cmd);
+                    } catch (error) {
+                        await terminate_instance(instanceId);
+                        const re_instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(re_instanceId, ready, type, grade)
+                        return
+                    }
                 }
 
                 console.log('✅ 시스템 준비 완료');
@@ -570,16 +578,14 @@ async function startServer() {
                         await terminate_instance(instanceId);
                         const re_instanceId = await createEC2Instance(type);
                         await new Promise(resolve => setTimeout(resolve, 10000));
-                        await ready_instance(re_instanceId, true, true, type);
+                        await ready_instance(re_instanceId, ready, type, grade)
+
+                        return
                     }
                 }, 20 * 60 * 1000);
 
             } catch (error) {
                 console.error("❌ ready_instance 중 오류:", error);
-                await terminate_instance(instanceId);
-                const re_instanceId = await createEC2Instance(type);
-                await new Promise(resolve => setTimeout(resolve, 10000));
-                await ready_instance(re_instanceId, true, true, type);
             }
         }
 
@@ -624,7 +630,7 @@ async function startServer() {
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
-
+                    
                     await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 } else {
                     const instanceId = await createEC2Instance(grade);
