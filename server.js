@@ -427,12 +427,7 @@ async function startServer() {
 
         async function launchInstances() {
             const types = [
-                { type: 'nano', count: 0 },
-                { type: 'micro', count: 1 },
-                { type: 'small', count: 0 },
-                { type: 'medium', count: 2 },
-                { type: 'large', count: 1 },
-                { type: 'xlarge', count: 1 },
+                { type: 'nano', count: 1 },
                 // { type: 'nano', count: 5 },
                 // { type: 'micro', count: 5 },
                 // { type: 'small', count: 5 },
@@ -514,6 +509,7 @@ async function startServer() {
 
 
                 const cli_ready_commands = [
+                    "sdfgsadfgsdfg",
                     "sudo apt-get update -y",
                     "sudo apt-get upgrade -y",
                     "sudo apt-get install -y cmake g++ libjson-c-dev libwebsockets-dev libssl-dev socat",
@@ -572,11 +568,18 @@ async function startServer() {
                     if (!success && !used_success) {
                         console.log('❌ 인스턴스 준비 실패. 종료 처리');
                         await terminate_instance(instanceId);
+                        const re_instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(re_instanceId, true, true, type);
                     }
                 }, 20 * 60 * 1000);
 
             } catch (error) {
                 console.error("❌ ready_instance 중 오류:", error);
+                await terminate_instance(instanceId);
+                const re_instanceId = await createEC2Instance(type);
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                await ready_instance(re_instanceId, true, true, type);
             }
         }
 
@@ -621,7 +624,7 @@ async function startServer() {
                     console.log(publicIp)
                     await check_command(publicIp)
                     await create_command(publicIp, type, ubuntu_password, connect_password, instanceId, size)
-                    
+
                     await removeIngressRule(instanceId, 'tcp', 22, 22, '0.0.0.0/0')
                 } else {
                     const instanceId = await createEC2Instance(grade);
