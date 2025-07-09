@@ -18,12 +18,14 @@
 </head>
 
 <body>
-    <h3>백업용 쉘 - </h3>
+    <h3>Backup Shell - </h3>
 
-    <input id="cmd" type="text" placeholder="명령어 입력" style="width: 400px;">
-    <button id="run">실행</button>
-    <button id="stop">실행 중단</button> <span> ※cd /path/path && command 혹은 /path/path/run.sh 이렇게 사용하세요 일반적인 cd 명령어는 지원하지
-        않습니다.</span>
+    <input id="cmd" type="text" placeholder="Enter command" style="width: 400px;">
+    <button id="run">Run</button>
+    <button id="stop">Stop</button>
+    <span>※ Use commands like <code>cd /path/path && command</code> or <code>/path/path/run.sh</code>.
+        Regular <code>cd</code> commands are not supported.</span>
+
     <pre id="output" style="white-space: pre-wrap; background:#eee; padding:10px;"></pre>
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>

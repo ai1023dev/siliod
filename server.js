@@ -438,28 +438,28 @@ async function startServer() {
             const allJobs = [];
 
             // 첫 번째 그룹: ready_instance(..., true, false, type)
-            for (const { type, count } of types) {
-                for (let i = 0; i < count; i++) {
-                    allJobs.push(async () => {
-                        const instanceId = await createEC2Instance(type);
-                        await new Promise(resolve => setTimeout(resolve, 10000));
-                        await ready_instance(instanceId, true, false, type);
-                        await new Promise(resolve => setTimeout(resolve, 10000));
-                    });
-                }
-            }
-
-            // 두 번째 그룹: ready_instance(..., true, true, type)
             // for (const { type, count } of types) {
             //     for (let i = 0; i < count; i++) {
             //         allJobs.push(async () => {
             //             const instanceId = await createEC2Instance(type);
             //             await new Promise(resolve => setTimeout(resolve, 10000));
-            //             await ready_instance(instanceId, true, true, type);
+            //             await ready_instance(instanceId, true, false, type);
             //             await new Promise(resolve => setTimeout(resolve, 10000));
             //         });
             //     }
             // }
+
+            // 두 번째 그룹: ready_instance(..., true, true, type)
+            for (const { type, count } of types) {
+                for (let i = 0; i < count; i++) {
+                    allJobs.push(async () => {
+                        const instanceId = await createEC2Instance(type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        await ready_instance(instanceId, true, true, type);
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                    });
+                }
+            }
 
             // 순차 실행
             for (const job of allJobs) {
@@ -1510,9 +1510,9 @@ async function startServer() {
         });
 
         // HTTP → HTTPS 리다이렉션
-        // redirectApp.all('*', (req, res) => {
-        //     res.redirect(301, `https://siliod.com${req.url}`);
-        // });
+        redirectApp.all('*', (req, res) => {
+            res.redirect(301, `https://siliod.com${req.url}`);
+        });
 
         http.createServer(redirectApp).listen(httpPort, () => {
             console.log(`HTTP 리다이렉션 서버가 http://siliod.com:${httpPort}에서 실행 중입니다.`);

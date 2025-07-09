@@ -136,7 +136,7 @@ $('#delete-incetance').click(function () {
 })
 
 $('#resize-volume').click(function () {
-    if (confirm("볼륨 크기를 변경하시겠습니까? 8GiB를 초과하는 용량에 대해, 1GiB당 시간당 1포인트가 사용됩니다.")) {
+    if (confirm("볼륨 크기를 변경하시겠습니까?")) {
         const size = $('#storage-input').val();
 
         $.ajax({

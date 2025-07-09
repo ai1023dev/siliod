@@ -12,7 +12,7 @@ if (month === 12) {
   month += 1;
 }
 
-const nextMonthFirst = `${year}-${String(month).padStart(2, '0')}-01 결제 예정`;
+const nextMonthFirst = `${year}-${String(month).padStart(2, '0')}-01 Payment Scheduled`;
 $(".date").text(nextMonthFirst);
 
 
@@ -24,7 +24,7 @@ $.ajax({
         if (data) {
             $(".avatar").attr('src', data.avatar_url);
             $(".username").text(data.name);
-            $(".amount").text(data.amount + ' 원');
+            $(".amount").text(data.amount + ' KRW');
 
 
             // ------  SDK 초기화 ------
@@ -60,7 +60,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server Error')
     }
 });
 
@@ -69,14 +69,14 @@ $(document).on('click', '.del-billing', function () {
     $("#payment-method-container").html(
         `<div class="payment-method">
             <div>
-                <img src="image/card.svg" alt="신용카드 아이콘" />
+                <img src="image/card.svg" alt="Credit Card Icon" />
                 <div>
-                    <div class="method-info">결제 수단 등록</div>
-                    <div class="method-sub">등록된 결제수단이 없습니다.</div>
+                    <div class="method-info">Register Payment Method</div>
+                    <div class="method-sub">No registered payment method.</div>
                 </div>
             </div>
             <div>
-                <button class="add-billing blue register-button">등록하기</button>
+                <button class="add-billing blue register-button">Register</button>
             </div>
         </div>`
     )
@@ -87,7 +87,7 @@ $(document).on('click', '.del-billing', function () {
         success: function (data) {
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server Error')
         }
     });
 })
@@ -100,15 +100,15 @@ $.ajax({
             $("#payment-method-container").html(
                 `<div class="payment-method">
                     <div>
-                        <img src="image/card.svg" alt="신용카드 아이콘" />
+                        <img src="image/card.svg" alt="Credit Card Icon" />
                         <div>
-                            <div class="method-info">결제 수단 · ${data.cardType}카드</div>
+                            <div class="method-info">Payment Method · ${data.cardType} Card</div>
                             <div class="method-sub">${data.cardCompany} · ${formatCardNumber(data.cardNumber)}</div>
                         </div>
                     </div>
                     <div>
-                        <button class="add-billing register-button">수정하기</button>
-                        <button class="del-billing register-button">삭제하기</button>
+                        <button class="add-billing register-button">Edit</button>
+                        <button class="del-billing register-button">Delete</button>
                     </div>
                 </div>`
             )
@@ -116,21 +116,21 @@ $.ajax({
             $("#payment-method-container").html(
                 `<div class="payment-method">
                     <div>
-                        <img src="image/card.svg" alt="신용카드 아이콘" />
+                        <img src="image/card.svg" alt="Credit Card Icon" />
                         <div>
-                            <div class="method-info">결제 수단 등록</div>
-                            <div class="method-sub">등록된 결제수단이 없습니다.</div>
+                            <div class="method-info">Register Payment Method</div>
+                            <div class="method-sub">No registered payment method.</div>
                         </div>
                     </div>
                     <div>
-                        <button class="add-billing blue register-button">등록하기</button>
+                        <button class="add-billing blue register-button">Register</button>
                     </div>
                 </div>`
             )
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server Error')
     }
 });
 
@@ -157,7 +157,7 @@ function calculateMonthlyFee() {
 
         const total = baseFee + monthlyExtraFee;
 
-        $('#monthly-fee').text(total.toLocaleString() + " 원");
+        $('#monthly-fee').text(total.toLocaleString() + " KRW");
     }
 
     $('#instance-price, #planned-hours, #storage-size').on('input', calculateMonthlyFee);

@@ -16,7 +16,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('server error')
     }
 });
 

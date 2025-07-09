@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -16,32 +16,32 @@
     <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
     <link rel="manifest" href="icon/site.webmanifest">
 
-    <link rel="stylesheet" href="ko/create/style.css" />
+    <link rel="stylesheet" href="en/create/style.css" />
 </head>
 
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal login-modal">
-            <p>가장 쉬운 클라우드 컴퓨팅</p>
+            <p>The Easiest Cloud Computing</p>
             <img class="logo" src="image/siliod_logo_black.png" alt="logo" />
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Sign in with Google
                 </button></a>
-            <span>Siliod는 가입되지 않은 구글 계정으로 로그인할 경우, 자동으로 회원가입이 진행되며<br>이때 <a class="terms" href="/terms">이용약관</a>에 동의한 것으로 간주합니다.</span>
+            <span>If you sign in with a Google account that isn't registered with Siliod, you'll be automatically signed up<br>and this will be considered as agreement to our <a class="terms" href="/terms">Terms of Service</a>.</span>
         </div>
     </div>
 
     <!-- 공룡 게임 모달 -->
     <div class="dino-modal-backdrop hidden">
         <div class="modal dino-modal">
-            <span id="dino-time">예상 소요시간 1분</span>
-            <a id="dino-dashboard"><button>대쉬보드로 이동</button></a><br>
+            <span id="dino-time">Estimated time: 1 minute</span>
+            <a id="dino-dashboard"><button>Go to Dashboard</button></a><br>
             <iframe frameborder="0"></iframe>
 
-            <div>게임 한 판 어때요? 인스턴스가 곧 시작돼요!</div>
+            <div>How about a quick game? Your instance will start soon!</div>
         </div>
     </div>
 
@@ -53,11 +53,11 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="/"><img src="image/dashboard.svg"> 대쉬보드</button></a>
-                <a href="/billing"><img src="image/billing.svg"> 결제 관리</a>
-                <a href="/setting"><img src="image/setting.svg"> 설정</a>
-                <a href="/guide"><img src="image/guide.svg"> 가이드</a>
-                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> 디스코드 문의</a>
+                <a href="/"><img src="image/dashboard.svg"> Dashboard</button></a>
+                <a href="/billing"><img src="image/billing.svg"> Billing</a>
+                <a href="/setting"><img src="image/setting.svg"> Settings</a>
+                <a href="/guide"><img src="image/guide.svg"> Guide</a>
+                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> Discord Support</a>
             </nav>
         </aside>
 
@@ -65,7 +65,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>인스턴스 생성</h2>
+                    <h2>Create Instance</h2>
                 </div>
 
                 <div class="header-right">
@@ -76,12 +76,12 @@
 
             <div class="form-section">
                 <div class="form-group">
-                    <label for="instance-name">인스턴스 이름</label>
-                    <input type="text" id="instance-name" placeholder="예: my-instance (띄어쓰기 불가)" />
+                    <label for="instance-name">Instance Name</label>
+                    <input type="text" id="instance-name" placeholder="e.g., my-instance (no spaces allowed)" />
                 </div>
 
                 <div class="form-group">
-                    <label>접속 방식</label>
+                    <label>Connection Method</label>
                     <div class="radio-group">
                         <label class="custom-radio">
                             <input type="radio" name="interface" value="gui" />
@@ -99,23 +99,23 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">인스턴스 등급</label>
+                            <label for="instance-name">Instance Type</label>
                             <select id="instance-grade" class="custom-select" name="interface">
                                 <option value="nano">nano</option>
                                 <option value="micro">micro</option>
                                 <option value="small">small</option>
-                                <option value="medium" selected>medium (권장)</option>
+                                <option value="medium" selected>medium (recommended)</option>
                                 <option value="large">large</option>
                                 <option value="xlarge">xlarge</option>
                             </select>
 
-                            <div class="strength" id="speac-strength">vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 100원
+                            <div class="strength" id="speac-strength">vCPU 2 / Memory 4GiB / Baseline CPU Performance 20% / 100원 per hour (~$0.10)
                             </div>
                         </div>
                     </div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">운영체제</label>
+                            <label for="instance-name">Operating System</label>
                             <select class="custom-select" name="interface">
                                 <option selected>Ubuntu (24.04.2 LTS)</option>
                             </select>
@@ -123,9 +123,9 @@
                     </div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">리전</label>
+                            <label for="instance-name">Region</label>
                             <select class="custom-select" name="interface">
-                                <option selected>미국 오하이오 (aws)</option>
+                                <option selected>US Ohio (aws)</option>
                             </select>
                         </div>
                     </div>
@@ -134,21 +134,21 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="instance-name">스토리지</label>
+                            <label for="instance-name">Storage</label>
                             <div class="password-wrapper">
                                 <input type="number" id="storage-input" min="10" step="1" value="10" />
                                 <button type="button" class="gib">GiB</button>
                             </div>
-                            <div class="strength" id="storage-strength">GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.</div>
+                            <div class="strength" id="storage-strength">GUI uses 6GiB by default, CLI uses 3GiB by default.</div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="form-group">
-                            <label for="instance-name">접속 허용 IP (CIDR 표기 필수)</label>
+                            <label for="instance-name">Allowed IP Access (CIDR notation required)</label>
                             <input id="ip" type="text">
 
-                            <div class="strength" id="ip-strength">현재 ip</div>
+                            <div class="strength" id="ip-strength">Current IP</div>
                         </div>
                     </div>
                 </div>
@@ -157,48 +157,48 @@
                 <div>
                     <div class="width">
                         <div class="form-group">
-                            <label for="ubuntu-password">Ubuntu 비밀번호</label>
+                            <label for="ubuntu-password">Ubuntu Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="ubuntu-password" />
-                                <button type="button" class="toggle-password" data-target="#ubuntu-password">보기</button>
+                                <button type="button" class="toggle-password" data-target="#ubuntu-password">Show</button>
                             </div>
                             <div class="strength" id="ubuntu-strength"></div>
                         </div><br>
 
                         <div class="form-group">
-                            <label for="ubuntu-password-confirm">Ubuntu 비밀번호 확인</label>
+                            <label for="ubuntu-password-confirm">Confirm Ubuntu Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="ubuntu-password-confirm" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#ubuntu-password-confirm">보기</button>
+                                    data-target="#ubuntu-password-confirm">Show</button>
                             </div>
                         </div>
                     </div>
 
                     <div class="width">
                         <div class="form-group">
-                            <label for="connect-password">접속 비밀번호</label>
+                            <label for="connect-password">Connection Password</label>
                             <div class="password-wrapper">
-                                <input type="password" id="connect-password" placeholder="Connect 비밀번호 (6~8자리)" />
+                                <input type="password" id="connect-password" placeholder="Connect password (6-8 characters)" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#connect-password">보기</button>
+                                    data-target="#connect-password">Show</button>
                             </div>
                             <div class="strength" id="connect-strength"></div>
                         </div><br>
 
                         <div class="form-group">
-                            <label for="connect-password-confirm">접속 비밀번호 확인</label>
+                            <label for="connect-password-confirm">Confirm Connection Password</label>
                             <div class="password-wrapper">
                                 <input type="password" id="connect-password-confirm" />
                                 <button type="button" class="toggle-password"
-                                    data-target="#connect-password-confirm">보기</button>
+                                    data-target="#connect-password-confirm">Show</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-actions">
-                    <button type="button" id="create-instance-btn">인스턴스 생성</button>
+                    <button type="button" id="create-instance-btn">Create Instance</button>
                 </div>
             </div>
         </div>
@@ -206,7 +206,7 @@
 
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-    <script src="ko/create/script.js"></script>
+    <script src="en/create/script.js"></script>
 </body>
 
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -16,21 +16,21 @@
     <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
     <link rel="manifest" href="icon/site.webmanifest">
 
-    <link rel="stylesheet" href="ko/setting/style.css" />
+    <link rel="stylesheet" href="en/setting/style.css" />
 </head>
 
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal login-modal">
-            <p>가장 쉬운 클라우드 컴퓨팅</p>
+            <p>The Easiest Cloud Computing</p>
             <img class="logo" src="image/siliod_logo_black.png" alt="logo" />
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Sign in with Google
                 </button></a>
-            <span>Siliod는 가입되지 않은 구글 계정으로 로그인할 경우, 자동으로 회원가입이 진행되며<br>이때 <a class="terms" href="/terms">이용약관</a>에 동의한 것으로 간주합니다.</span>
+            <span>By signing in with a Google account not registered with Siliod, you will be automatically registered<br>and this constitutes agreement to our <a class="terms" href="/terms">Terms of Service</a>.</span>
         </div>
     </div>
 
@@ -42,10 +42,10 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="/"><img src="image/dashboard.svg"> 대쉬보드</button></a>
-                <a href="/billing"><img src="image/billing.svg"> 결제 관리</a>
-                <a href="/guide"><img src="image/guide.svg"> 가이드</a>
-                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> 디스코드 문의</a>
+                <a href="/"><img src="image/dashboard.svg"> Dashboard</button></a>
+                <a href="/billing"><img src="image/billing.svg"> Billing</a>
+                <a href="/guide"><img src="image/guide.svg"> Guide</a>
+                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> Discord Support</a>
             </nav>
         </aside>
 
@@ -53,7 +53,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>설정</h2>
+                    <h2>Settings</h2>
                 </div>
 
                 <div class="header-right">
@@ -65,23 +65,23 @@
             <!-- 언어 선택 | 로그아웃 | 결제 내역 -->
 
             <div class="form-group">
-                <label for="instance-name">언어 (language)</label>
+                <label for="instance-name">Language</label>
                 <select class="custom-select" name="interface">
-                    <option value="US">English</option>
-                    <option selected value="KR">한국어</option>
+                    <option selected value="US">English</option>
+                    <option value="KR">한국어</option>
                 </select>
             </div>
 
-            <button class="logout">로그아웃</button>
+            <button class="logout">Sign Out</button>
 
             <div class="form-group">
-                <label>결제 내역</label>
+                <label>Payment History</label>
                 <div class="receipt-container"></div>
             </div>
         </div>
 
         <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
-        <script src="ko/setting/script.js"></script>
+        <script src="en/setting/script.js"></script>
 </body>
 
 </html>

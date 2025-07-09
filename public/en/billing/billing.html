@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -16,22 +16,21 @@
     <link rel="apple-touch-icon" href="icon/apple-touch-icon.png">
     <link rel="manifest" href="icon/site.webmanifest">
 
-    <link rel="stylesheet" href="ko/billing/style.css" />
+    <link rel="stylesheet" href="en/billing/style.css" />
 </head>
 
 <body>
     <!-- 로그인 모달 -->
     <div class="login-modal-backdrop hidden">
         <div class="modal login-modal">
-            <p>가장 쉬운 클라우드 컴퓨팅</p>
+            <p>The Easiest Cloud Computing</p>
             <img class="logo" src="image/siliod_logo_black.png" alt="logo" />
 
             <a href="/login/google"><button class="social-login google-login">
                     <img src="image/google-icon.png" alt="Google" />
-                    Google 계정으로 로그인
+                    Sign in with Google
                 </button></a>
-            <span>Siliod는 가입되지 않은 구글 계정으로 로그인할 경우, 자동으로 회원가입이 진행되며<br>이때 <a class="terms" href="/terms">이용약관</a>에 동의한
-                것으로 간주합니다.</span>
+            <span>If you sign in with a Google account that isn't registered with Siliod, you'll be automatically signed up<br>and this will be considered as agreement to our <a class="terms" href="/terms">Terms of Service</a>.</span>
         </div>
     </div>
 
@@ -43,16 +42,11 @@
                 <a href="/home"><img src="image/siliod_logo_black.png" alt="logo" /></a>
             </div>
 
-            <!-- <div class="balance-section">
-                <div class="balance-label">보유금액</div>
-                <div class="balance-amount"></div>
-            </div> -->
-
             <nav class="sidebar-menu">
-                <a href="/"><img src="image/dashboard.svg"> 대쉬보드</button></a>
-                <a href="/setting"><img src="image/setting.svg"> 설정</a>
-                <a href="/guide"><img src="image/guide.svg"> 가이드</a>
-                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> 디스코드 문의</a>
+                <a href="/"><img src="image/dashboard.svg"> Dashboard</button></a>
+                <a href="/setting"><img src="image/setting.svg"> Settings</a>
+                <a href="/guide"><img src="image/guide.svg"> Guide</a>
+                <a href="https://discord.gg/CBHbDZ4MdM" target="_blank"><img src="image/discord.svg"> Discord Support</a>
             </nav>
         </aside>
 
@@ -60,7 +54,7 @@
         <div class="main-content">
             <header class="header">
                 <div class="header-left">
-                    <h2>구독 / 결제</h2>
+                    <h2>Subscription / Billing</h2>
                 </div>
 
                 <div class="header-right">
@@ -74,14 +68,14 @@
                     <!-- 상단 결제 정보 -->
                     <div class="flex-box">
                         <div class="card box">
-                            <div class="label">다음 결제 예정 금액</div>
-                            <div class="amount">0 원</div>
+                            <div class="label">Next Payment Amount</div>
+                            <div class="amount">0 KRW</div>
                             <div class="date"></div>
                         </div>
                     </div>
 
                     <br><!-- 결제수단 -->
-                    <div class="section-title">결제수단</div>
+                    <div class="section-title">Payment Method</div>
                     <div id="payment-method-container" class="card">
                         <!-- <div class="payment-method">
                         <div>
@@ -98,38 +92,38 @@
                     </div> -->
                     </div><br>
 
-                    <div class="section-title">예상 금액 계산기</div>
+                    <div class="section-title">Cost Calculator</div>
                     <div class="card box">
-                        <label id="monthly-fee-label">예상 월 납입료</label>
-                        <h2 id="monthly-fee">1240 원</h2>
+                        <label id="monthly-fee-label">Estimated Monthly Payment</label>
+                        <h2 id="monthly-fee">1,240 KRW</h2>
 
                         <br>
                         <div class="fee-info">
-                            월 결제 금액은 '월별 예정 실행 시간'에 '인스턴스 시간당 요금'을 곱한 후<br>
-                            8GiB를 초과한 스토리지 1GiB당 매주 월요일마다 30원을 더해 산정됩니다.<br>
-                            (실제 결제금액과 소액의 차이가 날 수 있음.)
+                            Monthly billing amount is calculated by multiplying 'Monthly Planned Runtime' by 'Instance Hourly Rate'<br>
+                            plus 27 KRW per GiB for storage exceeding 8GiB, charged every Monday.<br>
+                            (Actual billing amount may vary slightly.)
                         </div>
 
                         <br>
 
-                        <label>인스턴스 등급</label>
+                        <label>Instance Tier</label>
                         <select id="instance-price">
-                            <option value="30">nano (시간당 요금 30원)</option>
-                            <option value="50">micro (시간당 요금 50원)</option>
-                            <option value="70">small (시간당 요금 70원)</option>
-                            <option value="100" selected>medium (시간당 요금 100원)</option>
-                            <option value="200">large (시간당 요금 200원)</option>
-                            <option value="400">xlarge (시간당 요금 400원)</option>
+                            <option value="31">nano (31 KRW/hour)</option>
+                            <option value="51">micro (51 KRW/hour)</option>
+                            <option value="69">small (69 KRW/hour)</option>
+                            <option value="100" selected>medium (100 KRW/hour)</option>
+                            <option value="200">large (200 KRW/hour)</option>
+                            <option value="400">xlarge (400 KRW/hour)</option>
                         </select>
 
                         <br>
 
-                        <label>월별 예정 실행 시간</label>
+                        <label>Monthly Planned Runtime (hours)</label>
                         <input type="number" id="planned-hours" value="10">
 
                         <br>
 
-                        <label>스토리지 크기 (GiB)</label>
+                        <label>Storage Size (GiB)</label>
                         <input type="number" id="storage-size" value="10" min="8">
                     </div>
                     <br>
@@ -141,7 +135,7 @@
 
     <script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://js.tosspayments.com/v2/standard"></script>
-    <script src="ko/billing/script.js"></script>
+    <script src="en/billing/script.js"></script>
 </body>
 
 </html>

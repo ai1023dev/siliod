@@ -60,7 +60,7 @@ function main_data() {
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 
@@ -73,11 +73,11 @@ function main_data() {
             if (data) {
                 $('#public-ip').text(data)
             } else {
-                $('#public-ip').text('인스턴트가 시작 되지 않음')
+                $('#public-ip').text('Instance not started')
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 
@@ -98,7 +98,7 @@ function main_data() {
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 }
@@ -114,13 +114,13 @@ $('#refresh').click(function () {
     $('#instance-status-loading').removeClass('running')
     $('#instance-status-loading').removeClass('stopped')
 
-    $('#public-ip').text('로딩중')
+    $('#public-ip').text('Loading...')
 
     main_data()
 })
 
 $('#delete-incetance').click(function () {
-    if (confirm("정말 인스턴스를 삭제 하시겠습니까?")) {
+    if (confirm("Are you sure you want to delete the instance?")) {
         $.ajax({
             method: 'POST',
             url: `/delete_instance`,
@@ -129,14 +129,14 @@ $('#delete-incetance').click(function () {
                 window.location.href = window.location.origin;
             },
             error: function (xhr, status, error) {
-                alert('서버 측 에러')
+                alert('Server error')
             }
         });
     }
 })
 
 $('#resize-volume').click(function () {
-    if (confirm("볼륨 크기를 변경하시겠습니까? 8GiB를 초과하는 용량에 대해, 1GiB당 시간당 1포인트가 사용됩니다.")) {
+    if (confirm("Do you want to change the volume size?")) {
         const size = $('#storage-input').val();
 
         $.ajax({
@@ -146,10 +146,10 @@ $('#resize-volume').click(function () {
             success: function (data) {
                 console.log(data)
                 if (data !== '6time err') {
-                    alert("볼륨 크기가 성공적으로 변경되었습니다.");
+                    alert("Volume size has been successfully changed.");
                     window.location.href = '/guide#storage';
                 } else {
-                    alert("볼륨당 최대 수정 횟수에 도달했습니다. 볼륨별로 수정 간 최소 6시간을 기다려 주세요.");
+                    alert("Maximum edit count per volume reached. Please wait at least 6 hours between changes.");
                 }
             },
             error: function (xhr, status, error) {
@@ -159,9 +159,6 @@ $('#resize-volume').click(function () {
     }
 });
 
-
-
-
 let my_ip
 $.ajax({
     method: 'GET',
@@ -170,10 +167,9 @@ $.ajax({
         my_ip = data.ip + '/32'
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러');
+        alert('Server error');
     }
 });
-
 
 function createRule(i, rule = {}) {
     const protocol = rule.protocol?.toUpperCase() || 'TCP';
@@ -187,25 +183,25 @@ function createRule(i, rule = {}) {
         <div class="rule-list">
             <div class="form-rule" data-field="${i}">
                 <div class="form-group">
-                    <label>프로토콜</label>
+                    <label>Protocol</label>
                     <select class="protocol">
                         <option value="tcp" ${protocol === 'TCP' ? 'selected' : ''}>TCP</option>
                         <option value="udp" ${protocol === 'UDP' ? 'selected' : ''}>UDP</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>포트 범위 (범위 표기는 '-'으로 구분)</label>
-                    <input type="text" class="port-range" placeholder="예: 80 또는 1000-2000" value="${portRange}">
+                    <label>Port Range (use '-' to separate range)</label>
+                    <input type="text" class="port-range" placeholder="e.g., 80 or 1000-2000" value="${portRange}">
                 </div>
                 <div class="form-group">
-                    <label>허용 IP (CIDR 표기 필수)</label>
+                    <label>Allowed IP (CIDR notation required)</label>
                     <select class="allowed-ip-option">
-                        <option value="0.0.0.0/0" ${!isCustomIP ? 'selected' : ''}>모든 IP 허용 (0.0.0.0/0)</option>
-                        <option value="custom" ${isCustomIP ? 'selected' : ''}>지정 IP</option>
+                        <option value="0.0.0.0/0" ${!isCustomIP ? 'selected' : ''}>Allow all IPs (0.0.0.0/0)</option>
+                        <option value="custom" ${isCustomIP ? 'selected' : ''}>Custom IP</option>
                     </select>
-                    <input type="text" class="custom-ip" placeholder="IP 입력" value="${isCustomIP ? source : my_ip}" style="${isCustomIP ? '' : 'display:none;'}">
+                    <input type="text" class="custom-ip" placeholder="Enter IP" value="${isCustomIP ? source : my_ip}" style="${isCustomIP ? '' : 'display:none;'}">
                 </div>
-                ${rule.protocol ? '<button class="remove-port-btn">삭제</button>' : '<button class="add-port-btn">추가</button>'}
+                ${rule.protocol ? '<button class="remove-port-btn">Delete</button>' : '<button class="add-port-btn">Add</button>'}
             </div>
         </div>
     `;
@@ -213,13 +209,12 @@ function createRule(i, rule = {}) {
     $('#rules-container').append(ruleHtml);
 }
 
-
-// 규칙 추가
+// Add rule
 $('#add-rule').click(function () {
     createRule();
 });
 
-// 동적으로 추가된 요소에도 이벤트 적용
+// Apply events to dynamically added elements
 $('#rules-container').on('change', '.allowed-ip-option', function () {
     const selected = $(this).val();
     const specificIpInput = $(this).siblings('.custom-ip');
@@ -238,10 +233,9 @@ $('#rules-container').on('input change', '.form-rule .protocol, .form-rule .port
         $button
             .removeClass('remove-port-btn')
             .addClass('edit-port-btn')
-            .text('수정');
+            .text('Edit');
     }
 });
-
 
 $('#rules-container').on('click', '.add-port-btn', function () {
     const $form = $(this).closest('.form-rule');
@@ -255,16 +249,15 @@ $('#rules-container').on('click', '.add-port-btn', function () {
     console.log('Allowed IP:', customIP);
 
     if (!isValidPortRange(portRange)) {
-        alert('포트 범위 형식이 잘못되었습니다.');
+        alert('Invalid port range format.');
         return;
     }
 
     if (!isValidCIDR(customIP)) {
-        alert('IP주소 형식이 잘못 되었습니다.');
+        alert('Invalid IP address format.');
         return;
     }
 
-    // 포트 범위 파싱
     let fromPort, toPort;
     if (portRange.includes('-')) {
         const [from, to] = portRange.split('-').map(p => parseInt(p, 10));
@@ -274,14 +267,12 @@ $('#rules-container').on('click', '.add-port-btn', function () {
         fromPort = toPort = parseInt(portRange, 10);
     }
 
-    // 결과 객체 구성
     const rule = {
         protocol: protocol,
         fromPort: fromPort,
         toPort: toPort,
         sources: [customIP]
     };
-
 
     $.ajax({
         method: 'POST',
@@ -296,15 +287,16 @@ $('#rules-container').on('click', '.add-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading...')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 });
+
 $('#rules-container').on('click', '.edit-port-btn', function () {
     const $form = $(this).closest('.form-rule');
     const protocol = $form.find('.protocol').val();
@@ -317,16 +309,15 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
     console.log('Allowed IP:', customIP);
 
     if (!isValidPortRange(portRange)) {
-        alert('포트 범위 형식이 잘못되었습니다.');
+        alert('Invalid port range format.');
         return;
     }
 
     if (!isValidCIDR(customIP)) {
-        alert('IP주소 형식이 잘못 되었습니다.');
+        alert('Invalid IP address format.');
         return;
     }
 
-    // 포트 범위 파싱
     let fromPort, toPort;
     if (portRange.includes('-')) {
         const [from, to] = portRange.split('-').map(p => parseInt(p, 10));
@@ -336,7 +327,6 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
         fromPort = toPort = parseInt(portRange, 10);
     }
 
-    // 결과 객체 구성
     const rule = {
         protocol: protocol,
         fromPort: fromPort,
@@ -361,18 +351,16 @@ $('#rules-container').on('click', '.edit-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading...')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 });
 
-
-// 규칙 삭제
 $('#rules-container').on('click', '.remove-port-btn', function () {
     const $form = $(this).closest('.form-rule');
     const protocol = $form.find('.protocol').val();
@@ -380,7 +368,6 @@ $('#rules-container').on('click', '.remove-port-btn', function () {
     const allowedOption = $form.find('.allowed-ip-option').val();
     const customIP = allowedOption === 'custom' ? $form.find('.custom-ip').val() : allowedOption;
 
-    // 포트 범위 파싱
     let fromPort, toPort;
     if (portRange.includes('-')) {
         const [from, to] = portRange.split('-').map(p => parseInt(p, 10));
@@ -390,7 +377,6 @@ $('#rules-container').on('click', '.remove-port-btn', function () {
         fromPort = toPort = parseInt(portRange, 10);
     }
 
-    // 결과 객체 구성
     const rule = {
         protocol: protocol,
         fromPort: fromPort,
@@ -413,12 +399,12 @@ $('#rules-container').on('click', '.remove-port-btn', function () {
             $('#instance-status-loading').removeClass('running')
             $('#instance-status-loading').removeClass('stopped')
 
-            $('#public-ip').text('로딩중')
+            $('#public-ip').text('Loading...')
 
             main_data()
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러')
+            alert('Server error')
         }
     });
 
@@ -427,8 +413,7 @@ $('#rules-container').on('click', '.remove-port-btn', function () {
     });
 });
 
-
-// 포트 범위 유효성 검사 함수
+// Port range validation
 function isValidPortRange(input) {
     const singlePort = /^(\d{1,5})$/;
     const portRange = /^(\d{1,5})-(\d{1,5})$/;
@@ -448,7 +433,7 @@ function isValidPortRange(input) {
     return false;
 }
 
-// CIDR 유효성 검사 함수
+// CIDR validation
 function isValidCIDR(cidr) {
     const cidrPattern = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))\/([0-9]|[1-2][0-9]|3[0-2])$/;
     return cidrPattern.test(cidr);

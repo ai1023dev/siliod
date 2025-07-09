@@ -14,7 +14,7 @@ $.ajax({
         }
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러')
+        alert('Server error')
     }
 });
 
@@ -24,7 +24,7 @@ $(".toggle-password").click(function () {
     const target = $($(this).data("target"));
     const type = target.attr("type") === "password" ? "text" : "password";
     target.attr("type", type);
-    $(this).text(type === "password" ? "보기" : "숨기기");
+    $(this).text(type === "password" ? "Show" : "Hide");
 });
 
 // 비밀번호 일치 검사
@@ -40,15 +40,15 @@ function checkPasswordStrength(password) {
     if (/[0-9]/.test(password)) strength++;    // 숫자 포함
     if (/[^A-Za-z0-9]/.test(password)) strength++; // 특수문자 포함
 
-    if (strength <= 1) return { level: "weak", text: "약함" };
-    else if (strength === 2 || strength === 3) return { level: "medium", text: "보통" };
-    else return { level: "strong", text: "강함" };
+    if (strength <= 1) return { level: "weak", text: "Weak" };
+    else if (strength === 2 || strength === 3) return { level: "medium", text: "Medium" };
+    else return { level: "strong", text: "Strong" };
 }
 
 function validateConnectPassword(password) {
     // Connect 비밀번호는 6~8자리로 제한
     if (password.length < 6 || password.length > 8) {
-        message = "접속 비밀번호는 6~8자리여야 합니다.";
+        message = "Connection password must be 6-8 characters.";
         return { level: "weak", text: message }
     } else {
         return { level: "strong", text: '' }
@@ -92,22 +92,22 @@ $('#instance-grade').change(function () {
 
     switch (selectedValue) {
         case 'nano':
-            specs = 'vCPU 2 / 메모리 0.5GiB / 기본 CPU 성능 5% / 시간당 요금 30원';
+            specs = 'vCPU 2 / Memory 0.5GiB / Baseline CPU Performance 5% / 30원 per hour (~$0.03)';
             break;
         case 'micro':
-            specs = 'vCPU 2 / 메모리 1GiB / 기본 CPU 성능 10% / 시간당 요금 50원';
+            specs = 'vCPU 2 / Memory 1GiB / Baseline CPU Performance 10% / 50원 per hour (~$0.05)';
             break;
         case 'small':
-            specs = 'vCPU 2 / 메모리 2GiB / 기본 CPU 성능 20% / 시간당 요금 70원';
+            specs = 'vCPU 2 / Memory 2GiB / Baseline CPU Performance 20% / 70원 per hour (~$0.07)';
             break;
         case 'medium':
-            specs = 'vCPU 2 / 메모리 4GiB / 기본 CPU 성능 20% / 시간당 요금 100원';
+            specs = 'vCPU 2 / Memory 4GiB / Baseline CPU Performance 20% / 100원 per hour (~$0.10)';
             break;
         case 'large':
-            specs = 'vCPU 2 / 메모리 8GiB / 기본 CPU 성능 30% / 시간당 요금 200원';
+            specs = 'vCPU 2 / Memory 8GiB / Baseline CPU Performance 30% / 200원 per hour (~$0.20)';
             break;
         case 'xlarge':
-            specs = 'vCPU 4 / 메모리 16GiB / 기본 CPU 성능 40% / 시간당 요금 400원';
+            specs = 'vCPU 4 / Memory 16GiB / Baseline CPU Performance 40% / 400원 per hour (~$0.40)';
             break;
         default:
             specs = '';
@@ -121,13 +121,13 @@ $('#instance-grade').change(function () {
 $('#storage-input').on('input', function () {
     const storage = $('#storage-input').val(); // 선택된 값 가져오기
     if (storage >= 8) {
-        $('#storage-strength').text('GUI 선택 시 6GiB, CLI 선택 시 3GiB가 기본으로 사용됩니다.').removeClass("weak medium strong");
+        $('#storage-strength').text('GUI uses 6GiB by default, CLI uses 3GiB by default.').removeClass("weak medium strong");
 
         const selectedValue = $('#instance-grade').val(); // 선택된 값 가져오기
         const time_selectValue = $('#time-select').val(); // 선택된 값 가져오기
         $('#amount').text(Number(selectedValue) * Number(time_selectValue) + ((Number(storage) - 8) * 120) + '원');
     } else {
-        $('#storage-strength').text('최소 스토리지 용량은 8GiB입니다.').removeClass("weak medium strong").addClass('weak');
+        $('#storage-strength').text('Minimum storage capacity is 8GiB.').removeClass("weak medium strong").addClass('weak');
     }
 });
 
@@ -136,9 +136,9 @@ $('#storage-input').on('input', function () {
 $('#ip').on('input', function () {
     const isValid = ip_check();
     if (isValid) {
-        $('#ip-strength').text("유효한 IP 입력입니다.").removeClass("weak strong").addClass('strong');
+        $('#ip-strength').text("Valid IP input.").removeClass("weak strong").addClass('strong');
     } else {
-        $('#ip-strength').text("유효하지 않은 IP가 포함되어 있습니다.").removeClass("weak strong").addClass('weak');
+        $('#ip-strength').text("Invalid IP address included.").removeClass("weak strong").addClass('weak');
     }
 });
 
@@ -185,47 +185,47 @@ $("#create-instance-btn").click(function () {
     const interfaceSelected = $("input[name='interface']:checked").length > 0;
 
     if (!instanceName || !ubuntuPassword || !ubuntuPasswordConfirm || !connectPassword || !connectPasswordConfirm || !interfaceSelected) {
-        alert("모든 필드를 채워주세요.");
+        alert("Please fill in all fields.");
         return;
     }
 
     if (instanceName.includes(' ')) {
-        alert("인스턴스 이름에 공백이 포함되어 있습니다.");
+        alert("Instance name contains spaces.");
         return;
     }
 
     if (ubuntuPassword.includes(' ')) {
-        alert("Ubuntu 비밀번호에 공백이 포함되어 있습니다.");
+        alert("Ubuntu password contains spaces.");
         return;
     }
 
     if (connectPassword.includes(' ')) {
-        alert("접속 비밀번호에 공백이 포함되어 있습니다.");
+        alert("Connection password contains spaces.");
         return;
     }
 
     if (storage < 8) {
-        alert("최소 스토리지 용량은 8GiB입니다.");
+        alert("Minimum storage capacity is 8GiB.");
         return;
     }
 
     // 비밀번호 일치 검사
     if (!ubuntuMatch) {
-        alert("Ubuntu 비밀번호가 일치하지 않습니다.");
+        alert("Ubuntu passwords do not match.");
         return;
     }
     if (!connectMatch) {
-        alert("접속 비밀번호가 일치하지 않습니다.");
+        alert("Connection passwords do not match.");
         return;
     }
 
     if (connectPassword.length < 6 || connectPassword.length > 8) {
-        alert("접속 비밀번호는 6~8자리여야 합니다.");
+        alert("Connection password must be 6-8 characters.");
         return;
     }
 
     if (!ip_check()) {
-        alert("유효하지 않은 IP가 포함되어 있습니다..");
+        alert("Invalid IP address included.");
         return;
     }
 
@@ -255,7 +255,7 @@ $("#create-instance-btn").click(function () {
             console.log(data);
             if (data) {
                 if (!data.ready) {
-                    $("#dino-time").text('예상 소요시간 10분')
+                    $("#dino-time").text('Estimated time: 10 minutes')
                 }
                 $("#dino-dashboard").attr('href', '/?instance=' + data.instanceId.substring(2));
 
@@ -272,11 +272,11 @@ $("#create-instance-btn").click(function () {
                     });
                 }, 5000);
             } else {
-                alert('특수문자가 비밀번호에 삽입되어있습니다.')
+                alert('Special characters are not allowed in passwords.')
             }
         },
         error: function (xhr, status, error) {
-            alert('서버 측 에러');
+            alert('Server error');
         }
     });
 });
@@ -296,6 +296,6 @@ $.ajax({
         $("#ip").val(data.ip + '/32')
     },
     error: function (xhr, status, error) {
-        alert('서버 측 에러');
+        alert('Server error');
     }
 });
