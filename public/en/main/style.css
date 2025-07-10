@@ -401,7 +401,7 @@ a:not(.deal-incetance-link, .terms) {
 }
 
 .cards-container {
-    height: calc(100vh - 400px - 39px - 5.5rem);
+    height: calc(100vh - 12.5rem);
     padding-bottom: 8px;
     margin-left: -0.5rem;
     margin-right: -1rem;
