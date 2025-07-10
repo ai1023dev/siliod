@@ -44,7 +44,7 @@ a:not(.deal-incetance-link, .terms) {
     background: #fff;
     padding: 2.5rem;
     border-radius: 1.5rem;
-    width: 600px;
+    width: 700px;
     text-align: center;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
     animation: scaleUp 0.3s ease-out;
