@@ -308,7 +308,7 @@ br:not(.footer-br) {
     }
 
     br {
-        display: block;
+        display: block !important;
     }
 
 
