@@ -690,7 +690,7 @@ async function startServer() {
                 `echo 'ubuntu:${ubuntu_password}' | sudo chpasswd`,
                 `echo "${connect_password}" | vncpasswd -f > ~/.vnc/passwd`,
                 `chmod 600 ~/.vnc/passwd > /dev/null 2>&1`,
-                `(crontab -l 2>/dev/null; echo "@reboot ~/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
+                `(crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/.novnc/start.sh ${instanceId.substring(2)}") | crontab -`,
                 `vncserver :1`,
                 `nohup sudo /home/ubuntu/.novnc/utils/novnc_proxy --vnc localhost:5901 --cert /etc/ssl/certs/${domain}.crt --key /etc/ssl/private/${domain}.key --listen 443 > /dev/null 2>&1 & disown`
             ];
